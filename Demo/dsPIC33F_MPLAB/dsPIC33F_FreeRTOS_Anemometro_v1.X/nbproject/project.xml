@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>RTOSDemo_dsPIC33F</name>
+            <name>dsPIC33F_FreeRTOS_Anemometro_v1</name>
             <creation-uuid>0b2742cd-da86-49c6-83b7-4b5c6edc71f8</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

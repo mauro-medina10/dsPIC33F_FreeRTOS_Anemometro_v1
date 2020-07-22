@@ -97,6 +97,18 @@
       <item path="../../../Source/portable/MemMang/heap_1.c"
             ex="true"
             overriding="false">
+        <C30>
+        </C30>
+        <C30-AR>
+        </C30-AR>
+        <C30-AS>
+        </C30-AS>
+        <C30-CO>
+        </C30-CO>
+        <C30-LD>
+        </C30-LD>
+        <C30Global>
+        </C30Global>
       </item>
       <C30>
         <property key="code-model" value="default"/>

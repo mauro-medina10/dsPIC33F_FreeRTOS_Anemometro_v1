@@ -10,6 +10,7 @@
 
 # Own makefile or mine template
 *.mine
+*.mk
 
 # Object files
 *.d
