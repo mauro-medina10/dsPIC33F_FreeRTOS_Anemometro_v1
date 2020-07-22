@@ -60,7 +60,7 @@ static void led_test_task(void *pvParameters) {
 
     while (1) {
         
-        adc_start();
+        //adc_start();
         
         vTaskDelay(2000 / portTICK_PERIOD_MS);
         
