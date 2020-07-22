@@ -5,9 +5,8 @@
  * Created on July 13, 2020, 2:40 PM
  */
 
-
-#include "xc.h"
-
+#include <xc.h> // include processor files - each processor file is guarded.  
+#include "pwm.h"
 
 uint8_t pulseCount = 0;
 

@@ -9,9 +9,9 @@
       <itemPath>../../../Source/include/croutine.h</itemPath>
       <itemPath>../../../Source/include/queue.h</itemPath>
       <itemPath>../FreeRTOSConfig.h</itemPath>
-      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/demoFreeRTOS/freeRTOS-PIC24-dsPIC-PIC32MM/Demo/dsPIC33F_MPLAB/config.h</itemPath>
-      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/demoFreeRTOS/freeRTOS-PIC24-dsPIC-PIC32MM/Demo/dsPIC33F_MPLAB/adc.h</itemPath>
-      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/demoFreeRTOS/freeRTOS-PIC24-dsPIC-PIC32MM/Demo/dsPIC33F_MPLAB/pwm.h</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.h</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/config.h</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/pwm.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -33,8 +33,8 @@
         <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/demoFreeRTOS/freeRTOS-PIC24-dsPIC-PIC32MM/Source/portable/MemMang/heap_4.c</itemPath>
       </logicalFolder>
       <itemPath>../main.c</itemPath>
-      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/demoFreeRTOS/freeRTOS-PIC24-dsPIC-PIC32MM/Demo/dsPIC33F_MPLAB/adc.c</itemPath>
-      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/demoFreeRTOS/freeRTOS-PIC24-dsPIC-PIC32MM/Demo/dsPIC33F_MPLAB/pwm.c</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.c</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/pwm.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -411,7 +411,7 @@
         <property key="REAL TIME CLOCK AND CALENDAR" value="true"/>
         <property key="SPI 1" value="true"/>
         <property key="SPI 2" value="true"/>
-        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="SecureSegment.SegmentProgramming" value="SegmentProgrammingAll"/>
         <property key="TIMER1" value="true"/>
         <property key="TIMER2" value="true"/>
         <property key="TIMER3" value="true"/>

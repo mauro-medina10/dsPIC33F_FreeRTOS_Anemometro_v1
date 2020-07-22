@@ -28,8 +28,8 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef XC_HEADER_TEMPLATE_H
-#define	XC_HEADER_TEMPLATE_H
+#ifndef CONFIG_HEADER_TEMPLATE_H
+#define	CONFIG_HEADER_TEMPLATE_H
 
 // DSPIC33FJ128GP802 Configuration Bit Settings
 

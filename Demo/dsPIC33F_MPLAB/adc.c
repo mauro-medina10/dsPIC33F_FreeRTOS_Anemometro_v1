@@ -5,7 +5,8 @@
  * Created on July 16, 2020, 10:06 AM
  */
 
-#include "xc.h"
+#include <xc.h> // include processor files - each processor file is guarded.  
+#include "adc.h"
 
 uint16_t ADCvalue[128];
 uint8_t indice = 0;
@@ -23,7 +24,7 @@ void adc_init(void) {
     //AD1CON2 Register
     //AD1CON2bits.SMPI = 0; // Increment DMA address every 1 sample/conversion
     AD1CON2bits.BUFM = 0;
-    AD1CON2bits.CHPS = 3; // Converts CH0/CH1
+    AD1CON2bits.CHPS = 1; // Converts CH0/CH1
 
 
     //AD1CON3 Register        
@@ -41,7 +42,7 @@ void adc_init(void) {
     AD1CHS0bits.CH0SA = 5; // MUXA +ve input selection (AIN0) for CH0
     AD1CHS0bits.CH0NA = 0; // MUXA -ve input selection (Vref-) for CH0
 
-    AD1CHS123bits.CH123SA = 1; // CH3 positive input is AN5
+    AD1CHS123bits.CH123SA = 1; // CH1 positive input is AN3
     AD1CHS123bits.CH123NA = 0; // MUXA -ve input selection (Vref-) for CH1
 
 
@@ -50,6 +51,8 @@ void adc_init(void) {
     //AD1PCFGH=0xFFFF;
     //Configura pin AN5 para usar el ADC
     AD1PCFGLbits.PCFG5 = 0;
+    //Configura pin AN5 para usar el ADC
+    AD1PCFGLbits.PCFG3 = 0;
 
     //AD1CSSH/AD1CSSL: A/D Input Scan Selection Register
     AD1CSSL = 0x0000; // Channel Scan is disabled, default state
