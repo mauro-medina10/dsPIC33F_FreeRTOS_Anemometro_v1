@@ -12,6 +12,9 @@
       <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.h</itemPath>
       <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/config.h</itemPath>
       <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/pwm.h</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/timers.h</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/include/FreeRTOS.h</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/UART_RTOS.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -35,6 +38,7 @@
       <itemPath>../main.c</itemPath>
       <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.c</itemPath>
       <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/pwm.c</itemPath>
+      <itemPath>C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/UART_RTOS.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -143,7 +147,7 @@
         <property key="oXC16gcc-sfr-warn" value="false"/>
         <property key="oXC16gcc-smar-io-lvl" value="1"/>
         <property key="oXC16gcc-smart-io-fmt" value=""/>
-        <property key="optimization-level" value="2"/>
+        <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
         <property key="preprocessor-macros" value="MPLAB_DSPIC_PORT"/>
@@ -429,7 +433,7 @@
         <property key="communication.interface" value=""/>
         <property key="communication.interface.jtag" value="2wire"/>
         <property key="communication.speed" value="${communication.speed.default}"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
         <property key="memories.configurationmemory" value="true"/>

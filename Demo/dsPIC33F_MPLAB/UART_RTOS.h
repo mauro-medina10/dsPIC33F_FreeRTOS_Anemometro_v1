@@ -28,10 +28,10 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef PWM_HEADER_TEMPLATE_H
-#define	PWM_HEADER_TEMPLATE_H
+#ifndef UART_RTOS_HEADER_H
+#define	UART_RTOS_HEADER_H
 
-#include <xc.h> // include processor files - each processor file is guarded. 
+#include <xc.h> // include processor files - each processor file is guarded.  
 
 #include <stdint.h>
 #include <stdio.h> 
@@ -45,20 +45,7 @@
 #include "timers.h"
 #include "semphr.h"
 
-/*==================[external functions definition]==========================*/
-void comparadorInit(void);
-
-void comparador_rtos_init(void);
-
-void comparadorStart(void);
-
-void comparadorStop(void);
-
-void comparadorPulseTrainRTOS(uint8_t n);
-
-void comparadorPulseTrain_bloq(uint8_t n);
-
-void pwm_updateDutycycle(uint8_t dutyCyclePercent);
+void UART_initRTOS(void);
 
 #ifdef	__cplusplus
 extern "C" {

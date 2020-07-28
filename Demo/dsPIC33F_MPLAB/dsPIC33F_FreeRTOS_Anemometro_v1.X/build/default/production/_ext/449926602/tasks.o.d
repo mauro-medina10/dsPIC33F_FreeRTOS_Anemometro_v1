@@ -9,6 +9,5 @@ build/default/production/_ext/449926602/tasks.o:  \
  ../../../Source/include/mpu_wrappers.h  \
 ../../../Source/include/task.h  \
  ../../../Source/include/list.h  \
-../../../Source/include/timers.h  \
- ../../../Source/include/task.h  \
-../../../Source/include/StackMacros.h 
+../timers.h  \
+ ../../../Source/include/StackMacros.h 

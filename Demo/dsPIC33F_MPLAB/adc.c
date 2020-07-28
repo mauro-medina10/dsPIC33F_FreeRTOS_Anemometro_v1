@@ -5,7 +5,8 @@
  * Created on July 16, 2020, 10:06 AM
  */
 
-#include <xc.h> // include processor files - each processor file is guarded.  
+#include <xc.h>
+#include <p33FJ128GP802.h> // include processor files - each processor file is guarded.  
 #include "adc.h"
 
 uint16_t ADCvalue[128];
@@ -57,11 +58,11 @@ void adc_init(void) {
     //AD1CSSH/AD1CSSL: A/D Input Scan Selection Register
     AD1CSSL = 0x0000; // Channel Scan is disabled, default state
 
-
+    IPC3bits.AD1IP = 1;  //Interrupt priority 1
     IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
 
-    INTCON1bits.NSTDIS = 1; // Disable interrupt nesting
+    INTCON1bits.NSTDIS = 0; // Enable interrupt nesting
 }
 
 void adc_start(void) {
