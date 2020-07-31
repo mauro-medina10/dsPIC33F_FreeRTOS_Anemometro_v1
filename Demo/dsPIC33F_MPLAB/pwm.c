@@ -43,7 +43,7 @@ void comparadorInit(void) {
     OC1R = 380;
 
     //Habilito interrupcion para cada toggle
-    IPC0bits.OC1IP = 2; // Setup Output Compare 1 interrupt for
+    IPC0bits.OC1IP = 3; // Setup Output Compare 1 interrupt for
     IFS0bits.OC1IF = 0; // Clear Output Compare 1 interrupt flag
     IEC0bits.OC1IE = 1; // Enable Output Compare 1 interrupts
 

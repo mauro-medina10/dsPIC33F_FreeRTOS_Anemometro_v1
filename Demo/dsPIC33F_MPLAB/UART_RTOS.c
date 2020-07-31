@@ -5,68 +5,114 @@
  * Created on July 28, 2020, 10:22 AM
  */
 
-
 #include "UART_RTOS.h"
 
-void UART_initRTOS(void){
-	// configure U2MODE
-	U1MODEbits.UARTEN = 0;	// Bit15 TX, RX DISABLED, ENABLE at end of func
-	//U2MODEbits.notimplemented;	// Bit14
-	U1MODEbits.USIDL = 0;	// Bit13 Continue in Idle
-	U1MODEbits.IREN = 0;	// Bit12 No IR translation
-	U1MODEbits.RTSMD = 0;	// Bit11 Simplex Mode
-	//U2MODEbits.notimplemented;	// Bit10
-	U1MODEbits.UEN = 0;		// Bits8,9 TX,RX enabled, CTS,RTS not
-	U1MODEbits.WAKE = 0;	// Bit7 No Wake up (since we don't sleep here)
-	U1MODEbits.LPBACK = 0;	// Bit6 No Loop Back
-	U1MODEbits.ABAUD = 0;	// Bit5 No Autobaud (would require sending '55')
-	U1MODEbits.URXINV = 0;	// Bit4 IdleState = 1  (for dsPIC)
-	U1MODEbits.BRGH = 1;	// Bit3 16 clocks per bit period
-	U1MODEbits.PDSEL = 0;	// Bits1,2 8bit, No Parity
-	U1MODEbits.STSEL = 0;	// Bit0 One Stop Bit
-	
-	// Load a value into Baud Rate Generator.  Example is for 9600.
-	// See section 19.3.1 of datasheet.
-	//  U2BRG = (Fcy/(4*BaudRate))-1
-	//  U2BRG = (35M/(4*115200))-1		
-	//  U2BRG = 75
-	U1BRG = 75;	// 40Mhz osc, 9600 Baud
+/*Defines*/
+#define BAUDRATE 115200
+#define BRGVAL ((35000000/BAUDRATE)/4)-1
 
-	// Load all values in for U1STA SFR
-	U1STAbits.UTXISEL1 = 0;	//Bit15 Int when Char is transferred (1/2 config!)
-	U1STAbits.UTXINV = 0;	//Bit14 N/A, IRDA config
-	U1STAbits.UTXISEL0 = 0;	//Bit13 Other half of Bit15
-	//U2STAbits.notimplemented = 0;	//Bit12
-	U1STAbits.UTXBRK = 0;	//Bit11 Disabled
-	U1STAbits.UTXEN = 0;	//Bit10 TX pins controlled by periph
-	U1STAbits.UTXBF = 0;	//Bit9 *Read Only Bit*
-	U1STAbits.TRMT = 0;	//Bit8 *Read Only bit*
-	U1STAbits.URXISEL = 0;	//Bits6,7 Int. on character recieved
-	U1STAbits.ADDEN = 0;	//Bit5 Address Detect Disabled
-	U1STAbits.RIDLE = 0;	//Bit4 *Read Only Bit*
-	U1STAbits.PERR = 0;		//Bit3 *Read Only Bit*
-	U1STAbits.FERR = 0;		//Bit2 *Read Only Bit*
-	U1STAbits.OERR = 0;		//Bit1 *Read Only Bit*
-	U1STAbits.URXDA = 0;	//Bit0 *Read Only Bit*
+/*Global variables*/
+bool txHasEnded = false;
 
-	IPC7 = 0x4400;	// Mid Range Interrupt Priority level 4, no urgent reason
+/* FreeRTOS declarations*/
+static SemaphoreHandle_t xSemaphoreUartSend;
+static QueueHandle_t qRecv;
 
-	IFS1bits.U2TXIF = 0;	// Clear the Transmit Interrupt Flag
-	IEC1bits.U2TXIE = 1;	// Enable Transmit Interrupts
-	IFS1bits.U2RXIF = 0;	// Clear the Recieve Interrupt Flag
-	IEC1bits.U2RXIE = 1;	// Enable Recieve Interrupts
+void uartInit(void) {
+    xSemaphoreUartSend = xSemaphoreCreateBinary();
 
-	U1MODEbits.UARTEN = 1;	// And turn the peripheral on
+    qRecv = xQueueCreate(16, sizeof (char));
 
-	U1STAbits.UTXEN = 1;
-	// I think I have the thing working now. lol
+    if (xSemaphoreUartSend == NULL || qRecv == NULL) {
+        while (1);
+    };
+
+    U1MODEbits.STSEL = 0; // 1-Stop bit
+    U1MODEbits.PDSEL = 0; // No Parity, 8-Data bits
+    U1MODEbits.ABAUD = 0; // Auto-Baud disabled
+    U1MODEbits.BRGH = 1; // Standard-Speed mode
+    U1BRG = BRGVAL; // Baud Rate setting for 9600
+    U1STAbits.UTXISEL0 = 0; // Interrupt after one TX character is transmitted
+    U1STAbits.URXISEL = 0; // Interrupt after one RX character is received;
+    IPC2bits.U1RXIP = 2; // Setup Output Compare 1 interrupt for
+    IPC3bits.U1TXIP = 2; // Setup Output Compare 1 interrupt for
+    IFS1bits.U2RXIF = 0; // Clear the Recieve Interrupt Flag
+    IEC1bits.U2RXIE = 1; // Enable Recieve Interrupt
+    U1STAbits.UTXISEL1 = 0;
+    IEC0bits.U1TXIE = 1; // Enable UART TX interrupt
+    U1MODEbits.UARTEN = 1; // Enable UART
+    U1STAbits.UTXEN = 1; // Enable UART TX
+
+    //Configuro Pin 15 como RP6: U1RX 
+    RPINR18bits.U1RXR = 6;
+    //Configuro pin 16 como RP7 : U1TX = 00011 
+    RPOR3bits.RP7R = 3;
 }
 
-void __attribute__ ((interrupt, no_auto_psv)) _U1RXInterrupt(void) {
-	LATA = U1RXREG;
-	IFS0bits.U1RXIF = 0;
+uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
+    int32_t ret = 0;
+    TickType_t waitTick;
+
+    if (blockTime != portMAX_DELAY)
+        waitTick = blockTime / portTICK_PERIOD_MS;
+    else
+        waitTick = portMAX_DELAY;
+
+    while ((ret < size) && (xQueueReceive(qRecv, &pBuf[ret], waitTick) == pdTRUE)) {
+        ret++;
+        waitTick = 0;
+    }
+
+    return ret;
 }
 
-void __attribute__ ((interrupt, no_auto_psv)) _U1TXInterrupt(void) {
-	IFS0bits.U1TXIF = 0;
+uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
+    int32_t ret = 0;
+    TickType_t waitTick;
+
+    if (blockTime != portMAX_DELAY)
+        waitTick = blockTime / portTICK_PERIOD_MS;
+    else
+        waitTick = portMAX_DELAY;
+    
+    while (ret < size) {
+        U1TXREG = pBuf[ret];
+        xSemaphoreTake(xSemaphoreUartSend, waitTick);
+        waitTick = 0;
+        ret++;
+    }
+
+    return ret;
+}
+
+void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt(void) {
+    uint8_t data;
+    BaseType_t xHigherPriorityTaskWoken;
+
+    /* obtiene dato recibido por puerto serie */
+    data = U1RXREG;
+
+    /* pone dato en queue */
+    xQueueSendFromISR(qRecv, &data, &xHigherPriorityTaskWoken);
+
+    IFS0bits.U1RXIF = 0;
+
+    if (xHigherPriorityTaskWoken != pdFALSE) {
+        taskYIELD();
+    }
+}
+
+void __attribute__((__interrupt__)) _U1TXInterrupt(void) {
+    BaseType_t xHigherPriorityTaskWoken;
+
+    /* We have not woken a task at the start of the ISR. */
+    xHigherPriorityTaskWoken = pdFALSE;
+
+    xSemaphoreGiveFromISR(xSemaphoreUartSend, &xHigherPriorityTaskWoken);
+
+    IFS0bits.U1TXIF = 0;
+
+    if (xHigherPriorityTaskWoken != pdFALSE) {
+        taskYIELD();
+    }
 }

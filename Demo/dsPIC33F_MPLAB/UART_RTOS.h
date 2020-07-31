@@ -35,6 +35,7 @@
 
 #include <stdint.h>
 #include <stdio.h> 
+#include <stdbool.h>
 
 /*FreeRTOS includes*/
 #include "FreeRTOS.h"
@@ -45,7 +46,11 @@
 #include "timers.h"
 #include "semphr.h"
 
-void UART_initRTOS(void);
+void uartInit(void);
+
+uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime);
+
+uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime);
 
 #ifdef	__cplusplus
 extern "C" {

@@ -24,6 +24,7 @@
 /*Peripherals drivers includes*/
 #include <adc.h>
 #include <pwm.h>
+#include <UART_RTOS.h>
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -31,6 +32,7 @@
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
+#define MUX_INPUT_INH(b)    (PORTBbits.RB4 = (b))
 //Manejo led
 #define LED_ON() (PORTAbits.RA4 = 1)
 #define LED_OFF() (PORTAbits.RA4 = 0)
@@ -59,19 +61,21 @@ int main(void) {
     prvSetupHardware();
 
     //Output compare
-    //comparadorInit();
     comparador_rtos_init();
 
     //ADC init
     adc_init();
 
+    //UART init
+    uartInit();
+    
     if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
         while (1);
     }
 
-//    if (xTaskCreate(transductor_test_task, "transductor_test_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-//        while (1);
-//    }
+    //    if (xTaskCreate(transductor_test_task, "transductor_test_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+    //        while (1);
+    //    }
 
     vTaskStartScheduler();
 
@@ -85,9 +89,9 @@ int main(void) {
 static void transductor_test_task(void *pvParameters) {
 
     while (1) {
-        
+
         vTaskDelay(10 / portTICK_PERIOD_MS);
-        
+
         LED_ON();
         //CANAL 0
         muxOutputSelect(TRANS_EMISOR_OESTE);
@@ -97,7 +101,7 @@ static void transductor_test_task(void *pvParameters) {
         vTaskDelay(5000 / portTICK_PERIOD_MS);
         //CANAL 1
         LED_OFF();
-        
+
         muxOutputSelect(TRANS_EMISOR_ESTE);
 
         comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
@@ -105,7 +109,7 @@ static void transductor_test_task(void *pvParameters) {
         vTaskDelay(5000 / portTICK_PERIOD_MS);
         //CANAL 2
         LED_ON();
-        
+
         muxOutputSelect(TRANS_EMISOR_NORTE);
 
         comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
@@ -113,7 +117,7 @@ static void transductor_test_task(void *pvParameters) {
         vTaskDelay(5000 / portTICK_PERIOD_MS);
         //CANAL 3
         LED_OFF();
-        
+
         muxOutputSelect(TRANS_EMISOR_SUR);
 
         comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
@@ -124,25 +128,37 @@ static void transductor_test_task(void *pvParameters) {
 
 static void led_test_task(void *pvParameters) {
     uint8_t flag = 0;
-
+    char str[] = "HOLA\n\r";
+    char strRev[10];
+    
     while (1) {
         muxOutputSelect(TRANS_EMISOR_ESTE);
-        
+        //Apago 2do mux
+        //        MUX_INPUT_INH(0);
+
         //adc_start();
 
-         if (flag) {
+        if (flag) {
             //Apaga led
             LED_OFF();
             //Apaga pwm
+            //            MUX_INPUT_INH(0);
+            vTaskDelay(5 / portTICK_PERIOD_MS);
+//            uartRecv( (uint8_t *) strRev, 5, portMAX_DELAY);
             //comparadorStop();
             flag = 0;
         } else {
             //Prende Led
             LED_ON();
+            vTaskDelay(5 / portTICK_PERIOD_MS);
+            //            MUX_INPUT_INH(1);
+            //            vTaskDelay(5 / portTICK_PERIOD_MS);
+            //UART
+            uartSend( (uint8_t *) &str, 6, portMAX_DELAY);
             //Arranca pwm
             //comparadorStart();
-            comparadorPulseTrainRTOS(TRAIN_PULSE_LENGTH);
-            
+            //            comparadorPulseTrainRTOS(TRAIN_PULSE_LENGTH);
+
             flag = 1;
         }
         vTaskDelay(5000 / portTICK_PERIOD_MS);
@@ -158,7 +174,7 @@ static void prvSetupHardware(void) {
     CLKDIVbits.PLLPRE = 2; // N1=4
     CLKDIVbits.PLLPOST0 = 0; // N2=2
     CLKDIVbits.PLLPOST1 = 0;
-    
+
     // Clock Switch to incorporate PLL
     __builtin_write_OSCCONH(0x03); // Initiate Clock Switch to 
     // FRC with PLL (NOSC=0b001)
@@ -178,10 +194,11 @@ static void prvSetupHardware(void) {
     //Set mux control pins as outputs
     TRISAbits.TRISA0 = 0;
     TRISAbits.TRISA1 = 0;
+    TRISBbits.TRISB4 = 0;
 
     //Apago el LED
     PORTAbits.RA4 = 0;
-    
+
 }
 
 /*Configura los pines de salida del PORTA: RA1 = A y RA0 = B*/
