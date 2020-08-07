@@ -52,7 +52,7 @@ void adc_init(void) {
     //AD1PCFGH=0xFFFF;
     //Configura pin AN5 para usar el ADC
     AD1PCFGLbits.PCFG5 = 0;
-    //Configura pin AN5 para usar el ADC
+    //Configura pin AN3 para usar el ADC
     AD1PCFGLbits.PCFG3 = 0;
 
     //AD1CSSH/AD1CSSL: A/D Input Scan Selection Register

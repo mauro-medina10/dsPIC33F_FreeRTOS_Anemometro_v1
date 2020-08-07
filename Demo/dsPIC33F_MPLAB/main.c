@@ -28,7 +28,8 @@
 
 // PLL activado
 #define _PLLACTIVATED_
-
+//Delay
+#define DELAY_50uS asm volatile ("REPEAT, #1751"); Nop(); // 50uS delay
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
@@ -68,7 +69,7 @@ int main(void) {
 
     //UART init
     uartInit();
-    
+
     if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
         while (1);
     }
@@ -128,14 +129,15 @@ static void transductor_test_task(void *pvParameters) {
 
 static void led_test_task(void *pvParameters) {
     uint8_t flag = 0;
-    char str[] = "HOLA\n\r";
+    char str[] = "TEST\r\n";
     char strRev[10];
-    
-    while (1) {
-        muxOutputSelect(TRANS_EMISOR_ESTE);
-        //Apago 2do mux
-        //        MUX_INPUT_INH(0);
 
+    while (1) {
+        muxOutputSelect(TRANS_EMISOR_NORTE);
+        vTaskDelay(5 / portTICK_PERIOD_MS);
+        //Prendo 2do mux
+        MUX_INPUT_INH(0);
+        vTaskDelay(5 / portTICK_PERIOD_MS);
         //adc_start();
 
         if (flag) {
@@ -144,7 +146,8 @@ static void led_test_task(void *pvParameters) {
             //Apaga pwm
             //            MUX_INPUT_INH(0);
             vTaskDelay(5 / portTICK_PERIOD_MS);
-//            uartRecv( (uint8_t *) strRev, 5, portMAX_DELAY);
+            //            filtroEnable();
+            uartRecv((uint8_t *) strRev, 5, portMAX_DELAY);
             //comparadorStop();
             flag = 0;
         } else {
@@ -152,9 +155,10 @@ static void led_test_task(void *pvParameters) {
             LED_ON();
             vTaskDelay(5 / portTICK_PERIOD_MS);
             //            MUX_INPUT_INH(1);
+            //            filtroDisable();
             //            vTaskDelay(5 / portTICK_PERIOD_MS);
             //UART
-            uartSend( (uint8_t *) &str, 6, portMAX_DELAY);
+            uartSend((uint8_t *) str, 6, portMAX_DELAY);
             //Arranca pwm
             //comparadorStart();
             //            comparadorPulseTrainRTOS(TRAIN_PULSE_LENGTH);

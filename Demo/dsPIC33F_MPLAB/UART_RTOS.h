@@ -48,6 +48,10 @@
 
 void uartInit(void);
 
+void uartInit_RTOS(void);
+
+void uartSendMenu(uint8_t o);
+
 uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime);
 
 uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime);

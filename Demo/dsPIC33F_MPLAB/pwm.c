@@ -4,7 +4,7 @@
  *
  * Created on July 13, 2020, 2:40 PM
  */
- 
+
 #include "pwm.h"
 
 #define RTOS_AVAILABLE //El periferico se usará en contexto de un RTOS
@@ -20,8 +20,8 @@ QueueHandle_t xQueueComparadorNumPulsos;
 uint8_t pulseCount = 0;
 
 void comparadorInit(void) {
- /* T3 is used to generate interrupts.  T4 is used to provide an accurate
-    time measurement. */
+    /* T3 is used to generate interrupts.  T4 is used to provide an accurate
+       time measurement. */
     T3CONbits.TON = 0;
     T3CON = 0;
     T3CONbits.TCKPS = 0;
@@ -47,23 +47,24 @@ void comparadorInit(void) {
     IFS0bits.OC1IF = 0; // Clear Output Compare 1 interrupt flag
     IEC0bits.OC1IE = 1; // Enable Output Compare 1 interrupts
 
-    //Configuro Pin 6 como RP1: OC1 = 10010
-    RPOR1bits.RP2R = 18;    
+    //Configuro Pin 6 como RP2: OC1 = 10010
+    RPOR1bits.RP2R = 18;
+
 }
 
-void comparador_rtos_init(void){
+void comparador_rtos_init(void) {
 
     xSemaphoreComparadorPulsos = xSemaphoreCreateBinary();
     xQueueComparadorNumPulsos = xQueueCreate(10, sizeof ( uint8_t));
-    
+
     if (xSemaphoreComparadorPulsos == NULL || xQueueComparadorNumPulsos == NULL) {
         while (1);
     };
 
-    if (xTaskCreate(comparador_task, "comparador_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
+    if (xTaskCreate(comparador_task, "comparador_task", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
         while (1);
     }
-    
+
     comparadorInit();
 }
 
@@ -86,20 +87,26 @@ void comparadorStop(void) {
 /*Configura el comparador para enviar un tren de pulsos de longitud definida.
  No se debe iniciar el comparador antes con pwm_start();*/
 void comparadorPulseTrain_bloq(uint8_t n) {
+    //Desactivo filtro receptor
+    filtroDisable();
+
     comparadorStart();
 
     while (pulseCount < (2 * n)); //Bloquea hasta que se den n pulsos   
 
     comparadorStop();
+    //Activo filtro receptor
+    filtroEnable();
+
     //Reinicio contador global
     pulseCount = 0;
 }
 
-void comparadorPulseTrainRTOS(uint8_t n) {  
+void comparadorPulseTrainRTOS(uint8_t n) {
     uint8_t nmrPulsos = n;
-    
-    if(xQueueSend(xQueueComparadorNumPulsos, &nmrPulsos, 0) != pdPASS ){
-        while(1);
+
+    if (xQueueSend(xQueueComparadorNumPulsos, &nmrPulsos, 0) != pdPASS) {
+        while (1);
     }
 }
 
@@ -109,17 +116,36 @@ static void comparador_task(void *pvParameters) {
     while (1) {
 
         xQueueReceive(xQueueComparadorNumPulsos, &nPulsos, portMAX_DELAY);
+        //Desactivo filtro receptor
+        //filtroDisable();
 
         comparadorStart();
 
         while (pulseCount < (2 * nPulsos)) {
             xSemaphoreTake(xSemaphoreComparadorPulsos, portMAX_DELAY);
         }
+        //Activo filtro receptor
+        //filtroEnable();
 
         comparadorStop();
 
+        
         pulseCount = 0;
     }
+}
+
+void filtroEnable(void) {
+    TRISBbits.TRISB0 = 1;
+
+    //    AD1PCFGLbits.PCFG2 = 0;
+}
+
+void filtroDisable(void) {
+    //    AD1PCFGLbits.PCFG2 = 1;
+
+    TRISBbits.TRISB0 = 0;
+
+    PORTBbits.RB0 = 0;
 }
 
 void __attribute__((interrupt, no_auto_psv)) _OC1Interrupt(void) {
@@ -128,7 +154,7 @@ void __attribute__((interrupt, no_auto_psv)) _OC1Interrupt(void) {
 
     //Contador global de pulsos (cuenta cada semi-periodo)
     pulseCount++;
-    
+
     xSemaphoreGiveFromISR(xSemaphoreComparadorPulsos, &xTaskWoken);
 
     //Limpio bandera
@@ -146,4 +172,3 @@ void __attribute__((interrupt, no_auto_psv)) _OC1Interrupt(void) {
 #endif
 }
 
-    

@@ -60,6 +60,10 @@ void comparadorPulseTrain_bloq(uint8_t n);
 
 void pwm_updateDutycycle(uint8_t dutyCyclePercent);
 
+void filtroEnable(void);
+
+void filtroDisable(void);
+
 #ifdef	__cplusplus
 extern "C" {
 #endif /* __cplusplus */

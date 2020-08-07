@@ -11,12 +11,40 @@
 #define BAUDRATE 115200
 #define BRGVAL ((35000000/BAUDRATE)/4)-1
 
+#define MENU "1- Medir\r\n2- Elegir emisor\r\n\nIngrese opcion: "
+#define MENU_COORDENADAS "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion: "
+
 /*Global variables*/
 bool txHasEnded = false;
 
 /* FreeRTOS declarations*/
+static void uart_task(void *pvParameters);
+
 static SemaphoreHandle_t xSemaphoreUartSend;
 static QueueHandle_t qRecv;
+
+void uartInit_RTOS(void) {
+    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+        while (1);
+    }
+
+    uartInit();
+}
+
+void uartSendMenu(uint8_t o) {
+    uint8_t opcion = o;
+    //    static const char MENU[] = "1- Medir\r\n2- Elegir emisor\r\n\nIngrese opcion: ";
+    //    static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion: ";
+    switch (opcion) {
+        case 1:
+            uartSend(&MENU, sizeof(MENU), portMAX_DELAY);
+            break;
+        case 2:
+            uartSend(&MENU_COORDENADAS, sizeof(MENU_COORDENADAS), portMAX_DELAY);
+            break;
+        default: uartSend(&MENU, sizeof(MENU), portMAX_DELAY);
+    }
+}
 
 void uartInit(void) {
     xSemaphoreUartSend = xSemaphoreCreateBinary();
@@ -30,16 +58,21 @@ void uartInit(void) {
     U1MODEbits.STSEL = 0; // 1-Stop bit
     U1MODEbits.PDSEL = 0; // No Parity, 8-Data bits
     U1MODEbits.ABAUD = 0; // Auto-Baud disabled
-    U1MODEbits.BRGH = 1; // Standard-Speed mode
-    U1BRG = BRGVAL; // Baud Rate setting for 9600
+    U1MODEbits.BRGH = 1; // High-Speed mode
+
+    U1BRG = BRGVAL; // Baud Rate setting for 115200
+
     U1STAbits.UTXISEL0 = 0; // Interrupt after one TX character is transmitted
     U1STAbits.URXISEL = 0; // Interrupt after one RX character is received;
-    IPC2bits.U1RXIP = 2; // Setup Output Compare 1 interrupt for
-    IPC3bits.U1TXIP = 2; // Setup Output Compare 1 interrupt for
-    IFS1bits.U2RXIF = 0; // Clear the Recieve Interrupt Flag
-    IEC1bits.U2RXIE = 1; // Enable Recieve Interrupt
-    U1STAbits.UTXISEL1 = 0;
+    IPC2bits.U1RXIP = 1; // Setup RX priryty 1 interrupt for
+    IPC3bits.U1TXIP = 1; // Setup TX priryty 1 interrupt for
+    IFS0bits.U1RXIF = 0; // Clear the Recieve Interrupt Flag
+    IEC0bits.U1RXIE = 1; // Enable Recieve Interrupt
+    U1STAbits.UTXISEL1 = 0; // Interrupt when a character is transferred to the Transmit Shift register 
+    U1STAbits.UTXISEL0 = 0;
+    IFS0bits.U1TXIF = 0; // Clear the Transmiter Interrupt Flag
     IEC0bits.U1TXIE = 1; // Enable UART TX interrupt
+
     U1MODEbits.UARTEN = 1; // Enable UART
     U1STAbits.UTXEN = 1; // Enable UART TX
 
@@ -60,7 +93,7 @@ uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 
     while ((ret < size) && (xQueueReceive(qRecv, &pBuf[ret], waitTick) == pdTRUE)) {
         ret++;
-        waitTick = 0;
+        //        waitTick = 0;
     }
 
     return ret;
@@ -74,7 +107,7 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
         waitTick = blockTime / portTICK_PERIOD_MS;
     else
         waitTick = portMAX_DELAY;
-    
+
     while (ret < size) {
         U1TXREG = pBuf[ret];
         xSemaphoreTake(xSemaphoreUartSend, waitTick);
@@ -83,6 +116,13 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
     }
 
     return ret;
+}
+
+static void uart_task(void *pvParameters) {
+
+    while (1) {
+
+    }
 }
 
 void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt(void) {
