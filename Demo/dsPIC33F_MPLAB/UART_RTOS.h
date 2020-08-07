@@ -46,11 +46,29 @@
 #include "timers.h"
 #include "semphr.h"
 
+/*Typedef*/
+typedef enum {
+    menuTemplate = 0,
+    menuTemplate_config,
+} uart_menu_enum;
+
+typedef enum {
+    Menu = 0,
+    Medicion_Simple,
+    Medicion_Continua,
+    Configuracion
+} uart_mode_enum;
+
+typedef struct {
+    float mag;
+    float deg;
+} wind_medicion_type;
+
 void uartInit(void);
 
 void uartInit_RTOS(void);
 
-void uartSendMenu(uint8_t o);
+void uartSendMenu(uart_menu_enum opcion);
 
 uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime);
 

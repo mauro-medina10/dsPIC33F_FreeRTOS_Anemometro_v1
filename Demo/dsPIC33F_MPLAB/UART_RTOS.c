@@ -11,38 +11,45 @@
 #define BAUDRATE 115200
 #define BRGVAL ((35000000/BAUDRATE)/4)-1
 
-#define MENU "1- Medir\r\n2- Elegir emisor\r\n\nIngrese opcion: "
-#define MENU_COORDENADAS "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion: "
-
 /*Global variables*/
 bool txHasEnded = false;
+
+static const char MENU[] = "1- Medicion Simple\r\n2- Medicion Continua\r\n3- Configuracion\r\n\nIngrese opcion: ";
+static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion: ";
 
 /* FreeRTOS declarations*/
 static void uart_task(void *pvParameters);
 
 static SemaphoreHandle_t xSemaphoreUartSend;
 static QueueHandle_t qRecv;
+static QueueHandle_t qSendMedicion;
+static QueueHandle_t qMenuOpcion;
 
 void uartInit_RTOS(void) {
-    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+    qMenuOpcion = xQueueCreate(2, sizeof (char));
+
+    if (qMenuOpcion == NULL) {
+        while (1);
+    }
+
+    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 4, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
         while (1);
     }
 
     uartInit();
 }
 
-void uartSendMenu(uint8_t o) {
-    uint8_t opcion = o;
-    //    static const char MENU[] = "1- Medir\r\n2- Elegir emisor\r\n\nIngrese opcion: ";
-    //    static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion: ";
-    switch (opcion) {
-        case 1:
-            uartSend(&MENU, sizeof(MENU), portMAX_DELAY);
+void uartSendMenu(uart_menu_enum opcion) {
+    uart_menu_enum op = opcion;
+
+    switch (op) {
+        case menuTemplate:
+            uartSend((uint8_t *) MENU, sizeof (MENU), portMAX_DELAY);
             break;
-        case 2:
-            uartSend(&MENU_COORDENADAS, sizeof(MENU_COORDENADAS), portMAX_DELAY);
+        case menuTemplate_config:
+            uartSend((uint8_t *) MENU_COORDENADAS, sizeof (MENU_COORDENADAS), portMAX_DELAY);
             break;
-        default: uartSend(&MENU, sizeof(MENU), portMAX_DELAY);
+        default: uartSend((uint8_t *) MENU, sizeof (MENU), portMAX_DELAY);
     }
 }
 
@@ -51,7 +58,9 @@ void uartInit(void) {
 
     qRecv = xQueueCreate(16, sizeof (char));
 
-    if (xSemaphoreUartSend == NULL || qRecv == NULL) {
+    qSendMedicion = xQueueCreate(5, sizeof (wind_medicion_type));
+
+    if (xSemaphoreUartSend == NULL || qRecv == NULL || qSendMedicion == NULL) {
         while (1);
     };
 
@@ -111,7 +120,7 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
     while (ret < size) {
         U1TXREG = pBuf[ret];
         xSemaphoreTake(xSemaphoreUartSend, waitTick);
-        waitTick = 0;
+//        waitTick = 0;
         ret++;
     }
 
@@ -119,9 +128,48 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 }
 
 static void uart_task(void *pvParameters) {
-
+    uart_mode_enum modoActivo = Menu;
+    wind_medicion_type medSimple;
+    char msg[33];
+    char comando = 'z';
+    char exit = 'z';
     while (1) {
+        switch (modoActivo) {
+            case Menu:
+                uartSendMenu(menuTemplate);
+                uartRecv((uint8_t *) &comando, 1, portMAX_DELAY);
+                if (comando < 52 && comando > 48) {
+                    modoActivo = comando - 48;
+                }
+                break;
+            case Medicion_Simple:
+                if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
+                    sprintf(msg, "Medición: %4.2f m/s - %4.2f °\n\r", medSimple.mag, medSimple.deg);
+                    uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
+                    modoActivo = Configuracion;
+                }
+                break;
+            case Medicion_Continua:
+                xQueueReceive(qRecv, &exit, 0);
+                if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE && exit == 'z') {
+                    sprintf(msg, "Medición: %4.2f m/s - %4.2f °\n\r", medSimple.mag, medSimple.deg);
+                    uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
+                    modoActivo = Configuracion;
+                } else {
+                    exit = 'z';
+                    modoActivo = Menu;
+                }
+                break;
+            case Configuracion:
+                uartSendMenu(menuTemplate_config);
+                uartRecv((uint8_t *) &comando, 1, portMAX_DELAY);
 
+                /*TODO*/
+
+                modoActivo = Menu;
+                break;
+            default: modoActivo = Medicion_Simple;
+        }
     }
 }
 

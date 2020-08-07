@@ -40,7 +40,7 @@
 //Longitud tren de pulsos
 #define TRAIN_PULSE_LENGTH 10
 
-/*Typedef definitions*/
+/*definitions*/
 typedef enum {
     TRANS_EMISOR_OESTE = 0,
     TRANS_EMISOR_ESTE,
@@ -68,9 +68,10 @@ int main(void) {
     adc_init();
 
     //UART init
-    uartInit();
+    uartInit_RTOS();
+    //    uartInit();
 
-    if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+    if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
         while (1);
     }
 
@@ -147,7 +148,7 @@ static void led_test_task(void *pvParameters) {
             //            MUX_INPUT_INH(0);
             vTaskDelay(5 / portTICK_PERIOD_MS);
             //            filtroEnable();
-            uartRecv((uint8_t *) strRev, 5, portMAX_DELAY);
+            //            uartRecv((uint8_t *) strRev, 5, portMAX_DELAY);
             //comparadorStop();
             flag = 0;
         } else {
@@ -158,7 +159,8 @@ static void led_test_task(void *pvParameters) {
             //            filtroDisable();
             //            vTaskDelay(5 / portTICK_PERIOD_MS);
             //UART
-            uartSend((uint8_t *) str, 6, portMAX_DELAY);
+            //            uartSendMenu(menuTemplate);
+            //            uartSend((uint8_t *) str, 6, portMAX_DELAY);
             //Arranca pwm
             //comparadorStart();
             //            comparadorPulseTrainRTOS(TRAIN_PULSE_LENGTH);
@@ -201,7 +203,7 @@ static void prvSetupHardware(void) {
     TRISBbits.TRISB4 = 0;
 
     //Apago el LED
-    PORTAbits.RA4 = 0;
+//    PORTAbits.RA4 = 0;
 
 }
 

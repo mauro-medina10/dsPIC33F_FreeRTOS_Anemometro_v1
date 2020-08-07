@@ -61,7 +61,7 @@ void comparador_rtos_init(void) {
         while (1);
     };
 
-    if (xTaskCreate(comparador_task, "comparador_task", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
+    if (xTaskCreate(comparador_task, "comparador_task", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY + 3, NULL) != pdPASS) {
         while (1);
     }
 
