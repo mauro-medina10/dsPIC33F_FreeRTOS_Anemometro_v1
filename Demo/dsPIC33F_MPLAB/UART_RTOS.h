@@ -54,8 +54,8 @@
 #define BRGVAL ((35000000/BAUDRATE)/4)-1
 
 /*Global variables*/
-static const char MENU[] = "1- Medicion Simple\r\n2- Medicion Continua\r\n3- Configuracion\r\n\nIngrese opcion: ";
-static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion: ";
+static const char MENU[] = "1- Medicion Simple\r\n2- Medicion Continua\r\n3- Configuracion\r\n\nIngrese opcion:\r\n";
+static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion:\r\n";
 
 /*Typedef*/
 typedef enum {
@@ -68,6 +68,7 @@ static SemaphoreHandle_t xSemaphoreUartSend;
 static QueueHandle_t qRecv;
 static QueueHandle_t qSendMedicion;
 static QueueHandle_t qMenuOpcion;
+static QueueHandle_t qAnemometroModo;
 
 void uartInit(void);
 
@@ -78,6 +79,10 @@ void uartSendMenu(uart_menu_enum opcion);
 uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime);
 
 uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime);
+
+anemometro_mode_enum uartGetMode(void);
+
+void uartSendMed(wind_medicion_type med);
 
 #ifdef	__cplusplus
 extern "C" {

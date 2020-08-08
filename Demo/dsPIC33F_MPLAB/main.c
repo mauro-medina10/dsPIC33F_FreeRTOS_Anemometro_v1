@@ -26,6 +26,7 @@
 #include <adc.h>
 #include <pwm.h>
 #include <UART_RTOS.h>
+#include <timer.h>
 
 /*Funciones locales*/
 static void prvSetupHardware(void);
@@ -39,9 +40,6 @@ static void led_test_task(void *pvParameters);
 static void transductor_test_task(void *pvParameters);
 
 static void anemometro_main_task(void *pvParameters);
-
-/*FreeRTOS definitions*/
-QueueHandle_t xQueueAnemometroModo;
 
 int main(void) {
     //Inicio Hardware
@@ -57,17 +55,19 @@ int main(void) {
     //UART init
     uartInit_RTOS();
     //    uartInit();
+    //Timer 32bits
+    timerInit();
 
     //FreeRTOS inits
-    xQueueAnemometroModo = xQueueCreate(1, sizeof ( anemometro_mode_enum));
+
 
     if (xTaskCreate(anemometro_main_task, "anemometro_main_task", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
         while (1);
     }
 
-    if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
-        while (1);
-    }
+    //    if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
+    //        while (1);
+    //    }
 
     //    if (xTaskCreate(transductor_test_task, "transductor_test_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
     //        while (1);
@@ -85,16 +85,23 @@ static void anemometro_main_task(void *pvParameters) {
     anemometro_mode_enum anemometroModoActivo = Menu;
     wind_medicion_type simpleMed = {0, 0};
 
+    LED_ON();
+    vTaskDelay(5 / portTICK_PERIOD_MS);
+    muxOutputSelect(TRANS_EMISOR_ESTE);
+    //Desactivo MUX
+    MUX_INPUT_INH(1);
+
     while (1) {
         switch (anemometroModoActivo) {
             case Menu:
-                xQueueReceive(xQueueAnemometroModo, &anemometroModoActivo, portMAX_DELAY) == pdTRUE;
+                anemometroModoActivo = uartGetMode();
                 break;
             case Medicion_Simple:
                 simpleMed = anemometroGetMed();
-                if (xQueueSend(qSendMedicion, &simpleMed, portMAX_DELAY) == pdTRUE) {
-                    anemometroModoActivo = Menu;
-                }
+
+                uartSendMed(simpleMed);
+
+                anemometroModoActivo = Menu;
                 break;
             case Medicion_Continua:
                 break;
@@ -231,36 +238,46 @@ void muxOutputSelect(mux_transSelect_enum ch) {
     switch (ch) {
         case TRANS_EMISOR_OESTE:
             MUX_INPUT_A(0);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
+            vTaskDelay(20 / portTICK_PERIOD_MS);
             MUX_INPUT_B(0);
             break;
         case TRANS_EMISOR_ESTE:
             MUX_INPUT_A(1);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
+            vTaskDelay(20 / portTICK_PERIOD_MS);
             MUX_INPUT_B(0);
             break;
         case TRANS_EMISOR_NORTE:
             MUX_INPUT_A(0);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
+            vTaskDelay(20 / portTICK_PERIOD_MS);
             MUX_INPUT_B(1);
             break;
         case TRANS_EMISOR_SUR:
             MUX_INPUT_A(1);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
+            vTaskDelay(20 / portTICK_PERIOD_MS);
             MUX_INPUT_B(1);
             break;
         default:
             MUX_INPUT_A(0);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
+            vTaskDelay(20 / portTICK_PERIOD_MS);
             MUX_INPUT_B(0);
             break;
     }
+    vTaskDelay(20 / portTICK_PERIOD_MS);
 }
 
 wind_medicion_type anemometroGetMed(void) {
-    wind_medicion_type valMed = {0,0};
-    
+    wind_medicion_type valMed = {0, 0};
+    uint32_t timeMed = 0;
+
+    timerStart();
+
     comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
+
+    timeMed = timerCount();
+
+    timerStop();
+
+    valMed.mag = (float) timeMed;
     
     return valMed;
 }

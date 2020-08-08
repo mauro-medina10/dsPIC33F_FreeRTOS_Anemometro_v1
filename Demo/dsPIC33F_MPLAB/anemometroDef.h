@@ -32,6 +32,16 @@
 #define	ANEMOMETRO_DEF_HEADER_TEMPLATE_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
+#include <stdint.h>
+#include <stdio.h> 
+/*FreeRTOS includes*/
+#include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
+#include "list.h"
+#include "queue.h"
+#include "task.h"
+#include "timers.h"
+#include "semphr.h"
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -71,6 +81,9 @@ typedef struct {
     float mag;
     float deg;
 } wind_medicion_type;
+
+/*FreeRTOS definitions*/
+
 
 #ifdef	__cplusplus
 extern "C" {

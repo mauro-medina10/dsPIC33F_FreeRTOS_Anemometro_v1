@@ -19,4 +19,5 @@ build/default/production/_ext/1472/main.o:  \
 ../anemometroDef.h  \
 ../adc.h  \
 ../pwm.h  \
- ../UART_RTOS.h 
+ ../UART_RTOS.h  \
+../timer.h 

@@ -53,7 +53,7 @@ uint32_t timerCount(void) {
     msw = TMR5HLD; // Read msw from the Type C timer holding register
 
     timerVal = (msw << 16) | lsw;
-    
+
     return timerVal;
 }
 
