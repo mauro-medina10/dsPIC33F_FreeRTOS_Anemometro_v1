@@ -28,56 +28,49 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef UART_RTOS_HEADER_H
-#define	UART_RTOS_HEADER_H
+#ifndef ANEMOMETRO_DEF_HEADER_TEMPLATE_H
+#define	ANEMOMETRO_DEF_HEADER_TEMPLATE_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
-#include <stdint.h>
-#include <stdio.h> 
-#include <stdbool.h>
+// PLL activado
+#define _PLLACTIVATED_
 
-/*anemometro headers*/
-#include <anemometroDef.h>
+//Rtos
+#define RTOS_AVAILABLE //El periferico se usará en contexto de un RTOS
 
-/*FreeRTOS includes*/
-#include "FreeRTOS.h"
-#include "FreeRTOSConfig.h"
-#include "list.h"
-#include "queue.h"
-#include "task.h"
-#include "timers.h"
-#include "semphr.h"
+//Delay
+#define DELAY_50uS asm volatile ("REPEAT, #1751"); Nop(); // 50uS delay
+//Entradas mux
+#define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
+#define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
+#define MUX_INPUT_INH(b)    (PORTBbits.RB4 = (b))
+//Manejo led
+#define LED_ON() (PORTAbits.RA4 = 1)
+#define LED_OFF() (PORTAbits.RA4 = 0)
+//Longitud tren de pulsos
+#define TRAIN_PULSE_LENGTH 10
 
-/*Defines*/
-#define BAUDRATE 115200
-#define BRGVAL ((35000000/BAUDRATE)/4)-1
-
-/*Global variables*/
-static const char MENU[] = "1- Medicion Simple\r\n2- Medicion Continua\r\n3- Configuracion\r\n\nIngrese opcion: ";
-static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion: ";
-
-/*Typedef*/
+/*typedef definitions*/
 typedef enum {
-    menuTemplate = 0,
-    menuTemplate_config,
-} uart_menu_enum;
+    Menu = 0,
+    Medicion_Simple,
+    Medicion_Continua,
+    Configuracion
+} anemometro_mode_enum;
 
-/* FreeRTOS declarations*/
-static SemaphoreHandle_t xSemaphoreUartSend;
-static QueueHandle_t qRecv;
-static QueueHandle_t qSendMedicion;
-static QueueHandle_t qMenuOpcion;
+typedef enum {
+    TRANS_EMISOR_OESTE = 0,
+    TRANS_EMISOR_ESTE,
+    TRANS_EMISOR_NORTE,
+    TRANS_EMISOR_SUR
+} mux_transSelect_enum;
 
-void uartInit(void);
-
-void uartInit_RTOS(void);
-
-void uartSendMenu(uart_menu_enum opcion);
-
-uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime);
-
-uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime);
+/*Structs definitions*/
+typedef struct {
+    float mag;
+    float deg;
+} wind_medicion_type;
 
 #ifdef	__cplusplus
 extern "C" {

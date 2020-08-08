@@ -7,8 +7,6 @@
 
 #include "pwm.h"
 
-#define RTOS_AVAILABLE //El periferico se usará en contexto de un RTOS
-
 /*FreeRTOS definitions*/
 static void comparador_task(void *pvParameters);
 
@@ -20,6 +18,11 @@ QueueHandle_t xQueueComparadorNumPulsos;
 uint8_t pulseCount = 0;
 
 void comparadorInit(void) {
+    //Semaforo usado en la interrupcion
+    xSemaphoreComparadorPulsos = xSemaphoreCreateBinary();
+
+    if(xSemaphoreComparadorPulsos == NULL) while(1);
+    
     /* T3 is used to generate interrupts.  T4 is used to provide an accurate
        time measurement. */
     T3CONbits.TON = 0;
@@ -49,15 +52,13 @@ void comparadorInit(void) {
 
     //Configuro Pin 6 como RP2: OC1 = 10010
     RPOR1bits.RP2R = 18;
-
 }
 
 void comparador_rtos_init(void) {
 
-    xSemaphoreComparadorPulsos = xSemaphoreCreateBinary();
     xQueueComparadorNumPulsos = xQueueCreate(10, sizeof ( uint8_t));
 
-    if (xSemaphoreComparadorPulsos == NULL || xQueueComparadorNumPulsos == NULL) {
+    if (xQueueComparadorNumPulsos == NULL) {
         while (1);
     };
 
@@ -102,6 +103,19 @@ void comparadorPulseTrain_bloq(uint8_t n) {
     pulseCount = 0;
 }
 
+void comparadorPulseTrain_NObloq(uint8_t nPulsos) {
+    pulseCount = 0;
+
+    comparadorStart();
+
+    while (pulseCount < (2 * nPulsos)) {
+        xSemaphoreTake(xSemaphoreComparadorPulsos, portMAX_DELAY);
+    }
+    comparadorStop();
+
+    pulseCount = 0;
+}
+
 void comparadorPulseTrainRTOS(uint8_t n) {
     uint8_t nmrPulsos = n;
 
@@ -129,7 +143,7 @@ static void comparador_task(void *pvParameters) {
 
         comparadorStop();
 
-        
+
         pulseCount = 0;
     }
 }

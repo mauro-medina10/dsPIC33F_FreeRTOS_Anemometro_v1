@@ -22,47 +22,34 @@
 #include "semphr.h"
 
 /*Peripherals drivers includes*/
+#include <anemometroDef.h>
 #include <adc.h>
 #include <pwm.h>
 #include <UART_RTOS.h>
-
-// PLL activado
-#define _PLLACTIVATED_
-//Delay
-#define DELAY_50uS asm volatile ("REPEAT, #1751"); Nop(); // 50uS delay
-//Entradas mux
-#define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
-#define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
-#define MUX_INPUT_INH(b)    (PORTBbits.RB4 = (b))
-//Manejo led
-#define LED_ON() (PORTAbits.RA4 = 1)
-#define LED_OFF() (PORTAbits.RA4 = 0)
-//Longitud tren de pulsos
-#define TRAIN_PULSE_LENGTH 10
-
-/*definitions*/
-typedef enum {
-    TRANS_EMISOR_OESTE = 0,
-    TRANS_EMISOR_ESTE,
-    TRANS_EMISOR_NORTE,
-    TRANS_EMISOR_SUR
-} mux_transSelect_enum;
 
 /*Funciones locales*/
 static void prvSetupHardware(void);
 
 void muxOutputSelect(mux_transSelect_enum ch);
 
+wind_medicion_type anemometroGetMed(void);
+
 /*--------Tasks declaration---------*/
 static void led_test_task(void *pvParameters);
 static void transductor_test_task(void *pvParameters);
+
+static void anemometro_main_task(void *pvParameters);
+
+/*FreeRTOS definitions*/
+QueueHandle_t xQueueAnemometroModo;
 
 int main(void) {
     //Inicio Hardware
     prvSetupHardware();
 
     //Output compare
-    comparador_rtos_init();
+    comparadorInit();
+    //    comparador_rtos_init();
 
     //ADC init
     adc_init();
@@ -70,6 +57,13 @@ int main(void) {
     //UART init
     uartInit_RTOS();
     //    uartInit();
+
+    //FreeRTOS inits
+    xQueueAnemometroModo = xQueueCreate(1, sizeof ( anemometro_mode_enum));
+
+    if (xTaskCreate(anemometro_main_task, "anemometro_main_task", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
+        while (1);
+    }
 
     if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
         while (1);
@@ -85,6 +79,31 @@ int main(void) {
     while (1);
 
     return 0;
+}
+
+static void anemometro_main_task(void *pvParameters) {
+    anemometro_mode_enum anemometroModoActivo = Menu;
+    wind_medicion_type simpleMed = {0, 0};
+
+    while (1) {
+        switch (anemometroModoActivo) {
+            case Menu:
+                xQueueReceive(xQueueAnemometroModo, &anemometroModoActivo, portMAX_DELAY) == pdTRUE;
+                break;
+            case Medicion_Simple:
+                simpleMed = anemometroGetMed();
+                if (xQueueSend(qSendMedicion, &simpleMed, portMAX_DELAY) == pdTRUE) {
+                    anemometroModoActivo = Menu;
+                }
+                break;
+            case Medicion_Continua:
+                break;
+            case Configuracion:
+                /*TODO*/
+                break;
+            default: anemometroModoActivo = Menu;
+        }
+    }
 }
 
 /*CADA 5 SEGUNDOS ENVIARÁ UN TREN DE PULSOS POR UNO DE LOS CANALES*/
@@ -130,8 +149,8 @@ static void transductor_test_task(void *pvParameters) {
 
 static void led_test_task(void *pvParameters) {
     uint8_t flag = 0;
-    char str[] = "TEST\r\n";
-    char strRev[10];
+    //    char str[] = "TEST\r\n";
+    //    char strRev[10];
 
     while (1) {
         muxOutputSelect(TRANS_EMISOR_NORTE);
@@ -203,7 +222,7 @@ static void prvSetupHardware(void) {
     TRISBbits.TRISB4 = 0;
 
     //Apago el LED
-//    PORTAbits.RA4 = 0;
+    //    PORTAbits.RA4 = 0;
 
 }
 
@@ -236,6 +255,14 @@ void muxOutputSelect(mux_transSelect_enum ch) {
             MUX_INPUT_B(0);
             break;
     }
+}
+
+wind_medicion_type anemometroGetMed(void) {
+    wind_medicion_type valMed = {0,0};
+    
+    comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
+    
+    return valMed;
 }
 
 void vApplicationIdleHook(void) {

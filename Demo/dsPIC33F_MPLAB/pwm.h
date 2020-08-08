@@ -36,6 +36,9 @@
 #include <stdint.h>
 #include <stdio.h> 
 
+/*anemometro headers*/
+#include <anemometroDef.h>
+
 /*FreeRTOS includes*/
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
@@ -57,6 +60,8 @@ void comparadorStop(void);
 void comparadorPulseTrainRTOS(uint8_t n);
 
 void comparadorPulseTrain_bloq(uint8_t n);
+
+void comparadorPulseTrain_NObloq(uint8_t nPulsos);
 
 void pwm_updateDutycycle(uint8_t dutyCyclePercent);
 

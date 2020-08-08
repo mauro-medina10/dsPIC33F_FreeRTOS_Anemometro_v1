@@ -7,23 +7,8 @@
 
 #include "UART_RTOS.h"
 
-/*Defines*/
-#define BAUDRATE 115200
-#define BRGVAL ((35000000/BAUDRATE)/4)-1
-
-/*Global variables*/
-bool txHasEnded = false;
-
-static const char MENU[] = "1- Medicion Simple\r\n2- Medicion Continua\r\n3- Configuracion\r\n\nIngrese opcion: ";
-static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion: ";
-
-/* FreeRTOS declarations*/
+/*Tasks*/
 static void uart_task(void *pvParameters);
-
-static SemaphoreHandle_t xSemaphoreUartSend;
-static QueueHandle_t qRecv;
-static QueueHandle_t qSendMedicion;
-static QueueHandle_t qMenuOpcion;
 
 void uartInit_RTOS(void) {
     qMenuOpcion = xQueueCreate(2, sizeof (char));
@@ -128,17 +113,18 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 }
 
 static void uart_task(void *pvParameters) {
-    uart_mode_enum modoActivo = Menu;
+    anemometro_mode_enum modoActivo = Menu;
     wind_medicion_type medSimple;
     char msg[33];
     char comando = 'z';
     char exit = 'z';
+    
     while (1) {
         switch (modoActivo) {
             case Menu:
                 uartSendMenu(menuTemplate);
                 uartRecv((uint8_t *) &comando, 1, portMAX_DELAY);
-                if (comando < 52 && comando > 48) {
+                if (comando < 53 && comando > 48) {
                     modoActivo = comando - 48;
                 }
                 break;
@@ -190,7 +176,7 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt(void) {
     }
 }
 
-void __attribute__((__interrupt__)) _U1TXInterrupt(void) {
+void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt(void) {
     BaseType_t xHigherPriorityTaskWoken;
 
     /* We have not woken a task at the start of the ISR. */

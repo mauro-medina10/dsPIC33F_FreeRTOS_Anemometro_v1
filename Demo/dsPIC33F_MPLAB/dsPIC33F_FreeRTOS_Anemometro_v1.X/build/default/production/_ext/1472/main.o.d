@@ -16,6 +16,7 @@ build/default/production/_ext/1472/main.o:  \
  ../timers.h  \
 ../../../Source/include/semphr.h  \
  ../../../Source/include/queue.h  \
+../anemometroDef.h  \
 ../adc.h  \
 ../pwm.h  \
-../UART_RTOS.h 
+ ../UART_RTOS.h 
