@@ -87,7 +87,7 @@ static void anemometro_main_task(void *pvParameters) {
 
     LED_ON();
     vTaskDelay(5 / portTICK_PERIOD_MS);
-    muxOutputSelect(TRANS_EMISOR_ESTE);
+    muxOutputSelect(TRANS_EMISOR_OESTE);
     //Desactivo MUX
     MUX_INPUT_INH(1);
 
@@ -99,7 +99,13 @@ static void anemometro_main_task(void *pvParameters) {
             case Medicion_Simple:
                 simpleMed = anemometroGetMed();
 
-                uartSendMed(simpleMed);
+                //                uartSendMed(simpleMed);
+
+                adc_start();
+                vTaskDelay(1 / portTICK_PERIOD_MS);
+                adc_stop();
+
+                timerStop();
 
                 anemometroModoActivo = Menu;
                 break;
@@ -190,7 +196,11 @@ static void led_test_task(void *pvParameters) {
             //Arranca pwm
             //comparadorStart();
             //            comparadorPulseTrainRTOS(TRAIN_PULSE_LENGTH);
-
+            //ADC
+            adc_start();
+            //            DELAY_50uS;
+            vTaskDelay(1 / portTICK_PERIOD_MS);
+            adc_stop();
             flag = 1;
         }
         vTaskDelay(5000 / portTICK_PERIOD_MS);
@@ -200,9 +210,9 @@ static void led_test_task(void *pvParameters) {
 static void prvSetupHardware(void) {
 #ifdef _PLLACTIVATED_
     // Configure Oscillator to operate the device at 40Mhz
-    // Fosc= Fin*M/(N1*N2), Fcy=Fosc/2 = 35MHz
-    // Fosc= 20M*28/(4*2)=70Mhz for 20M input clock
-    PLLFBD = 26; // M=28
+    // Fosc= Fin*M/(N1*N2), Fcy=Fosc/2 = 40MHz
+    // Fosc= 20M*32/(4*2)=80Mhz for 20M input clock
+    PLLFBD = 30; // M=32
     CLKDIVbits.PLLPRE = 2; // N1=4
     CLKDIVbits.PLLPOST0 = 0; // N2=2
     CLKDIVbits.PLLPOST1 = 0;
@@ -222,15 +232,16 @@ static void prvSetupHardware(void) {
 
     /* set LED0 pins as outputs */
     TRISAbits.TRISA4 = 0;
-
+    DELAY_50uS;
     //Set mux control pins as outputs
     TRISAbits.TRISA0 = 0;
+    DELAY_50uS;
     TRISAbits.TRISA1 = 0;
+    DELAY_50uS;
     TRISBbits.TRISB4 = 0;
-
+    DELAY_50uS;
     //Apago el LED
     //    PORTAbits.RA4 = 0;
-
 }
 
 /*Configura los pines de salida del PORTA: RA1 = A y RA0 = B*/
@@ -273,12 +284,8 @@ wind_medicion_type anemometroGetMed(void) {
 
     comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
 
-    timeMed = timerCount();
+    //    timeMed = timerCount();
 
-    timerStop();
-
-    valMed.mag = (float) timeMed;
-    
     return valMed;
 }
 

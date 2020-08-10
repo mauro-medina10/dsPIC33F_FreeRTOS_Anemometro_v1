@@ -9,8 +9,8 @@
 #include <p33FJ128GP802.h> // include processor files - each processor file is guarded.  
 #include "adc.h"
 
-uint16_t ADCvalue[128];
-uint8_t indice = 0;
+uint16_t ADCvalue[1100];
+uint16_t indice1 = 0;
 
 void adc_init(void) {
 
@@ -20,19 +20,15 @@ void adc_init(void) {
     AD1CON1bits.ASAM = 1; // ADC Sample Control: Sampling begins immediately after conversion
     AD1CON1bits.SIMSAM = 0; // Sequencial Sampling/conversion
     AD1CON1bits.AD12B = 0; // 10-bit 2/4-channel operation
-    //AD1CON1bits.ADDMABM = 1; // DMA buffers are built in conversion order mode
-
-    //AD1CON2 Register
-    //AD1CON2bits.SMPI = 0; // Increment DMA address every 1 sample/conversion
-    AD1CON2bits.BUFM = 0;
     AD1CON2bits.CHPS = 1; // Converts CH0/CH1
 
 
     //AD1CON3 Register        
     AD1CON3bits.ADRC = 0; // ADC Clock is derived from Systems Clock
     AD1CON3bits.SAMC = 0; // Auto Sample Time = 0*Tad
-
-    AD1CON3bits.ADCS = 5; // ADC Conversion Clock Tad=Tcy*(ADCS+1)
+    AD1CON3bits.ADCS = 2; // ADC Conversion Clock TAD = TCY * (ADCS + 1) = (1/40M) * 3 =
+    //                       75 ns (13.3 MHz)
+    //                       ADC Conversion Time for 10-bit Tconv = 12 * TAD = 900 ns (1.1 MHz)
 
     //AD1CON4 Register  
     AD1CON4 = 0; // Allocate 1 words of buffer to each analog input
@@ -40,12 +36,11 @@ void adc_init(void) {
     // This is required only in the scatter/gather mode
 
     //AD1CHS0/AD1CHS123: A/D Input Select Register
-    AD1CHS0bits.CH0SA = 5; // MUXA +ve input selection (AIN0) for CH0
+    AD1CHS0bits.CH0SA = 5; // MUXA +ve input selection (AIN5) for CH0
     AD1CHS0bits.CH0NA = 0; // MUXA -ve input selection (Vref-) for CH0
 
-    AD1CHS123bits.CH123SA = 1; // CH1 positive input is AN3
+    AD1CHS123bits.CH123SA = 1; // CH1 positive input is AN3, CH3 in AN5
     AD1CHS123bits.CH123NA = 0; // MUXA -ve input selection (Vref-) for CH1
-
 
     //AD1PCFGH/AD1PCFGL: Port Configuration Register
     AD1PCFGL = 0xFFFF;
@@ -58,7 +53,7 @@ void adc_init(void) {
     //AD1CSSH/AD1CSSL: A/D Input Scan Selection Register
     AD1CSSL = 0x0000; // Channel Scan is disabled, default state
 
-    IPC3bits.AD1IP = 1;  //Interrupt priority 1
+    IPC3bits.AD1IP = 1; //Interrupt priority 1
     IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
 
@@ -75,13 +70,15 @@ void adc_stop(void) {
     IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
 }
+
 void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     //Leo valor ADC
-    ADCvalue[indice] = ADC1BUF0;
-    indice++;
-    if(indice == 128){
-        AD1CON1bits.ADON = 0; // Turn off ADC1
-    }
-    
+    ADCvalue[indice1] = ADC1BUF0;
+    indice1++;
+        if (indice1 == 1100) {
+            indice1 = 0;
+            AD1CON1bits.ADON = 0; // Turn off ADC1 
+        }
+
     IFS0bits.AD1IF = 0; // Clear ADC1 interrupt flag
 }
