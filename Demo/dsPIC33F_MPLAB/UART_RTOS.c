@@ -58,7 +58,7 @@ void uartInit(void) {
     U1MODEbits.STSEL = 0; // 1-Stop bit
     U1MODEbits.PDSEL = 0; // No Parity, 8-Data bits
     U1MODEbits.ABAUD = 0; // Auto-Baud disabled
-    U1MODEbits.BRGH = 1; // High-Speed mode
+    U1MODEbits.BRGH = 0; // High-Speed mode
 
     U1BRG = BRGVAL; // Baud Rate setting for 115200
 

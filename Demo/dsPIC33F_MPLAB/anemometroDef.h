@@ -43,6 +43,13 @@
 #include "timers.h"
 #include "semphr.h"
 
+//Distancias entre transductores
+#define DISTANCE_NS 0.176  //Norte-Sur (blanco-negro)
+#define DISTANCE_EO 0.185   //Este-Oeste (Rosa-Nada)
+//Limites para deteccion de tren de pulsos
+#define LIMIT_SUP 390 
+#define LIMIT_INF 351
+
 // PLL activado
 #define _PLLACTIVATED_
 
@@ -50,14 +57,15 @@
 #define RTOS_AVAILABLE //El periferico se usará en contexto de un RTOS
 
 //Delay
-#define DELAY_50uS asm volatile ("REPEAT, #1751"); Nop(); // 50uS delay
+#define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
+#define DELAY_300uS asm volatile ("REPEAT, #12001"); Nop(); // 300uS delay
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
 #define MUX_INPUT_INH(b)    (PORTBbits.RB4 = (b))
 //Manejo led
-#define LED_ON() (PORTAbits.RA4 = 1)
-#define LED_OFF() (PORTAbits.RA4 = 0)
+#define LED_ON (PORTAbits.RA4 = 1)
+#define LED_OFF (PORTAbits.RA4 = 0)
 //Longitud tren de pulsos
 #define TRAIN_PULSE_LENGTH 10
 

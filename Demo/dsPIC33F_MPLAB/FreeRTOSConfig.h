@@ -88,7 +88,7 @@
 #define configUSE_IDLE_HOOK				1
 #define configUSE_TICK_HOOK				0
 #define configTICK_RATE_HZ				( ( TickType_t ) 1000 )
-#define configCPU_CLOCK_HZ				( ( unsigned long ) 35000000 )  /* Fosc / 2 */
+#define configCPU_CLOCK_HZ				( ( unsigned long ) 40000000 )  /* Fosc / 2 */
 #define configMAX_PRIORITIES			( 4 )
 #define configMINIMAL_STACK_SIZE		( 105 )
 #define configTOTAL_HEAP_SIZE			( ( size_t ) 5120 )

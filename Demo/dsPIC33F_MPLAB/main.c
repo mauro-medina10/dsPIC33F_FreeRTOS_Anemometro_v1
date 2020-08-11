@@ -65,9 +65,9 @@ int main(void) {
         while (1);
     }
 
-    //    if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
-    //        while (1);
-    //    }
+    //        if (xTaskCreate(led_test_task, "led_test_task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
+    //            while (1);
+    //        }
 
     //    if (xTaskCreate(transductor_test_task, "transductor_test_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
     //        while (1);
@@ -85,7 +85,7 @@ static void anemometro_main_task(void *pvParameters) {
     anemometro_mode_enum anemometroModoActivo = Menu;
     wind_medicion_type simpleMed = {0, 0};
 
-    LED_ON();
+    LED_ON;
     vTaskDelay(5 / portTICK_PERIOD_MS);
     muxOutputSelect(TRANS_EMISOR_OESTE);
     //Desactivo MUX
@@ -99,13 +99,7 @@ static void anemometro_main_task(void *pvParameters) {
             case Medicion_Simple:
                 simpleMed = anemometroGetMed();
 
-                //                uartSendMed(simpleMed);
-
-                adc_start();
-                vTaskDelay(1 / portTICK_PERIOD_MS);
-                adc_stop();
-
-                timerStop();
+                uartSendMed(simpleMed);
 
                 anemometroModoActivo = Menu;
                 break;
@@ -126,7 +120,7 @@ static void transductor_test_task(void *pvParameters) {
 
         vTaskDelay(10 / portTICK_PERIOD_MS);
 
-        LED_ON();
+        LED_ON;
         //CANAL 0
         muxOutputSelect(TRANS_EMISOR_OESTE);
 
@@ -134,7 +128,7 @@ static void transductor_test_task(void *pvParameters) {
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
         //CANAL 1
-        LED_OFF();
+        LED_OFF;
 
         muxOutputSelect(TRANS_EMISOR_ESTE);
 
@@ -142,7 +136,7 @@ static void transductor_test_task(void *pvParameters) {
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
         //CANAL 2
-        LED_ON();
+        LED_ON;
 
         muxOutputSelect(TRANS_EMISOR_NORTE);
 
@@ -150,7 +144,7 @@ static void transductor_test_task(void *pvParameters) {
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
         //CANAL 3
-        LED_OFF();
+        LED_OFF;
 
         muxOutputSelect(TRANS_EMISOR_SUR);
 
@@ -162,8 +156,8 @@ static void transductor_test_task(void *pvParameters) {
 
 static void led_test_task(void *pvParameters) {
     uint8_t flag = 0;
-    //    char str[] = "TEST\r\n";
-    //    char strRev[10];
+    char str[] = "TEST\r\n";
+    char strRev[10];
 
     while (1) {
         muxOutputSelect(TRANS_EMISOR_NORTE);
@@ -175,7 +169,7 @@ static void led_test_task(void *pvParameters) {
 
         if (flag) {
             //Apaga led
-            LED_OFF();
+            LED_OFF;
             //Apaga pwm
             //            MUX_INPUT_INH(0);
             vTaskDelay(5 / portTICK_PERIOD_MS);
@@ -185,7 +179,7 @@ static void led_test_task(void *pvParameters) {
             flag = 0;
         } else {
             //Prende Led
-            LED_ON();
+            LED_ON;
             vTaskDelay(5 / portTICK_PERIOD_MS);
             //            MUX_INPUT_INH(1);
             //            filtroDisable();
@@ -284,8 +278,21 @@ wind_medicion_type anemometroGetMed(void) {
 
     comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
 
-    //    timeMed = timerCount();
+    //Necesitaria esperar 300us
+    DELAY_300uS;
+    
+    adc_start();
 
+    vTaskDelay(2 / portTICK_PERIOD_MS);
+
+    adc_stop();
+
+    timeMed = timerCount();
+
+    timerStop();
+    
+    valMed.mag = (float) timeMed;
+    
     return valMed;
 }
 

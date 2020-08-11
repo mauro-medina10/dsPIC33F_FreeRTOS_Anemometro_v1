@@ -31,7 +31,7 @@ void comparadorInit(void) {
     T3CONbits.TCS = 0;
     T3CONbits.TGATE = 0;
     //El timer cuenta hasta 407 que equivale a medio periodo de 43kHz
-    PR3 = 407;
+    PR3 = (uint16_t) (configCPU_CLOCK_HZ / OUTPUT_FREQ) / 2;
     //Pongo en 0 el valor del timer
     TMR3 = 0;
 
@@ -43,7 +43,7 @@ void comparadorInit(void) {
     OC1CONbits.OCM = 3;
 
     //Configura pwm a 43kHz
-    OC1R = 380;
+    OC1R = 20;
 
     //Habilito interrupcion para cada toggle
     IPC0bits.OC1IP = 3; // Setup Output Compare 1 interrupt for
@@ -113,6 +113,9 @@ void comparadorPulseTrain_NObloq(uint8_t nPulsos) {
     }
     comparadorStop();
 
+    //Activo Mux 2
+    MUX_INPUT_INH(0);
+    
     pulseCount = 0;
 }
 

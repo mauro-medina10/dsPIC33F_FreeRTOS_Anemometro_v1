@@ -48,6 +48,8 @@
 #include "timers.h"
 #include "semphr.h"
 
+/*Define*/
+#define OUTPUT_FREQ 43000
 /*==================[external functions definition]==========================*/
 void comparadorInit(void);
 

@@ -51,7 +51,7 @@
 
 /*Defines*/
 #define BAUDRATE 115200
-#define BRGVAL ((35000000/BAUDRATE)/4)-1
+#define BRGVAL ((40000000/BAUDRATE)/16)-1
 
 /*Global variables*/
 static const char MENU[] = "1- Medicion Simple\r\n2- Medicion Continua\r\n3- Configuracion\r\n\nIngrese opcion:\r\n";
