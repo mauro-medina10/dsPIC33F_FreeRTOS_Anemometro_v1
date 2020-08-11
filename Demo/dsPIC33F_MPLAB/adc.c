@@ -5,12 +5,12 @@
  * Created on July 16, 2020, 10:06 AM
  */
 
-#include <xc.h>
-#include <p33FJ128GP802.h> // include processor files - each processor file is guarded.  
 #include "adc.h"
 
-uint16_t ADCvalue[1500];
-uint16_t indice1 = 0;
+//uint16_t ADCvalue[1500];
+//uint16_t indice1 = 0;
+
+anemometro_deteccion_enum estadoDeteccion = PRIMER_LIMITE;
 
 void adc_init(void) {
 
@@ -69,20 +69,31 @@ void adc_stop(void) {
     AD1CON1bits.ADON = 0; // Turn off ADC1
     IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
-    
-    indice1++;
-    ADCvalue[indice1] = 0xffff;
-    indice1 = 0;
 }
 
 void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
-    //Leo valor ADC
-    ADCvalue[indice1] = ADC1BUF0;
-    indice1++;
-    if (indice1 == 1500) {
-        indice1 = 0;
-        AD1CON1bits.ADON = 0; // Turn off ADC1 
-    }
+    BaseType_t xTaskWoken = pdFALSE;
+    uint16_t ADCval = 0;
 
+    /*Detecto el tren de pulsos directamente en la ISR*/
+    ADCval = ADC1BUF0;
+
+    switch (estadoDeteccion) {
+        case PRIMER_LIMITE:
+            if (ADCval > LIMIT_SUP) estadoDeteccion = SEGUNDO_LIMITE;
+            break;
+        case SEGUNDO_LIMITE:
+            if (ADCval < LIMIT_INF) {
+                IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
+                estadoDeteccion = PRIMER_LIMITE;
+                anemometroTdetected(&xTaskWoken);
+            }
+            break;
+        default: estadoDeteccion = PRIMER_LIMITE;
+    }
     IFS0bits.AD1IF = 0; // Clear ADC1 interrupt flag
+
+    if (xTaskWoken != pdFALSE) {
+        taskYIELD();
+    }
 }

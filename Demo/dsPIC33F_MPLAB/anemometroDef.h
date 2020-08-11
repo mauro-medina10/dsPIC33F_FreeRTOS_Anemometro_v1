@@ -46,9 +46,11 @@
 //Distancias entre transductores
 #define DISTANCE_NS 0.176  //Norte-Sur (blanco-negro)
 #define DISTANCE_EO 0.185   //Este-Oeste (Rosa-Nada)
+
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUP 390 
-#define LIMIT_INF 351
+#define LIMIT_SUP 393 //393
+#define LIMIT_INF 352 //352
+#define DETECTION_ERROR 9053
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -76,6 +78,11 @@ typedef enum {
     Medicion_Continua,
     Configuracion
 } anemometro_mode_enum;
+
+typedef enum {
+    PRIMER_LIMITE = 0,
+    SEGUNDO_LIMITE
+} anemometro_deteccion_enum;
 
 typedef enum {
     TRANS_EMISOR_OESTE = 0,

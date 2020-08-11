@@ -35,11 +35,16 @@ void muxOutputSelect(mux_transSelect_enum ch);
 
 wind_medicion_type anemometroGetMed(void);
 
+void anemometroTdetected(BaseType_t *pxHigherPriorityTaskWoken);
+
 /*--------Tasks declaration---------*/
 static void led_test_task(void *pvParameters);
 static void transductor_test_task(void *pvParameters);
 
 static void anemometro_main_task(void *pvParameters);
+
+/*FreeRTOS declarations*/
+SemaphoreHandle_t xSemaphoreTrenDetectado;
 
 int main(void) {
     //Inicio Hardware
@@ -59,7 +64,9 @@ int main(void) {
     timerInit();
 
     //FreeRTOS inits
+    xSemaphoreTrenDetectado = xSemaphoreCreateBinary();
 
+    if (xSemaphoreTrenDetectado == NULL) while (1);
 
     if (xTaskCreate(anemometro_main_task, "anemometro_main_task", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
         while (1);
@@ -280,20 +287,24 @@ wind_medicion_type anemometroGetMed(void) {
 
     //Necesitaria esperar 300us
     DELAY_300uS;
-    
+
     adc_start();
 
-    vTaskDelay(2 / portTICK_PERIOD_MS);
-
-    adc_stop();
+    xSemaphoreTake(xSemaphoreTrenDetectado, portMAX_DELAY);
 
     timeMed = timerCount();
 
+    adc_stop();
+
     timerStop();
-    
+
     valMed.mag = (float) timeMed;
-    
+
     return valMed;
+}
+
+void anemometroTdetected(BaseType_t *pxHigherPriorityTaskWoken) {
+    xSemaphoreGiveFromISR(xSemaphoreTrenDetectado, pxHigherPriorityTaskWoken);
 }
 
 void vApplicationIdleHook(void) {

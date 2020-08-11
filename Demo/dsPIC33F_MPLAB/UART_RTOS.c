@@ -7,6 +7,8 @@
 
 #include "UART_RTOS.h"
 
+/*declarations*/
+
 /*Tasks*/
 static void uart_task(void *pvParameters);
 
@@ -138,7 +140,7 @@ static void uart_task(void *pvParameters) {
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
-                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f °\n\r", medSimple.mag, medSimple.deg);
+                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                     modoActivo = Menu;
                 }
@@ -146,7 +148,7 @@ static void uart_task(void *pvParameters) {
             case Medicion_Continua:
                 xQueueReceive(qRecv, &exit, 0);
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE && exit == 'z') {
-                    sprintf(msg, "Medición: %4.2f m/s - %4.2f °\n\r", medSimple.mag, medSimple.deg);
+                    sprintf(msg, "Medición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                     modoActivo = Configuracion;
                 } else {

@@ -30,7 +30,21 @@
 // more than once.  
 #ifndef ADC_HEADER_TEMPLATE_H
 #define	ADC_HEADER_TEMPLATE_H
-  
+
+#include <xc.h>
+#include <p33FJ128GP802.h> // include processor files - each processor file is guarded.  
+
+#include <anemometroDef.h>
+
+/*FreeRTOS includes*/
+#include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
+#include "list.h"
+#include "queue.h"
+#include "task.h"
+#include "timers.h"
+#include "semphr.h"
+
 
 void adc_init(void);
 
