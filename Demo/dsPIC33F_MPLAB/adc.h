@@ -52,6 +52,8 @@ void adc_start(void);
 
 void adc_stop(void);
 
+void adc_transdSelect(mux_transSelect_enum transd);
+
 #ifdef	__cplusplus
 extern "C" {
 #endif /* __cplusplus */

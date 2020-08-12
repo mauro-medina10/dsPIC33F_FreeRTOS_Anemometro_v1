@@ -11,6 +11,10 @@
 //uint16_t indice1 = 0;
 
 anemometro_deteccion_enum estadoDeteccion = PRIMER_LIMITE;
+//uint16_t medicionesADC[1500];
+//uint32_t indexADC = 0;
+uint16_t LIMIT_SUP = 0;
+uint16_t LIMIT_INF = 0;
 
 void adc_init(void) {
 
@@ -53,7 +57,7 @@ void adc_init(void) {
     //AD1CSSH/AD1CSSL: A/D Input Scan Selection Register
     AD1CSSL = 0x0000; // Channel Scan is disabled, default state
 
-    IPC3bits.AD1IP = 1; //Interrupt priority 1
+    IPC3bits.AD1IP = 3; //Interrupt priority 1
     IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
 
@@ -71,6 +75,29 @@ void adc_stop(void) {
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
 }
 
+void adc_transdSelect(mux_transSelect_enum transd) {
+    switch (transd) {
+        case TRANS_EMISOR_NORTE:
+            LIMIT_SUP = LIMIT_SUP_N;
+            LIMIT_INF = LIMIT_INF_N;
+            break;
+        case TRANS_EMISOR_SUR:
+            LIMIT_SUP = LIMIT_SUP_S;
+            LIMIT_INF = LIMIT_INF_S;
+            break;
+        case TRANS_EMISOR_ESTE:
+            LIMIT_SUP = LIMIT_SUP_E;
+            LIMIT_INF = LIMIT_INF_E;
+            break;
+        case TRANS_EMISOR_OESTE:
+            LIMIT_SUP = LIMIT_SUP_O;
+            LIMIT_INF = LIMIT_INF_O;
+            break;
+        default: LIMIT_SUP = LIMIT_SUP_N;
+            LIMIT_INF = LIMIT_INF_N;
+    }
+}
+
 void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     BaseType_t xTaskWoken = pdFALSE;
     uint16_t ADCval = 0;
@@ -86,7 +113,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
             if (ADCval < LIMIT_INF) {
                 IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
                 estadoDeteccion = PRIMER_LIMITE;
-                anemometroTdetected(&xTaskWoken);
+                anemometroTdetect(&xTaskWoken);
             }
             break;
         default: estadoDeteccion = PRIMER_LIMITE;
@@ -97,3 +124,4 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
         taskYIELD();
     }
 }
+

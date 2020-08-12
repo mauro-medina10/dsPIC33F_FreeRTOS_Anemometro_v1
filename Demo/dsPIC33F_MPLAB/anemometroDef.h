@@ -48,9 +48,19 @@
 #define DISTANCE_EO 0.185   //Este-Oeste (Rosa-Nada)
 
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUP 393 //393
-#define LIMIT_INF 352 //352
-#define DETECTION_ERROR 9053
+#define LIMIT_SUP_E 392 
+#define LIMIT_INF_E 351 
+#define LIMIT_SUP_O 393 
+#define LIMIT_INF_O 352 
+#define LIMIT_SUP_N 393 
+#define LIMIT_INF_N 351 
+#define LIMIT_SUP_S 396 
+#define LIMIT_INF_S 353 
+
+#define DETECTION_ERROR_E 278.43
+#define DETECTION_ERROR_O 226.31
+#define DETECTION_ERROR_N 244.81
+#define DETECTION_ERROR_S 239.61
 
 // PLL activado
 #define _PLLACTIVATED_

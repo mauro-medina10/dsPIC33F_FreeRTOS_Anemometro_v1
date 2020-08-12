@@ -35,16 +35,19 @@ void muxOutputSelect(mux_transSelect_enum ch);
 
 wind_medicion_type anemometroGetMed(void);
 
-void anemometroTdetected(BaseType_t *pxHigherPriorityTaskWoken);
+void anemometroTdetect(BaseType_t *pxHigherPriorityTaskWoken);
 
 /*--------Tasks declaration---------*/
-static void led_test_task(void *pvParameters);
-static void transductor_test_task(void *pvParameters);
+//static void led_test_task(void *pvParameters);
+//static void transductor_test_task(void *pvParameters);
 
 static void anemometro_main_task(void *pvParameters);
 
 /*FreeRTOS declarations*/
 SemaphoreHandle_t xSemaphoreTrenDetectado;
+
+uint32_t medicionesMed[40];
+uint8_t indexMed = 0;
 
 int main(void) {
     //Inicio Hardware
@@ -94,7 +97,8 @@ static void anemometro_main_task(void *pvParameters) {
 
     LED_ON;
     vTaskDelay(5 / portTICK_PERIOD_MS);
-    muxOutputSelect(TRANS_EMISOR_OESTE);
+    muxOutputSelect(TRANS_EMISOR_NORTE);
+    adc_transdSelect(TRANS_EMISOR_NORTE);
     //Desactivo MUX
     MUX_INPUT_INH(1);
 
@@ -121,92 +125,95 @@ static void anemometro_main_task(void *pvParameters) {
 }
 
 /*CADA 5 SEGUNDOS ENVIARÁ UN TREN DE PULSOS POR UNO DE LOS CANALES*/
-static void transductor_test_task(void *pvParameters) {
+//static void transductor_test_task(void *pvParameters) {
+//
+//    while (1) {
+//
+//        vTaskDelay(10 / portTICK_PERIOD_MS);
+//
+//        LED_ON;
+//        //CANAL 0
+//        muxOutputSelect(TRANS_EMISOR_OESTE);
+//
+//        comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
+//
+//        vTaskDelay(5000 / portTICK_PERIOD_MS);
+//        //CANAL 1
+//        LED_OFF;
+//
+//        muxOutputSelect(TRANS_EMISOR_ESTE);
+//
+//        comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
+//
+//        vTaskDelay(5000 / portTICK_PERIOD_MS);
+//        //CANAL 2
+//        LED_ON;
+//
+//        muxOutputSelect(TRANS_EMISOR_NORTE);
+//
+//        comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
+//
+//        vTaskDelay(5000 / portTICK_PERIOD_MS);
+//        //CANAL 3
+//        LED_OFF;
+//
+//        muxOutputSelect(TRANS_EMISOR_SUR);
+//
+//        comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
+//
+//        vTaskDelay(5000 / portTICK_PERIOD_MS);
+//    }
+//}
 
-    while (1) {
-
-        vTaskDelay(10 / portTICK_PERIOD_MS);
-
-        LED_ON;
-        //CANAL 0
-        muxOutputSelect(TRANS_EMISOR_OESTE);
-
-        comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
-
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-        //CANAL 1
-        LED_OFF;
-
-        muxOutputSelect(TRANS_EMISOR_ESTE);
-
-        comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
-
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-        //CANAL 2
-        LED_ON;
-
-        muxOutputSelect(TRANS_EMISOR_NORTE);
-
-        comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
-
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-        //CANAL 3
-        LED_OFF;
-
-        muxOutputSelect(TRANS_EMISOR_SUR);
-
-        comparadorPulseTrain_bloq(TRAIN_PULSE_LENGTH);
-
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-    }
-}
-
-static void led_test_task(void *pvParameters) {
-    uint8_t flag = 0;
-    char str[] = "TEST\r\n";
-    char strRev[10];
-
-    while (1) {
-        muxOutputSelect(TRANS_EMISOR_NORTE);
-        vTaskDelay(5 / portTICK_PERIOD_MS);
-        //Prendo 2do mux
-        MUX_INPUT_INH(0);
-        vTaskDelay(5 / portTICK_PERIOD_MS);
-        //adc_start();
-
-        if (flag) {
-            //Apaga led
-            LED_OFF;
-            //Apaga pwm
-            //            MUX_INPUT_INH(0);
-            vTaskDelay(5 / portTICK_PERIOD_MS);
-            //            filtroEnable();
-            //            uartRecv((uint8_t *) strRev, 5, portMAX_DELAY);
-            //comparadorStop();
-            flag = 0;
-        } else {
-            //Prende Led
-            LED_ON;
-            vTaskDelay(5 / portTICK_PERIOD_MS);
-            //            MUX_INPUT_INH(1);
-            //            filtroDisable();
-            //            vTaskDelay(5 / portTICK_PERIOD_MS);
-            //UART
-            //            uartSendMenu(menuTemplate);
-            //            uartSend((uint8_t *) str, 6, portMAX_DELAY);
-            //Arranca pwm
-            //comparadorStart();
-            //            comparadorPulseTrainRTOS(TRAIN_PULSE_LENGTH);
-            //ADC
-            adc_start();
-            //            DELAY_50uS;
-            vTaskDelay(1 / portTICK_PERIOD_MS);
-            adc_stop();
-            flag = 1;
-        }
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-    }
-}
+//static void led_test_task(void *pvParameters) {
+//    uint8_t flag = 0;
+//    char str[] = "TEST\r\n";
+//    char strRev[10];
+//    uint16_t mediciones[1500];
+//    uint32_t index = 0;
+//
+//    while (1) {
+//        muxOutputSelect(TRANS_EMISOR_NORTE);
+//        vTaskDelay(5 / portTICK_PERIOD_MS);
+//        //Prendo 2do mux
+//        MUX_INPUT_INH(0);
+//        vTaskDelay(5 / portTICK_PERIOD_MS);
+//        //adc_start();
+//
+//        if (flag) {
+//            //Apaga led
+//            LED_OFF;
+//            //Apaga pwm
+//            //            MUX_INPUT_INH(0);
+//            vTaskDelay(5 / portTICK_PERIOD_MS);
+//            //            filtroEnable();
+//            //            uartRecv((uint8_t *) strRev, 5, portMAX_DELAY);
+//            //comparadorStop();
+//            flag = 0;
+//        } else {
+//            //Prende Led
+//            LED_ON;
+//            vTaskDelay(5 / portTICK_PERIOD_MS);
+//            //            MUX_INPUT_INH(1);
+//            //            filtroDisable();
+//            //            vTaskDelay(5 / portTICK_PERIOD_MS);
+//            //UART
+//            //            uartSendMenu(menuTemplate);
+//            //            uartSend((uint8_t *) str, 6, portMAX_DELAY);
+//            //Arranca pwm
+//            //comparadorStart();
+//            //            comparadorPulseTrainRTOS(TRAIN_PULSE_LENGTH);
+//            //ADC
+//            //            adc_start();
+//            //            simpleMed = anemometroGetMed();
+//            //            DELAY_50uS;
+//            //            vTaskDelay(1 / portTICK_PERIOD_MS);
+//            //            adc_stop();
+//            flag = 1;
+//        }
+//        vTaskDelay(5000 / portTICK_PERIOD_MS);
+//    }
+//}
 
 static void prvSetupHardware(void) {
 #ifdef _PLLACTIVATED_
@@ -298,12 +305,14 @@ wind_medicion_type anemometroGetMed(void) {
 
     timerStop();
 
+    medicionesMed[indexMed] = timeMed; //guardo las mediciones para analizar
+    indexMed++;
     valMed.mag = (float) timeMed;
 
     return valMed;
 }
 
-void anemometroTdetected(BaseType_t *pxHigherPriorityTaskWoken) {
+void anemometroTdetect(BaseType_t *pxHigherPriorityTaskWoken) {
     xSemaphoreGiveFromISR(xSemaphoreTrenDetectado, pxHigherPriorityTaskWoken);
 }
 
