@@ -123,14 +123,18 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 static void uart_task(void *pvParameters) {
     anemometro_mode_enum modoActivo = Menu;
     wind_medicion_type medSimple;
-    char msg[33];
+    char msg[] = "                                   ";
     char comando = 'z';
     char exit = 'z';
-
+  
+    
     while (1) {
         switch (modoActivo) {
             case Menu:
                 uartSendMenu(menuTemplate);
+                //                comando = 'z';
+                //                exit = 'z';
+
                 uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
                 if (comando < 53 && comando > 48) {
                     modoActivo = comando - 48;
@@ -146,15 +150,20 @@ static void uart_task(void *pvParameters) {
                 }
                 break;
             case Medicion_Continua:
-                xQueueReceive(qRecv, &exit, 0);
+                xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
+
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE && exit == 'z') {
-                    sprintf(msg, "Medición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
+                    //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
+                    sprintf(msg, "\r\n%4.2f", medSimple.mag);
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
-                    modoActivo = Configuracion;
                 } else {
                     exit = 'z';
                     modoActivo = Menu;
                 }
+                if (uartRecv((uint8_t *) & exit, 1, 0) != 1) {
+                    exit = 'z';
+                }
+                //                xQueueReceive(qRecv, &exit, 0);
                 break;
             case Configuracion:
                 uartSendMenu(menuTemplate_config);

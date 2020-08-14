@@ -33,6 +33,8 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
+#define timerCount2s(count) ((float) count / configCPU_CLOCK_HZ)
+
 void timerInit(void);
 
 void timerStart(void);

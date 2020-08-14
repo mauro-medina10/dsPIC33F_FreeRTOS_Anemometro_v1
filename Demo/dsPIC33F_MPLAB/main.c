@@ -8,6 +8,11 @@
 #define __dsPIC33FJ128GP802__
 #endif
 
+/*Standars includes*/
+#include <stdint.h>
+#include <stdio.h> 
+#include <Math.h>
+
 /*Config includes*/
 #include "xc.h"
 #include <config.h>
@@ -31,11 +36,7 @@
 /*Funciones locales*/
 static void prvSetupHardware(void);
 
-void muxOutputSelect(mux_transSelect_enum ch);
-
-wind_medicion_type anemometroGetMed(void);
-
-void anemometroTdetect(BaseType_t *pxHigherPriorityTaskWoken);
+wind_medicion_type anemometroTestCoord(mux_transSelect_enum coord);
 
 /*--------Tasks declaration---------*/
 //static void led_test_task(void *pvParameters);
@@ -44,10 +45,15 @@ void anemometroTdetect(BaseType_t *pxHigherPriorityTaskWoken);
 static void anemometro_main_task(void *pvParameters);
 
 /*FreeRTOS declarations*/
-SemaphoreHandle_t xSemaphoreTrenDetectado;
+//SemaphoreHandle_t xSemaphoreTrenDetectado;
 
-uint32_t medicionesMed[40];
-uint8_t indexMed = 0;
+static TaskHandle_t xTaskToNotify = NULL;
+
+/*Global variables*/
+float velMed[15];
+uint8_t indMed = 0;
+uint32_t timeMedVal[50];
+uint16_t indiceAux = 0;
 
 int main(void) {
     //Inicio Hardware
@@ -67,11 +73,11 @@ int main(void) {
     timerInit();
 
     //FreeRTOS inits
-    xSemaphoreTrenDetectado = xSemaphoreCreateBinary();
+    //    xSemaphoreTrenDetectado = xSemaphoreCreateBinary();
 
-    if (xSemaphoreTrenDetectado == NULL) while (1);
+    //    if (xSemaphoreTrenDetectado == NULL) while (1);
 
-    if (xTaskCreate(anemometro_main_task, "anemometro_main_task", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS) {
+    if (xTaskCreate(anemometro_main_task, "anemometro_main_task", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY + 2, &xTaskToNotify) != pdPASS) {
         while (1);
     }
 
@@ -94,11 +100,12 @@ int main(void) {
 static void anemometro_main_task(void *pvParameters) {
     anemometro_mode_enum anemometroModoActivo = Menu;
     wind_medicion_type simpleMed = {0, 0};
+    mux_transSelect_enum emisorSelect = TRANS_EMISOR_NORTE;
+    uint16_t auxV = 0;
 
     LED_ON;
     vTaskDelay(5 / portTICK_PERIOD_MS);
-    muxOutputSelect(TRANS_EMISOR_NORTE);
-    adc_transdSelect(TRANS_EMISOR_NORTE);
+    anemometroEmiterSelect(TRANS_EMISOR_OESTE);
     //Desactivo MUX
     MUX_INPUT_INH(1);
 
@@ -115,6 +122,24 @@ static void anemometro_main_task(void *pvParameters) {
                 anemometroModoActivo = Menu;
                 break;
             case Medicion_Continua:
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+                //                anemometroEmiterSelect(emisorSelect);
+
+                //                simpleMed = anemometroGetMed();
+
+                simpleMed = anemometroTestCoord(emisorSelect);
+
+                uartSendMed(simpleMed);
+
+                auxV++;
+                if (auxV == 50) {
+                    emisorSelect++;
+                    auxV = 0;
+                    if (emisorSelect == 4) {
+                        while (1);
+                    }
+                }
+                anemometroModoActivo = uartGetMode();
                 break;
             case Configuracion:
                 /*TODO*/
@@ -284,9 +309,11 @@ void muxOutputSelect(mux_transSelect_enum ch) {
     vTaskDelay(20 / portTICK_PERIOD_MS);
 }
 
-wind_medicion_type anemometroGetMed(void) {
-    wind_medicion_type valMed = {0, 0};
-    uint32_t timeMed = 0;
+wind_medicion_type anemometroTestCoord(mux_transSelect_enum coord) {
+    wind_medicion_type timeMed = {0, 0};
+    uint32_t ulNotificationValue;
+
+    anemometroEmiterSelect(coord);
 
     timerStart();
 
@@ -297,23 +324,88 @@ wind_medicion_type anemometroGetMed(void) {
 
     adc_start();
 
-    xSemaphoreTake(xSemaphoreTrenDetectado, portMAX_DELAY);
+    ulNotificationValue = ulTaskNotifyTake(pdTRUE, 2 / portTICK_PERIOD_MS);
 
-    timeMed = timerCount();
+    if (ulNotificationValue == 1) {
+        timeMed.mag = timerCount();
+    } else {
+        timeMed.mag = 0;
+    }
 
     adc_stop();
 
     timerStop();
 
-    medicionesMed[indexMed] = timeMed; //guardo las mediciones para analizar
-    indexMed++;
-    valMed.mag = (float) timeMed;
+    return timeMed;
+}
 
+wind_medicion_type anemometroGetMed(void) {
+    uint32_t ulNotificationValue;
+    wind_medicion_type valMed = {0, 0};
+    uint32_t timeMed[4]; //Guardo las mediciones en orden O-E-N-S
+    float timeConv[4];
+    mux_transSelect_enum transdSelect = TRANS_EMISOR_NORTE;
+
+    for (transdSelect = 0; transdSelect < 4; transdSelect++) {
+        anemometroEmiterSelect(transdSelect);
+
+        timerStart();
+
+        comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
+
+        //Necesitaria esperar 300us
+        DELAY_300uS;
+
+        adc_start();
+
+        ulNotificationValue = ulTaskNotifyTake(pdTRUE, 2 / portTICK_PERIOD_MS);
+
+        timeMed[transdSelect] = timerCount();
+
+        adc_stop();
+
+        timerStop();
+    }
+    timeMedVal[indiceAux] = timeConv[2];
+    indiceAux++;
+    //    Convierto tiempos a us
+    timeConv[0] = timerCount2s(timeMed[0]); //O
+    timeConv[1] = timerCount2s(timeMed[1]); //E
+    timeConv[2] = timerCount2s(timeMed[2]); //N
+    timeConv[3] = timerCount2s(timeMed[3]); //S
+    //Corrijo los tiempos medidos
+    timeConv[0] = timeConv[0] - DETECTION_ERROR_O;
+    timeConv[1] = timeConv[1] - DETECTION_ERROR_E;
+    timeConv[2] = timeConv[2] - DETECTION_ERROR_N;
+    timeConv[3] = timeConv[3] - DETECTION_ERROR_S;
+    //Calculo 
+    valMed.mag = sqrtf(powf((DISTANCE_EO / 2) * (1 / timeConv[0] - 1 / timeConv[1]), 2) + powf((DISTANCE_NS / 2) * (1 / timeConv[2] - 1 / timeMed[3]), 2));
+
+    valMed.deg = atanf((DISTANCE_EO / DISTANCE_NS) * ((1 / timeConv[0] - 1 / timeConv[1]) / (1 / timeConv[2] - 1 / timeConv[3]))) * 180 / 3.14159;
+
+    //MIDO en la coordenada N-S
+    valMed.mag = (DISTANCE_NS / 2) * (1 / timeConv[3] - 1 / timeMed[2]);
+
+    velMed[indMed] = valMed.mag;
+    indMed++;
+    if (indMed == 15) {
+        while (1);
+    }
     return valMed;
 }
 
-void anemometroTdetect(BaseType_t *pxHigherPriorityTaskWoken) {
-    xSemaphoreGiveFromISR(xSemaphoreTrenDetectado, pxHigherPriorityTaskWoken);
+//void anemometroTdetect(BaseType_t * pxHigherPriorityTaskWoken) {
+//    xSemaphoreGiveFromISR(xSemaphoreTrenDetectado, pxHigherPriorityTaskWoken);
+//}
+
+void anemometroTdetect(BaseType_t * pxHigherPriorityTaskWoken) {
+    vTaskNotifyGiveFromISR(xTaskToNotify, pxHigherPriorityTaskWoken);
+}
+
+void anemometroEmiterSelect(mux_transSelect_enum transd) {
+    muxOutputSelect(transd);
+
+    adc_transdSelect(transd);
 }
 
 void vApplicationIdleHook(void) {

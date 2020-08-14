@@ -34,6 +34,7 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include <stdint.h>
 #include <stdio.h> 
+
 /*FreeRTOS includes*/
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
@@ -48,19 +49,19 @@
 #define DISTANCE_EO 0.185   //Este-Oeste (Rosa-Nada)
 
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUP_E 392 
-#define LIMIT_INF_E 351 
-#define LIMIT_SUP_O 393 
-#define LIMIT_INF_O 352 
-#define LIMIT_SUP_N 393 
-#define LIMIT_INF_N 351 
-#define LIMIT_SUP_S 396 
-#define LIMIT_INF_S 353 
+#define LIMIT_SUP_E 500//389 
+#define LIMIT_INF_E 365 
+#define LIMIT_SUP_O 500//390
+#define LIMIT_INF_O 365 
+#define LIMIT_SUP_N 500//387
+#define LIMIT_INF_N 368
+#define LIMIT_SUP_S 500//396 
+#define LIMIT_INF_S 359 
 
-#define DETECTION_ERROR_E 278.43
-#define DETECTION_ERROR_O 226.31
-#define DETECTION_ERROR_N 244.81
-#define DETECTION_ERROR_S 239.61
+#define DETECTION_ERROR_E 0.00021354    //278.43
+#define DETECTION_ERROR_O 0.00021813    //226.31
+#define DETECTION_ERROR_N 0.00024063    //244.81
+#define DETECTION_ERROR_S 0.00024243    //239.61
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -109,6 +110,14 @@ typedef struct {
 
 /*FreeRTOS definitions*/
 
+/*Funciones*/
+void muxOutputSelect(mux_transSelect_enum ch);
+
+wind_medicion_type anemometroGetMed(void);
+
+void anemometroTdetect(BaseType_t *pxHigherPriorityTaskWoken);
+
+void anemometroEmiterSelect(mux_transSelect_enum transd);
 
 #ifdef	__cplusplus
 extern "C" {
