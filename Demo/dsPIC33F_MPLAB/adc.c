@@ -11,7 +11,7 @@
 //uint16_t indice1 = 0;
 
 anemometro_deteccion_enum estadoDeteccion = PRIMER_LIMITE;
-//uint16_t medicionesADC[600];
+uint16_t medicionesADC[600];
 uint32_t indexADC = 0;
 uint16_t LIMIT_SUP = 0;
 uint16_t LIMIT_INF = 0;
@@ -106,13 +106,13 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     /*Detecto el tren de pulsos directamente en la ISR*/
     ADCval = ADC1BUF0;
 
-    //        medicionesADC[indexADC] = ADCval;
-    //        indexADC++;
-    //        if (indexADC == 600) {
-    //            while (1);
-    //            IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-    //            anemometroTdetect(&xTaskWoken);
-    //        }
+    medicionesADC[indexADC] = ADCval;
+    indexADC++;
+    if (indexADC == 600) {
+        while (1);
+        IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
+        anemometroTdetect(&xTaskWoken);
+    }
     switch (estadoDeteccion) {
         case PRIMER_LIMITE:
             if (ADCval > LIMIT_SUP) estadoDeteccion = SEGUNDO_LIMITE;
