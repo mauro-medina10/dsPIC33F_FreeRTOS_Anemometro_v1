@@ -11,7 +11,6 @@
 #include <stdio.h> 
 
 /*anemometro headers*/
-#include <anemometroDef.h>
 #include <timer.h>
 
 /*Configura los timers 4 y 5 para trabajar como uno de 32bits*/

@@ -32,8 +32,9 @@
 #define	TIMER_HEADER_TEMPLATE_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
+#include <anemometroDef.h>
 
-#define timerCount2s(count) ((float) count / configCPU_CLOCK_HZ)
+#define timerCount2s(count) ((float) ((float)count / configCPU_CLOCK_HZ))
 
 void timerInit(void);
 
