@@ -12,7 +12,7 @@
 //uint16_t indice1 = 0;
 unsigned int DmaBuffer = 0;
 
-anemometro_deteccion_enum estadoDeteccion = 3;
+anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
 //uint16_t medicionesADC[600];
 uint32_t indexADC = 0;
 uint16_t LIMIT_SUP = 0;
@@ -135,7 +135,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
                     anemometroTdetected(&xTaskWoken);
                     break;
                 }
-                estadoDeteccion = SEMI_POSITIVO;
+                estadoDeteccion = SEMI_NEGATIVO;
             }
             break;
         case SEMI_NEGATIVO:
@@ -146,7 +146,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
                     anemometroTdetected(&xTaskWoken);
                     break;
                 }
-                estadoDeteccion = SEMI_NEGATIVO;
+                estadoDeteccion = SEMI_POSITIVO;
             }
             break;
         case PRIMERA_SAMPLE:

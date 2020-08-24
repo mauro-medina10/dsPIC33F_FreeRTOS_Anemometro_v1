@@ -105,7 +105,7 @@ static void anemometro_main_task(void *pvParameters) {
 
     LED_ON;
     vTaskDelay(5 / portTICK_PERIOD_MS);
-    anemometroEmiterSelect(TRANS_EMISOR_OESTE);
+
     //Desactivo MUX
     MUX_INPUT_INH(1);
 
@@ -123,22 +123,23 @@ static void anemometro_main_task(void *pvParameters) {
                 anemometroModoActivo = Menu;
                 break;
             case Medicion_Continua:
-                vTaskDelay(50 / portTICK_PERIOD_MS);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
                 //                anemometroEmiterSelect(emisorSelect);
 
-                simpleMed = anemometroGetMed();
+                //                simpleMed = anemometroGetMed();
 
-                simpleMed = anemometroTestTransd(emisorSelect);
+                //                simpleMed = anemometroTestTransd(emisorSelect);
 
-                //                simpleMed = anemometroTestCoord(TRANS_EMISOR_NORTE);
+                simpleMed = anemometroTestCoord(emisorSelect);
 
                 uartSendMed(simpleMed);
 
                 auxV++;
                 if (auxV == 50) {
-                    emisorSelect++;
+                    //                    emisorSelect++;
                     auxV = 0;
-                    if (emisorSelect == 4) {
+                    emisorSelect += 2;
+                    if (emisorSelect > 3) {
                         while (1);
                     }
                 }
@@ -319,7 +320,7 @@ wind_medicion_type anemometroTestCoord(mux_transSelect_enum coord) {
     uint8_t i = 1;
     float timeConv[2];
 
-    for (i = 1; i < 2; i++) {
+    for (i = 1; i < 3; i++) {
         anemometroEmiterSelect(coord + (mux_transSelect_enum) i - 1);
 
         DELAY_50uS;
