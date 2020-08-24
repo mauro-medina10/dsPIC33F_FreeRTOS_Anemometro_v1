@@ -48,20 +48,23 @@
 #define DISTANCE_NS 0.176  //Norte-Sur (blanco-negro)
 #define DISTANCE_EO 0.185   //Este-Oeste (Rosa-Nada)
 
+//Valor ADC sin excitacion
+#define ADC_CERO 377
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUP_E 389 
+#define LIMIT_SUPERIOR 392
+#define LIMIT_SUP_E 391//389 
 #define LIMIT_INF_E 365 
-#define LIMIT_SUP_O 392
+#define LIMIT_SUP_O 392//392
 #define LIMIT_INF_O 361 
-#define LIMIT_SUP_N 393
+#define LIMIT_SUP_N 392//393
 #define LIMIT_INF_N 361
-#define LIMIT_SUP_S 391 
+#define LIMIT_SUP_S 390//391 
 #define LIMIT_INF_S 361 
 
-#define DETECTION_ERROR_E 0.00019524    
-#define DETECTION_ERROR_O 0.00022296    
-#define DETECTION_ERROR_N 0.00023405    
-#define DETECTION_ERROR_S 0.00016576    
+#define DETECTION_ERROR_E 0.00021616    
+#define DETECTION_ERROR_O 0.00020503    
+#define DETECTION_ERROR_N 0.00024140    
+#define DETECTION_ERROR_S 0.00023025    
 
 #define OFFSET_ERROR_EO -0.1187
 #define OFFSET_ERROR_NS 0.2410
@@ -93,9 +96,15 @@ typedef enum {
     Configuracion
 } anemometro_mode_enum;
 
+//typedef enum {
+//    PRIMER_LIMITE = 0,
+//    SEGUNDO_LIMITE
+//} anemometro_deteccion_enum;
+
 typedef enum {
-    PRIMER_LIMITE = 0,
-    SEGUNDO_LIMITE
+    SEMI_POSITIVO = 0,
+    SEMI_NEGATIVO,
+    PRIMERA_SAMPLE
 } anemometro_deteccion_enum;
 
 typedef enum {
@@ -118,9 +127,12 @@ void muxOutputSelect(mux_transSelect_enum ch);
 
 wind_medicion_type anemometroGetMed(void);
 
-void anemometroTdetect(BaseType_t *pxHigherPriorityTaskWoken);
+void anemometroTdetected(BaseType_t *pxHigherPriorityTaskWoken);
 
 void anemometroEmiterSelect(mux_transSelect_enum transd);
+
+/*FreeRTOS declarations*/
+
 
 #ifdef	__cplusplus
 extern "C" {

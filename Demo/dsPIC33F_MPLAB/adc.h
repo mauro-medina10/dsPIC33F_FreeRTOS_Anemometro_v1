@@ -54,6 +54,12 @@ void adc_stop(void);
 
 void adc_transdSelect(mux_transSelect_enum transd);
 
+void initDma0(void);
+
+/*Global variables*/
+static unsigned int BufferA[1] __attribute__((space(dma)));
+static unsigned int BufferB[1] __attribute__((space(dma)));
+
 #ifdef	__cplusplus
 extern "C" {
 #endif /* __cplusplus */
