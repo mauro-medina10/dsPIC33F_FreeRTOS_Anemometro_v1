@@ -73,9 +73,6 @@ int main(void) {
     timerInit();
 
     //FreeRTOS inits
-    //    xSemaphoreTrenDetectado = xSemaphoreCreateBinary();
-
-    //    if (xSemaphoreTrenDetectado == NULL) while (1);
 
     if (xTaskCreate(anemometro_main_task, "anemometro_main_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 3, &xTaskToNotify) != pdPASS) {
         while (1);
@@ -317,11 +314,11 @@ wind_medicion_type anemometroTestCoord(mux_transSelect_enum coord) {
     wind_medicion_type valMed = {0, 0};
     uint32_t timeMed[2];
     uint32_t ulNotificationValue;
-    uint8_t i = 1;
+    uint8_t i = 0;
     float timeConv[2];
 
-    for (i = 1; i < 3; i++) {
-        anemometroEmiterSelect(coord + (mux_transSelect_enum) i - 1);
+    for (i = 0; i < 2; i++) {
+        anemometroEmiterSelect(coord + (mux_transSelect_enum) i);
 
         DELAY_50uS;
 
@@ -332,19 +329,26 @@ wind_medicion_type anemometroTestCoord(mux_transSelect_enum coord) {
         //Necesitaria esperar 300us
         DELAY_300uS;
 
+        DELAY_100uS;
+
         adc_start();
 
         ulNotificationValue = ulTaskNotifyTake(pdTRUE, 2 / portTICK_PERIOD_MS);
 
         if (ulNotificationValue == 1) {
-            timeMed[i - 1] = timerCount();
+            timeMed[i] = timerCount();
         } else {
-            timeMed[i - 1] = 0;
-            i--;
+            timeMed[i] = 0;
         }
         adc_stop();
 
         timerStop();
+    }
+
+    if (timeMed[0] == 0 || timeMed[1] == 0) {
+        valMed.mag = 0;
+        valMed.deg = 0;
+        return valMed;
     }
     //    Convierto tiempos a us
     timeConv[0] = timerCount2s(timeMed[0]); // N u O
@@ -356,13 +360,15 @@ wind_medicion_type anemometroTestCoord(mux_transSelect_enum coord) {
             //Corrijo los tiempos medidos
             timeConv[0] = timeConv[0] - DETECTION_ERROR_O; //taOE
             timeConv[1] = timeConv[1] - DETECTION_ERROR_E; //trOE
-            valMed.mag = (((float) DISTANCE_EO / 2) * (1 / timeConv[0] - 1 / timeConv[1])); //Agregar offset
+
+            valMed.mag = (((float) DISTANCE_EO / 2) * (1 / timeConv[0] - 1 / timeConv[1])) - OFFSET_ERROR_EO;
             break;
         case TRANS_EMISOR_NORTE:
             //Corrijo los tiempos medidos
             timeConv[0] = timeConv[0] - DETECTION_ERROR_N;
             timeConv[1] = timeConv[1] - DETECTION_ERROR_S;
-            valMed.mag = (((float) DISTANCE_NS / 2) * (1 / timeConv[0] - 1 / timeConv[1])); //Agregar offset
+
+            valMed.mag = (((float) DISTANCE_NS / 2) * (1 / timeConv[0] - 1 / timeConv[1])) - OFFSET_ERROR_NS;
             break;
         default: valMed.mag = 0;
     }
@@ -385,6 +391,8 @@ wind_medicion_type anemometroTestTransd(mux_transSelect_enum coord) {
 
     //Necesitaria esperar 300us
     DELAY_300uS;
+
+    DELAY_100uS;
 
     adc_start();
 
@@ -472,7 +480,7 @@ void anemometroTdetected(BaseType_t * pxHigherPriorityTaskWoken) {
 void anemometroEmiterSelect(mux_transSelect_enum transd) {
     muxOutputSelect(transd);
 
-    adc_transdSelect(transd);
+    //    adc_transdSelect(transd);
 }
 
 void vApplicationIdleHook(void) {

@@ -8,17 +8,21 @@
 #include "adc.h"
 
 #define NUMSAMP 256
+#define ADC_CRUCES_CANT 15
 //uint16_t ADCvalue[1500];
 //uint16_t indice1 = 0;
 unsigned int DmaBuffer = 0;
 
 anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
-//uint16_t medicionesADC[600];
+//uint16_t medicionesADC[1000];
 uint32_t indexADC = 0;
-uint16_t LIMIT_SUP = 0;
-uint16_t LIMIT_INF = 0;
+//uint16_t LIMIT_SUP = 0;
+//uint16_t LIMIT_INF = 0;
 ////Nuevo metodo de deteccion
 uint8_t ADCcrucesCount = 0;
+uint16_t ADClastRead = 0;
+uint8_t ADCsecondReadFlag = 0;
+uint8_t ADCsafetyFlag = 0;
 //uint16_t ADClastRead = 0;
 //uint8_t ADCmaxMinCount = 0;
 //uint8_t secondRead = 0;
@@ -92,31 +96,34 @@ void adc_stop(void) {
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
     ADCcrucesCount = 0;
     estadoDeteccion = PRIMERA_SAMPLE;
+    ADCsecondReadFlag = 0;
+    ADClastRead = 0;
+    ADCsafetyFlag = 0;
     //    indexADC = 0;
 }
 
-void adc_transdSelect(mux_transSelect_enum transd) {
-    switch (transd) {
-        case TRANS_EMISOR_NORTE:
-            LIMIT_SUP = LIMIT_SUP_N;
-            LIMIT_INF = LIMIT_INF_N;
-            break;
-        case TRANS_EMISOR_SUR:
-            LIMIT_SUP = LIMIT_SUP_S;
-            LIMIT_INF = LIMIT_INF_S;
-            break;
-        case TRANS_EMISOR_ESTE:
-            LIMIT_SUP = LIMIT_SUP_E;
-            LIMIT_INF = LIMIT_INF_E;
-            break;
-        case TRANS_EMISOR_OESTE:
-            LIMIT_SUP = LIMIT_SUP_O;
-            LIMIT_INF = LIMIT_INF_O;
-            break;
-        default: LIMIT_SUP = LIMIT_SUP_N;
-            LIMIT_INF = LIMIT_INF_N;
-    }
-}
+//void adc_transdSelect(mux_transSelect_enum transd) {
+//    switch (transd) {
+//        case TRANS_EMISOR_NORTE:
+//            LIMIT_SUP = LIMIT_SUP_N;
+//            LIMIT_INF = LIMIT_INF_N;
+//            break;
+//        case TRANS_EMISOR_SUR:
+//            LIMIT_SUP = LIMIT_SUP_S;
+//            LIMIT_INF = LIMIT_INF_S;
+//            break;
+//        case TRANS_EMISOR_ESTE:
+//            LIMIT_SUP = LIMIT_SUP_E;
+//            LIMIT_INF = LIMIT_INF_E;
+//            break;
+//        case TRANS_EMISOR_OESTE:
+//            LIMIT_SUP = LIMIT_SUP_O;
+//            LIMIT_INF = LIMIT_INF_O;
+//            break;
+//        default: LIMIT_SUP = LIMIT_SUP_N;
+//            LIMIT_INF = LIMIT_INF_N;
+//    }
+//}
 
 void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     BaseType_t xTaskWoken = pdFALSE;
@@ -125,12 +132,22 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     /*Detecto el tren de pulsos directamente en la ISR*/
     ADCval = ADC1BUF0;
 
+
+    //    medicionesADC[indexADC] = ADCval;
+    //    indexADC++;
+    //
+    //    if (indexADC == 1000) {
+    //        while (1);
+    //        IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
+    //        anemometroTdetect(&xTaskWoken);
+    //    }
+
     /*Detecto cruces por cero*/
     switch (estadoDeteccion) {
         case SEMI_POSITIVO:
-            if (ADCval < ADC_CERO) {
+            if (ADCval < LIMIT_INF) {
                 ADCcrucesCount++;
-                if (ADCcrucesCount == 16) {
+                if (ADCcrucesCount >= ADC_CRUCES_CANT && ADCsafetyFlag == 1) {
                     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
                     anemometroTdetected(&xTaskWoken);
                     break;
@@ -139,9 +156,9 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
             }
             break;
         case SEMI_NEGATIVO:
-            if (ADCval > ADC_CERO) {
+            if (ADCval > LIMIT_SUPERIOR) {
                 ADCcrucesCount++;
-                if (ADCcrucesCount == 16) {
+                if (ADCcrucesCount >= ADC_CRUCES_CANT && ADCsafetyFlag == 1) {
                     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
                     anemometroTdetected(&xTaskWoken);
                     break;
@@ -150,28 +167,27 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
             }
             break;
         case PRIMERA_SAMPLE:
-            if (ADCval > ADC_CERO) {
+            if ((ADCval > LIMIT_SUPERIOR) || (ADCval > ADClastRead && ADCsecondReadFlag)) {
                 estadoDeteccion = SEMI_POSITIVO;
-            } else {
+            } else if (ADCval < LIMIT_INF || (ADCval < ADClastRead && ADCsecondReadFlag)) {
                 estadoDeteccion = SEMI_NEGATIVO;
+            } else {
+                ADCsecondReadFlag = 1;
+                ADClastRead = ADCval;
+                ADCcrucesCount++;
             }
             break;
         default: estadoDeteccion = PRIMERA_SAMPLE;
     }
+    if (ADCval > LIMIT_SAFETY) {
+        ADCsafetyFlag = 1;
+    }
+
     IFS0bits.AD1IF = 0; // Clear ADC1 interrupt flag
 
     if (xTaskWoken != pdFALSE) {
         taskYIELD();
     }
-    //    medicionesADC[indexADC] = ADCval;
-    //    indexADC++;
-    //
-    //    if (indexADC == 500) {
-    //        while (1);
-    //        IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-    //        anemometroTdetect(&xTaskWoken);
-    //    }
-
     //    switch (estadoDeteccion) {
     //        case PRIMER_LIMITE:
     //            if (ADCval > LIMIT_SUP) estadoDeteccion = SEGUNDO_LIMITE;

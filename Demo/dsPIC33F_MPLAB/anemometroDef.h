@@ -51,23 +51,25 @@
 //Valor ADC sin excitacion
 #define ADC_CERO 377
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUPERIOR 392
-#define LIMIT_SUP_E 391//389 
-#define LIMIT_INF_E 365 
-#define LIMIT_SUP_O 392//392
-#define LIMIT_INF_O 361 
-#define LIMIT_SUP_N 392//393
-#define LIMIT_INF_N 361
-#define LIMIT_SUP_S 390//391 
-#define LIMIT_INF_S 361 
+#define LIMIT_SUPERIOR 377
+#define LIMIT_INF 376
+#define LIMIT_SAFETY 384
+//#define LIMIT_SUP_E 391//389 
+//#define LIMIT_INF_E 365 
+//#define LIMIT_SUP_O 392//392
+//#define LIMIT_INF_O 361 
+//#define LIMIT_SUP_N 392//393
+//#define LIMIT_INF_N 361
+//#define LIMIT_SUP_S 390//391 
+//#define LIMIT_INF_S 361 
 
-#define DETECTION_ERROR_E 0.00021500//0.00021492    0.00021616    						  
-#define DETECTION_ERROR_O 0.00020413//0.00020442    0.00020503    
-#define DETECTION_ERROR_N 0.00024020//0.00024031    0.00024140    
-#define DETECTION_ERROR_S 0.00022995//0.00023025    0.00023025    
+#define DETECTION_ERROR_E 0.00029981			   						  
+#define DETECTION_ERROR_O 0.00029980     
+#define DETECTION_ERROR_N 0.00032415    
+#define DETECTION_ERROR_S 0.00032603    
 
-#define OFFSET_ERROR_EO -0.1187
-#define OFFSET_ERROR_NS 0.2410
+#define OFFSET_ERROR_EO -0.0032
+#define OFFSET_ERROR_NS -0.0017	
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -77,6 +79,7 @@
 
 //Delay
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
+#define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 50uS delay
 #define DELAY_300uS asm volatile ("REPEAT, #12001"); Nop(); // 300uS delay
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
