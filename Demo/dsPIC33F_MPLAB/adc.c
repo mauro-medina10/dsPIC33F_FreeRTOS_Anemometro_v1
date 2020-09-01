@@ -8,21 +8,21 @@
 #include "adc.h"
 
 #define NUMSAMP 256
-#define ADC_CRUCES_CANT 15
+#define ADC_CRUCES_CANT 150
 //uint16_t ADCvalue[1500];
 //uint16_t indice1 = 0;
 unsigned int DmaBuffer = 0;
 
 anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
-//uint16_t medicionesADC[1000];
+//uint16_t medicionesADC[600];
 uint32_t indexADC = 0;
 //uint16_t LIMIT_SUP = 0;
 //uint16_t LIMIT_INF = 0;
 ////Nuevo metodo de deteccion
 uint8_t ADCcrucesCount = 0;
 uint16_t ADClastRead = 0;
-uint8_t ADCsecondReadFlag = 0;
-uint8_t ADCsafetyFlag = 0;
+uint8_t ADCsecondMaxFlag = 0;
+uint8_t ADCsafetyFlag = 1;
 //uint16_t ADClastRead = 0;
 //uint8_t ADCmaxMinCount = 0;
 //uint8_t secondRead = 0;
@@ -96,9 +96,9 @@ void adc_stop(void) {
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
     ADCcrucesCount = 0;
     estadoDeteccion = PRIMERA_SAMPLE;
-    ADCsecondReadFlag = 0;
+    ADCsecondMaxFlag = 0;
     ADClastRead = 0;
-    ADCsafetyFlag = 0;
+    //    ADCsafetyFlag = 0;
     //    indexADC = 0;
 }
 
@@ -132,62 +132,102 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     /*Detecto el tren de pulsos directamente en la ISR*/
     ADCval = ADC1BUF0;
 
-
     //    medicionesADC[indexADC] = ADCval;
     //    indexADC++;
     //
-    //    if (indexADC == 1000) {
+    //    if (indexADC == 100) {
     //        while (1);
     //        IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-    //        anemometroTdetect(&xTaskWoken);
+    //        anemometroTdetected(&xTaskWoken);
     //    }
 
-    /*Detecto cruces por cero*/
+    /*Detecto Tercer maximo*/
     switch (estadoDeteccion) {
         case SEMI_POSITIVO:
-            if (ADCval < LIMIT_INF) {
-                ADCcrucesCount++;
-                if (ADCcrucesCount >= ADC_CRUCES_CANT && ADCsafetyFlag == 1) {
-                    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-                    anemometroTdetected(&xTaskWoken);
-                    break;
-                }
+            if (ADCval > ADClastRead) {
                 estadoDeteccion = SEMI_NEGATIVO;
             }
             break;
         case SEMI_NEGATIVO:
-            if (ADCval > LIMIT_SUPERIOR) {
+            if (ADCval < ADClastRead) { //Maximo detectado
                 ADCcrucesCount++;
-                if (ADCcrucesCount >= ADC_CRUCES_CANT && ADCsafetyFlag == 1) {
-                    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-                    anemometroTdetected(&xTaskWoken);
-                    break;
-                }
                 estadoDeteccion = SEMI_POSITIVO;
+            }
+            if (ADCcrucesCount == 2) {
+                IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
+                anemometroTdetected(&xTaskWoken);
             }
             break;
         case PRIMERA_SAMPLE:
-            if ((ADCval > LIMIT_SUPERIOR) || (ADCval > ADClastRead && ADCsecondReadFlag)) {
-                estadoDeteccion = SEMI_POSITIVO;
-            } else if (ADCval < LIMIT_INF || (ADCval < ADClastRead && ADCsecondReadFlag)) {
-                estadoDeteccion = SEMI_NEGATIVO;
-            } else {
-                ADCsecondReadFlag = 1;
-                ADClastRead = ADCval;
-                ADCcrucesCount++;
-            }
+            estadoDeteccion = SEMI_POSITIVO;
             break;
         default: estadoDeteccion = PRIMERA_SAMPLE;
     }
-    if (ADCval > LIMIT_SAFETY) {
-        ADCsafetyFlag = 1;
-    }
+    ADClastRead = ADCval;
+
+    //    /*Detecto cruces por cero*/
+    //    switch (estadoDeteccion) {
+    //        case SEMI_POSITIVO:
+    //            if (ADCval < LIMIT_INF) {
+    //                ADCcrucesCount++;
+    //                if (ADCcrucesCount >= ADC_CRUCES_CANT && ADCsafetyFlag == 1) {
+    //                    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
+    //                    anemometroTdetected(&xTaskWoken);
+    //                    break;
+    //                }
+    //                estadoDeteccion = SEMI_NEGATIVO;
+    //            }
+    //            break;
+    //        case SEMI_NEGATIVO:
+    //            if (ADCval > LIMIT_SUPERIOR) {
+    //                ADCcrucesCount++;
+    //                if (ADCcrucesCount >= ADC_CRUCES_CANT && ADCsafetyFlag == 1) {
+    //                    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
+    //                    anemometroTdetected(&xTaskWoken);
+    //                    break;
+    //                }
+    //                estadoDeteccion = SEMI_POSITIVO;
+    //            }
+    //            break;
+    //            //        case PRIMERA_SAMPLE:
+    //            //            if ((ADCval > LIMIT_SUPERIOR) || (ADCval > ADClastRead && ADCsecondReadFlag)) {
+    //            //                estadoDeteccion = SEMI_POSITIVO;
+    //            //            } else if (ADCval < LIMIT_INF || (ADCval < ADClastRead && ADCsecondReadFlag)) {
+    //            //                estadoDeteccion = SEMI_NEGATIVO;
+    //            //            } else {
+    //            //                ADCsecondReadFlag = 1;
+    //            //                ADClastRead = ADCval;
+    //            //                ADCcrucesCount++;
+    //            //            }
+    //            //            break;
+    //        case PRIMERA_SAMPLE:
+    //            if (ADCsecondReadFlag == 1) {
+    //                if (ADCval > ADClastRead && ADCval > LIMIT_INF) {
+    //                    ADCcrucesCount++;
+    //                    estadoDeteccion = SEMI_POSITIVO;
+    //                } else if (ADCval < ADClastRead && ADCval < LIMIT_SUPERIOR) {
+    //                    ADCcrucesCount++;
+    //                    estadoDeteccion = SEMI_NEGATIVO;
+    //                }
+    //                ADClastRead = ADCval;
+    //            } else {
+    //                ADCsecondReadFlag = 1;
+    //                ADClastRead = ADCval;
+    //            }
+    //            break;
+    //        default: estadoDeteccion = PRIMERA_SAMPLE;
+    //    }
+    //    if (ADCval > LIMIT_SAFETY) {
+    //        ADCsafetyFlag = 1;
+    //    }
 
     IFS0bits.AD1IF = 0; // Clear ADC1 interrupt flag
 
+    //    IEC0bits.AD1IE = 1;
     if (xTaskWoken != pdFALSE) {
         taskYIELD();
     }
+
     //    switch (estadoDeteccion) {
     //        case PRIMER_LIMITE:
     //            if (ADCval > LIMIT_SUP) estadoDeteccion = SEGUNDO_LIMITE;

@@ -54,19 +54,11 @@
 #define LIMIT_SUPERIOR 377
 #define LIMIT_INF 376
 #define LIMIT_SAFETY 384
-//#define LIMIT_SUP_E 391//389 
-//#define LIMIT_INF_E 365 
-//#define LIMIT_SUP_O 392//392
-//#define LIMIT_INF_O 361 
-//#define LIMIT_SUP_N 392//393
-//#define LIMIT_INF_N 361
-//#define LIMIT_SUP_S 390//391 
-//#define LIMIT_INF_S 361 
 
-#define DETECTION_ERROR_E 0.00029981			   						  
-#define DETECTION_ERROR_O 0.00029980     
-#define DETECTION_ERROR_N 0.00032415    
-#define DETECTION_ERROR_S 0.00032603    
+#define DETECTION_ERROR_E 0.00019856						   						  
+#define DETECTION_ERROR_O 0.00022417     
+#define DETECTION_ERROR_N 0.00021610    
+#define DETECTION_ERROR_S 0.00021835    
 
 #define OFFSET_ERROR_EO -0.0032
 #define OFFSET_ERROR_NS -0.0017	
@@ -79,8 +71,12 @@
 
 //Delay
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
-#define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 50uS delay
-#define DELAY_300uS asm volatile ("REPEAT, #12001"); Nop(); // 300uS delay
+#define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
+#define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
+#define DELAY_O asm volatile ("REPEAT, #3251"); Nop();
+#define DELAY_E asm volatile ("REPEAT, #2231"); Nop();
+#define DELAY_N asm volatile ("REPEAT, #2201"); Nop();
+#define DELAY_S asm volatile ("REPEAT, #2301"); Nop();
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
@@ -98,11 +94,6 @@ typedef enum {
     Medicion_Continua,
     Configuracion
 } anemometro_mode_enum;
-
-//typedef enum {
-//    PRIMER_LIMITE = 0,
-//    SEGUNDO_LIMITE
-//} anemometro_deteccion_enum;
 
 typedef enum {
     SEMI_POSITIVO = 0,

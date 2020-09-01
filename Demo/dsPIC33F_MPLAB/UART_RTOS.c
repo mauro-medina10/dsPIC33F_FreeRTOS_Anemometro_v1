@@ -14,18 +14,18 @@ static void uart_task(void *pvParameters);
 
 void uartInit_RTOS(void) {
 
-    qMenuOpcion = xQueueCreate(2, sizeof (char));
+    qMenuOpcion = xQueueCreate(4, sizeof (char));
 
     if (qMenuOpcion == NULL) {
         while (1);
     }
-    qAnemometroModo = xQueueCreate(3, sizeof ( anemometro_mode_enum));
+    qAnemometroModo = xQueueCreate(5, sizeof ( anemometro_mode_enum));
 
     if (qAnemometroModo == NULL) {
         while (1);
     }
 
-    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 4, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 5, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
         while (1);
     }
 
@@ -123,17 +123,14 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 static void uart_task(void *pvParameters) {
     anemometro_mode_enum modoActivo = Menu;
     wind_medicion_type medSimple;
-    char msg[] = "                                   ";
+    char msg[] = "                                     ";
     char comando = 'z';
     char exit = 'z';
-  
-    
+      
     while (1) {
         switch (modoActivo) {
             case Menu:
                 uartSendMenu(menuTemplate);
-                //                comando = 'z';
-                //                exit = 'z';
 
                 uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
                 if (comando < 53 && comando > 48) {
@@ -144,7 +141,7 @@ static void uart_task(void *pvParameters) {
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
-                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
+                    sprintf(msg, "\r\nMedición: %5.2f m/s - %5.2f deg\r\n", medSimple.mag, medSimple.deg);
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                     modoActivo = Menu;
                 }
@@ -154,7 +151,7 @@ static void uart_task(void *pvParameters) {
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE && exit == 'z') {
                     //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
-                    sprintf(msg, "\r\n %2.4f     %2.4f", medSimple.mag, medSimple.deg);
+                    sprintf(msg, "\r\n %5.4f     %5.4f", medSimple.mag, medSimple.deg);
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                 } else {
                     exit = 'z';
