@@ -115,7 +115,8 @@ static void anemometro_main_task(void *pvParameters) {
                 break;
             case Medicion_Simple:
                 //                simpleMed = anemometroGetMed();
-                simpleMed = anemometroTestTransd(TRANS_EMISOR_ESTE);
+                //                simpleMed = anemometroTestTransd(TRANS_EMISOR_ESTE);
+                simpleMed = anemometroTestCoord(TRANS_EMISOR_OESTE);
 
                 uartSendMed(simpleMed);
 
@@ -127,19 +128,18 @@ static void anemometro_main_task(void *pvParameters) {
 
                 //                simpleMed = anemometroGetMed();
 
-                simpleMed = anemometroTestTransd(emisorSelect);
+                //                simpleMed = anemometroTestTransd(emisorSelect);
 
-                //                simpleMed = anemometroTestCoord(emisorSelect);
+                simpleMed = anemometroTestCoord(emisorSelect);
 
                 uartSendMed(simpleMed);
 
                 auxV++;
                 if (auxV == 50) {
                     auxV = 0;
-                    emisorSelect++;
-                    //                    emisorSelect += 2;
+                    //                    emisorSelect++;
+                    emisorSelect += 2;
                     if (emisorSelect > 3) {
-                        emisorSelect = 1;
                         while (1);
                     }
                 }

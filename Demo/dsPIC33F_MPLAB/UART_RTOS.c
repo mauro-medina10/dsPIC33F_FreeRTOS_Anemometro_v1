@@ -25,7 +25,7 @@ void uartInit_RTOS(void) {
         while (1);
     }
 
-    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 5, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 4, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
         while (1);
     }
 
@@ -110,7 +110,7 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
     else
         waitTick = portMAX_DELAY;
 
-    while (ret < size) {
+    while (ret < size && pBuf[ret] != '\0') {
         U1TXREG = pBuf[ret];
         xSemaphoreTake(xSemaphoreUartSend, waitTick);
         //        waitTick = 0;
@@ -123,7 +123,7 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 static void uart_task(void *pvParameters) {
     anemometro_mode_enum modoActivo = Menu;
     wind_medicion_type medSimple;
-    char msg[] = "                                     ";
+    char msg[50];
     char comando = 'z';
     char exit = 'z';
       
@@ -141,7 +141,7 @@ static void uart_task(void *pvParameters) {
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
-                    sprintf(msg, "\r\nMedición: %5.2f m/s - %5.2f deg\r\n", medSimple.mag, medSimple.deg);
+                    sprintf(msg, "\r\nMedición: %5.2f m/s - %5.2f deg\r\n\0", medSimple.mag, medSimple.deg);
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                     modoActivo = Menu;
                 }
@@ -151,12 +151,13 @@ static void uart_task(void *pvParameters) {
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE && exit == 'z') {
                     //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
-                    sprintf(msg, "\r\n %5.4f     %5.4f", medSimple.mag, medSimple.deg);
+                    sprintf(msg, "\r\n %5.4f     %5.4f\0", medSimple.mag, medSimple.deg);
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                 } else {
                     exit = 'z';
                     modoActivo = Menu;
                 }
+                /*Si recibo cualquier caracter que no sea 'z' termino el modo continuo*/
                 if (uartRecv((uint8_t *) & exit, 1, 0) != 1) {
                     exit = 'z';
                 }
