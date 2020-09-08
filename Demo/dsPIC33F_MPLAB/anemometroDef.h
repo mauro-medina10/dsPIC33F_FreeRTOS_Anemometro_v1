@@ -55,13 +55,13 @@
 #define LIMIT_INF 376
 #define LIMIT_SAFETY 384
 
-#define DETECTION_ERROR_E 0.00019856						   						  
-#define DETECTION_ERROR_O 0.00022417     
-#define DETECTION_ERROR_N 0.00021610    
-#define DETECTION_ERROR_S 0.00021835    
+#define DETECTION_ERROR_E 0.00024813//0.00020071    						   						  
+#define DETECTION_ERROR_O 0.00024943//0.00022481     
+#define DETECTION_ERROR_N 0.00027470//0.00022629    
+#define DETECTION_ERROR_S 0.00027500//0.00022617    
 
-#define OFFSET_ERROR_EO 7.30418	
-#define OFFSET_ERROR_NS -0.7271	
+#define OFFSET_ERROR_EO -0.1
+#define OFFSET_ERROR_NS -0.01	
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -73,10 +73,10 @@
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
 #define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
 #define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
-#define DELAY_O asm volatile ("REPEAT, #3251"); Nop();
-#define DELAY_E asm volatile ("REPEAT, #2231"); Nop();
-#define DELAY_N asm volatile ("REPEAT, #2201"); Nop();
-#define DELAY_S asm volatile ("REPEAT, #2301"); Nop();
+#define DELAY_O asm volatile ("REPEAT, #2271"); Nop();
+#define DELAY_E asm volatile ("REPEAT, #2071"); Nop();
+#define DELAY_N asm volatile ("REPEAT, #2081"); Nop();
+#define DELAY_S asm volatile ("REPEAT, #2091"); Nop();
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
@@ -117,11 +117,11 @@ typedef struct {
 /*FreeRTOS definitions*/
 
 /*Funciones*/
-void muxOutputSelect(mux_transSelect_enum ch);
+BaseType_t muxOutputSelect(mux_transSelect_enum ch);
 
 wind_medicion_type anemometroGetMed(void);
 
-void anemometroTdetected(BaseType_t *pxHigherPriorityTaskWoken);
+void anemometroTdetected(BaseType_t *pxHigherPriorityTaskWoken, uint32_t val);
 
 void anemometroEmiterSelect(mux_transSelect_enum transd);
 

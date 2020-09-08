@@ -63,13 +63,6 @@ typedef enum {
     menuTemplate_config,
 } uart_menu_enum;
 
-/* FreeRTOS declarations*/
-static SemaphoreHandle_t xSemaphoreUartSend;
-static QueueHandle_t qRecv;
-static QueueHandle_t qSendMedicion;
-static QueueHandle_t qMenuOpcion;
-static QueueHandle_t qAnemometroModo;
-
 void uartInit(void);
 
 void uartInit_RTOS(void);
@@ -83,6 +76,8 @@ uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime);
 anemometro_mode_enum uartGetMode(void);
 
 void uartSendMed(wind_medicion_type med);
+
+void uartEndMode(void);
 
 #ifdef	__cplusplus
 extern "C" {

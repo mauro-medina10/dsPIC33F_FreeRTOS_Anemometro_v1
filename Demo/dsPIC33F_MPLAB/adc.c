@@ -19,7 +19,7 @@ uint32_t indexADC = 0;
 //uint16_t LIMIT_SUP = 0;
 //uint16_t LIMIT_INF = 0;
 ////Nuevo metodo de deteccion
-uint8_t ADCcrucesCount = 0;
+uint16_t ADCmaximosCount = 0;
 uint16_t ADClastRead = 0;
 uint8_t ADCsecondMaxFlag = 0;
 uint8_t ADCsafetyFlag = 1;
@@ -72,18 +72,18 @@ void adc_init(void) {
     //    initDma0();
 }
 
-void initDma0(void) {
-    DMA0CONbits.AMODE = 0; // Configure DMA for Register indirect with post increment
-    DMA0CONbits.MODE = 2; // Configure DMA for Continuous Ping-Pong mode
-    DMA0PAD = (volatile unsigned int) &ADC1BUF0;
-    DMA0CNT = (NUMSAMP - 1);
-    DMA0REQ = 13;
-    DMA0STA = __builtin_dmaoffset(BufferA);
-    DMA0STB = __builtin_dmaoffset(BufferB);
-    IFS0bits.DMA0IF = 0; //Clear the DMA interrupt flag bit
-    IEC0bits.DMA0IE = 1; //Set the DMA interrupt enable bit
-    DMA0CONbits.CHEN = 1; //enable
-}
+//void initDma0(void) {
+//    DMA0CONbits.AMODE = 0; // Configure DMA for Register indirect with post increment
+//    DMA0CONbits.MODE = 2; // Configure DMA for Continuous Ping-Pong mode
+//    DMA0PAD = (volatile unsigned int) &ADC1BUF0;
+//    DMA0CNT = (NUMSAMP - 1);
+//    DMA0REQ = 13;
+//    DMA0STA = __builtin_dmaoffset(BufferA);
+//    DMA0STB = __builtin_dmaoffset(BufferB);
+//    IFS0bits.DMA0IF = 0; //Clear the DMA interrupt flag bit
+//    IEC0bits.DMA0IE = 1; //Set the DMA interrupt enable bit
+//    DMA0CONbits.CHEN = 1; //enable
+//}
 
 void adc_start(void) {
     IEC0bits.AD1IE = 1; // Enable ADC1 interrupts
@@ -91,14 +91,23 @@ void adc_start(void) {
 }
 
 void adc_stop(void) {
+    //    uint8_t i = 0;
+    //    wind_medicion_type aux;
+
     AD1CON1bits.ADON = 0; // Turn off ADC1
     IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
-    ADCcrucesCount = 0;
+    ADCmaximosCount = 0;
     estadoDeteccion = PRIMERA_SAMPLE;
-    ADCsecondMaxFlag = 0;
+    //    ADCsecondMaxFlag = 0;
     ADClastRead = 0;
     //    ADCsafetyFlag = 0;
+
+    //    for (i = 0; i < indexADC; i++) {
+    //        aux.mag = (float) medicionesADC[i];
+    //        aux.deg = 0;
+    //        uartSendMed(aux);
+    //    }
     //    indexADC = 0;
 }
 
@@ -133,13 +142,14 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     ADCval = ADC1BUF0;
 
     //    medicionesADC[indexADC] = ADCval;
-    //    indexADC++;
+    //    //    indexADC++;
     //
-    //    if (indexADC == 100) {
-    //        while (1);
+    //    if (indexADC == 200) {
+    //        //        while (1);
     //        IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-    //        anemometroTdetected(&xTaskWoken);
+    //        anemometroTdetected(&xTaskWoken, 1);
     //    }
+    //    indexADC++;
 
     /*Detecto Tercer maximo*/
     switch (estadoDeteccion) {
@@ -150,12 +160,19 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
             break;
         case SEMI_NEGATIVO:
             if (ADCval < ADClastRead) { //Maximo detectado
-                ADCcrucesCount++;
+                ADCmaximosCount++;
                 estadoDeteccion = SEMI_POSITIVO;
             }
-            if (ADCcrucesCount == 2) {
-                IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-                anemometroTdetected(&xTaskWoken);
+            if (ADCmaximosCount == 4) {
+                if (ADCval > LIMIT_SAFETY) {
+                    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
+                    /*Seteo el bit 0*/
+                    anemometroTdetected(&xTaskWoken, 0x01);
+                } else {
+                    IEC0bits.AD1IE = 0;
+                    /*Seteo bit 1*/
+                    anemometroTdetected(&xTaskWoken, 0x02);
+                }
             }
             break;
         case PRIMERA_SAMPLE:
@@ -165,135 +182,30 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     }
     ADClastRead = ADCval;
 
-    //    /*Detecto cruces por cero*/
-    //    switch (estadoDeteccion) {
-    //        case SEMI_POSITIVO:
-    //            if (ADCval < LIMIT_INF) {
-    //                ADCcrucesCount++;
-    //                if (ADCcrucesCount >= ADC_CRUCES_CANT && ADCsafetyFlag == 1) {
-    //                    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-    //                    anemometroTdetected(&xTaskWoken);
-    //                    break;
-    //                }
-    //                estadoDeteccion = SEMI_NEGATIVO;
-    //            }
-    //            break;
-    //        case SEMI_NEGATIVO:
-    //            if (ADCval > LIMIT_SUPERIOR) {
-    //                ADCcrucesCount++;
-    //                if (ADCcrucesCount >= ADC_CRUCES_CANT && ADCsafetyFlag == 1) {
-    //                    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-    //                    anemometroTdetected(&xTaskWoken);
-    //                    break;
-    //                }
-    //                estadoDeteccion = SEMI_POSITIVO;
-    //            }
-    //            break;
-    //            //        case PRIMERA_SAMPLE:
-    //            //            if ((ADCval > LIMIT_SUPERIOR) || (ADCval > ADClastRead && ADCsecondReadFlag)) {
-    //            //                estadoDeteccion = SEMI_POSITIVO;
-    //            //            } else if (ADCval < LIMIT_INF || (ADCval < ADClastRead && ADCsecondReadFlag)) {
-    //            //                estadoDeteccion = SEMI_NEGATIVO;
-    //            //            } else {
-    //            //                ADCsecondReadFlag = 1;
-    //            //                ADClastRead = ADCval;
-    //            //                ADCcrucesCount++;
-    //            //            }
-    //            //            break;
-    //        case PRIMERA_SAMPLE:
-    //            if (ADCsecondReadFlag == 1) {
-    //                if (ADCval > ADClastRead && ADCval > LIMIT_INF) {
-    //                    ADCcrucesCount++;
-    //                    estadoDeteccion = SEMI_POSITIVO;
-    //                } else if (ADCval < ADClastRead && ADCval < LIMIT_SUPERIOR) {
-    //                    ADCcrucesCount++;
-    //                    estadoDeteccion = SEMI_NEGATIVO;
-    //                }
-    //                ADClastRead = ADCval;
-    //            } else {
-    //                ADCsecondReadFlag = 1;
-    //                ADClastRead = ADCval;
-    //            }
-    //            break;
-    //        default: estadoDeteccion = PRIMERA_SAMPLE;
-    //    }
-    //    if (ADCval > LIMIT_SAFETY) {
-    //        ADCsafetyFlag = 1;
-    //    }
-
     IFS0bits.AD1IF = 0; // Clear ADC1 interrupt flag
 
-    //    IEC0bits.AD1IE = 1;
-    if (xTaskWoken != pdFALSE) {
-        taskYIELD();
-    }
-
-    //    switch (estadoDeteccion) {
-    //        case PRIMER_LIMITE:
-    //            if (ADCval > LIMIT_SUP) estadoDeteccion = SEGUNDO_LIMITE;
-    //            break;
-    //        case SEGUNDO_LIMITE:
-    //            if (ADCval < LIMIT_INF) {
-    //                IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-    //                estadoDeteccion = PRIMER_LIMITE;
-    //                anemometroTdetect(&xTaskWoken);
-    //            }
-    //            break;
-    //        default: estadoDeteccion = PRIMER_LIMITE;
-    //    }
-    //    //Cuento los maximos y minimos y detecto en el cuerto (?)  
-    //    if (secondRead == 1) {
-    //        if (ADCval < ADClastRead) {
-    //            estadoDeteccion = SEGUNDO_LIMITE; //minimo
-    //        } else {
-    //            estadoDeteccion = PRIMER_LIMITE;
-    //        }
-    //        secondRead = 3;
-    //    } else if (secondRead == 0) {
-    //        ADClastRead = ADCval;
-    //        secondRead = 1;
-    //    }
-    //    switch (estadoDeteccion) {
-    //        case PRIMER_LIMITE: //maxino
-    //            if (ADCval < ADClastRead) {
-    //                ADCmaxMinCount++;
-    //                estadoDeteccion = SEGUNDO_LIMITE;
-    //            }
-    //            ADClastRead = ADCval;
-    //            break;
-    //        case SEGUNDO_LIMITE:
-    //            if (ADCval > ADClastRead) {
-    //                ADCmaxMinCount++;
-    //                estadoDeteccion = PRIMER_LIMITE;
-    //            }
-    //            ADClastRead = ADCval;
-    //            break;
-    //        default: estadoDeteccion = PRIMER_LIMITE;
-    //    }
-    //
-    //    if (ADCmaxMinCount == 14) {
-    //        anemometroTdetect(&xTaskWoken);
-    //        ADCmaxMinCount = 0;
-    //    }
-}
-
-void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void) {
-    BaseType_t xTaskWoken = pdFALSE;
-
-    if (DmaBuffer == 0) {
-        //Buffer A
-        DmaBuffer = 0;
-    } else {
-        //Buffer B
-        while (1);
-    }
-    DmaBuffer ^= 1;
-
-    anemometroTdetected(&xTaskWoken);
-
-    IFS0bits.DMA0IF = 0;
-
     if (xTaskWoken != pdFALSE) {
         taskYIELD();
     }
 }
+
+//void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void) {
+//    BaseType_t xTaskWoken = pdFALSE;
+//
+//    if (DmaBuffer == 0) {
+//        //Buffer A
+//        DmaBuffer = 0;
+//    } else {
+//        //Buffer B
+//        while (1);
+//    }
+//    DmaBuffer ^= 1;
+//
+//    anemometroTdetected(&xTaskWoken, 1);
+//
+//    IFS0bits.DMA0IF = 0;
+//
+//    if (xTaskWoken != pdFALSE) {
+//        taskYIELD();
+//    }
+//}
