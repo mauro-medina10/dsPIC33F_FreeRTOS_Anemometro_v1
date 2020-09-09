@@ -60,8 +60,11 @@
 #define DETECTION_ERROR_N 0.00027470//0.00022629    
 #define DETECTION_ERROR_S 0.00027500//0.00022617    
 
-#define OFFSET_ERROR_EO -0.1
-#define OFFSET_ERROR_NS -0.01	
+#define OFFSET_ERROR_EO -0.7013
+#define OFFSET_ERROR_NS -0.333	
+
+//Numero de mediciones que se promedian
+#define N_MED_PROM 25
 
 // PLL activado
 #define _PLLACTIVATED_

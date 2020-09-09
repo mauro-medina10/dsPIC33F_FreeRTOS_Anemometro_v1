@@ -138,6 +138,8 @@ static void uart_task(void *pvParameters) {
     while (1) {
         switch (modoActivo) {
             case Menu:
+                xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
+
                 uartSendMenu(menuTemplate);
 
                 uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
@@ -153,7 +155,11 @@ static void uart_task(void *pvParameters) {
                 }
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
-                    sprintf(msg, "\r\nMedición: %5.2f m/s - %5.2f deg\r\n\0", medSimple.mag, medSimple.deg);
+                    if (medSimple.mag < 555) {
+                        sprintf(msg, "\r\nMedición: %5.2f m/s ; %5.2f deg\r\n\0", medSimple.mag, medSimple.deg);
+                    } else {
+                        sprintf(msg, "\r\n NULL     %5.4f\0", medSimple.deg);
+                    }
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                     modoActivo = Menu;
                 }
@@ -168,8 +174,12 @@ static void uart_task(void *pvParameters) {
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE && exit == 'z') {
-                    //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
-                    sprintf(msg, "\r\n %5.4f     %5.4f\0", medSimple.mag, medSimple.deg);
+                    if (medSimple.mag < 555) {
+                        //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
+                        sprintf(msg, "\r\n %5.4f     %5.4f\0", medSimple.mag, medSimple.deg);
+                    } else {
+                        sprintf(msg, "\r\n NULL     %5.4f\0", medSimple.deg);
+                    }
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                 } else {
                     exit = 'z';
