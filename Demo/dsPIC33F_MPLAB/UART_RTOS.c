@@ -174,7 +174,7 @@ static void uart_task(void *pvParameters) {
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE && exit == 'z') {
-                    if (medSimple.mag < 555) {
+                    if (medSimple.mag < 555 || medSimple.mag > 1000) {
                         //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
                         sprintf(msg, "\r\n %5.4f     %5.4f\0", medSimple.mag, medSimple.deg);
                     } else {

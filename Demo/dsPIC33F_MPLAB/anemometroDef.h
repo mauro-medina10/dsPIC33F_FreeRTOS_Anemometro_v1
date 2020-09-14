@@ -45,26 +45,27 @@
 #include "semphr.h"
 
 //Distancias entre transductores
-#define DISTANCE_NS 0.176  //Norte-Sur (blanco-negro)
-#define DISTANCE_EO 0.185   //Este-Oeste (Rosa-Nada)
+#define DISTANCE_NS 0.276  //Norte-Sur (blanco-negro)
+#define DISTANCE_EO 0.276   //Este-Oeste (Rosa-Nada)
 
 //Valor ADC sin excitacion
 #define ADC_CERO 377
 //Limites para deteccion de tren de pulsos
 #define LIMIT_SUPERIOR 377
 #define LIMIT_INF 376
-#define LIMIT_SAFETY 384
+#define LIMIT_SAFETY 382
 
-#define DETECTION_ERROR_E 0.00024813//0.00020071    						   						  
-#define DETECTION_ERROR_O 0.00024943//0.00022481     
-#define DETECTION_ERROR_N 0.00027470//0.00022629    
-#define DETECTION_ERROR_S 0.00027500//0.00022617    
+#define DETECTION_ERROR_O 0.00026255
+#define DETECTION_ERROR_E 0.00026108						   						  
+#define DETECTION_ERROR_N 0.00026940   
+#define DETECTION_ERROR_S 0.00026949 
 
-#define OFFSET_ERROR_EO -0.7013
-#define OFFSET_ERROR_NS -0.333	
+#define OFFSET_ERROR_EO 0//4.867876	
+#define OFFSET_ERROR_NS 0//-2.3815
 
 //Numero de mediciones que se promedian
-#define N_MED_PROM 25
+#define N_TIMER_PROM 20
+#define N_MED_PROM 5
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -76,10 +77,12 @@
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
 #define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
 #define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
-#define DELAY_O asm volatile ("REPEAT, #2271"); Nop();
-#define DELAY_E asm volatile ("REPEAT, #2071"); Nop();
-#define DELAY_N asm volatile ("REPEAT, #2081"); Nop();
-#define DELAY_S asm volatile ("REPEAT, #2091"); Nop();
+#define DELAY_O asm volatile ("REPEAT, #14181"); Nop();
+#define DELAY_E asm volatile ("REPEAT, #14081"); Nop();
+#define DELAY_N asm volatile ("REPEAT, #14401"); Nop();
+#define DELAY_S asm volatile ("REPEAT, #14411"); Nop();
+//#define DELAY_N asm volatile ("REPEAT, #2081"); Nop();
+//#define DELAY_S asm volatile ("REPEAT, #2091"); Nop();
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))

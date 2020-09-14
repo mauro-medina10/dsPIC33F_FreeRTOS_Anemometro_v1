@@ -14,7 +14,7 @@
 unsigned int DmaBuffer = 0;
 
 anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
-//uint16_t medicionesADC[600];
+//uint16_t medicionesADC[500];
 uint32_t indexADC = 0;
 //uint16_t LIMIT_SUP = 0;
 //uint16_t LIMIT_INF = 0;
@@ -91,8 +91,8 @@ void adc_start(void) {
 }
 
 void adc_stop(void) {
-    //    uint8_t i = 0;
-    //    wind_medicion_type aux;
+    uint8_t i = 0;
+    wind_medicion_type aux;
 
     AD1CON1bits.ADON = 0; // Turn off ADC1
     IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
@@ -142,10 +142,9 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     ADCval = ADC1BUF0;
 
     //    medicionesADC[indexADC] = ADCval;
-    //    //    indexADC++;
     //
-    //    if (indexADC == 200) {
-    //        //        while (1);
+    //    if (indexADC == 400) {
+    //        //                while (1);
     //        IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
     //        anemometroTdetected(&xTaskWoken, 1);
     //    }
@@ -163,7 +162,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
                 ADCmaximosCount++;
                 estadoDeteccion = SEMI_POSITIVO;
             }
-            if (ADCmaximosCount == 4) {
+            if (ADCmaximosCount == 3) {
                 if (ADCval > LIMIT_SAFETY) {
                     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
                     /*Seteo el bit 0*/

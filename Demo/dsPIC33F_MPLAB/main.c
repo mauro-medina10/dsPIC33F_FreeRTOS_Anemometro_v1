@@ -36,7 +36,9 @@
 /*Funciones locales*/
 static void prvSetupHardware(void);
 
-float anemometroTestCoord(mux_transSelect_enum coord);
+float anemometroGetVcoord(mux_transSelect_enum coord);
+
+float anemometroGetMedProm(uint8_t Nprom);
 
 wind_medicion_type anemometroTestTransd(mux_transSelect_enum coord);
 
@@ -102,6 +104,10 @@ static void anemometro_main_task(void *pvParameters) {
     mux_transSelect_enum emisorSelect = TRANS_EMISOR_OESTE;
     uint16_t auxV = 0;
     float medCoord = 0;
+    wind_medicion_type lineMed = {999.99, 999.99};
+    float medAcum = 0;
+    uint8_t i = 0;
+    uint8_t medNprom = N_TIMER_PROM;
 
     LED_ON;
     vTaskDelay(5 / portTICK_PERIOD_MS);
@@ -113,19 +119,23 @@ static void anemometro_main_task(void *pvParameters) {
         switch (anemometroModoActivo) {
             case Menu:
                 auxV = 0;
+                medAcum = 0;
                 anemometroModoActivo = uartGetMode();
 
                 if (anemometroModoActivo == Medicion_Continua) emisorSelect = TRANS_EMISOR_OESTE;
 
                 break;
             case Medicion_Simple:
-                simpleMed = anemometroGetMed();
-                //                simpleMed = anemometroTestCoord(TRANS_EMISOR_OESTE);
+                //                simpleMed = anemometroGetMed();
+                //                simpleMed.mag = anemometroGetMedProm(N_MED_PROM);
+                //                medCoord = anemometroGetVcoord(TRANS_EMISOR_NORTE);
+                //                simpleMed.mag = medCoord;
+                simpleMed = anemometroTestTransd(TRANS_EMISOR_NORTE);
                 //                simpleMed = anemometroTestTransd(emisorSelect);
-                //                emisorSelect++;
-                //                simpleMed = anemometroTestCoord(emisorSelect);
+                emisorSelect++;
+                //                simpleMed = anemometroGetVcoord(emisorSelect);
 
-                emisorSelect += 2;
+                //                emisorSelect += 2;
 
                 if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
 
@@ -137,10 +147,17 @@ static void anemometro_main_task(void *pvParameters) {
                 vTaskDelay(10 / portTICK_PERIOD_MS);
                 //                anemometroEmiterSelect(emisorSelect);
                 //                simpleMed = anemometroGetMed();
+                //                simpleMed = anemometroTestTransd(TRANS_EMISOR_SUR);
                 //                simpleMed = anemometroTestTransd(emisorSelect);
-                medCoord = anemometroTestCoord(TRANS_EMISOR_NORTE);
-                //                simpleMed = anemometroTestCoord(emisorSelect);
+                //                medCoord = anemometroGetVcoord(TRANS_EMISOR_NORTE);
+                medCoord = anemometroGetVcoord(emisorSelect);
+
                 simpleMed.mag = medCoord;
+
+                emisorSelect += 2;
+                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
+
+                //                simpleMed.mag = anemometroGetMedProm(N_MED_PROM);
 
                 uartSendMed(simpleMed);
 
@@ -149,13 +166,14 @@ static void anemometro_main_task(void *pvParameters) {
                 //                    auxV = 0;
                 //                    //                    emisorSelect++;
                 //                    emisorSelect += 2;
+                //                    //                    uartSendMed(lineMed);
                 //                    if (emisorSelect > TRANS_EMISOR_SUR) {
                 //                        emisorSelect = TRANS_EMISOR_OESTE;
-                ////                        uartSendMed(lineMed);
+                //                        uartSendMed(lineMed);
                 //                        //                        uartEndMode();
                 //                        //                        while (1);
                 //                    }
-                //        }
+                //                }
                 anemometroModoActivo = uartGetMode();
                 if (anemometroModoActivo == Menu) {
                     emisorSelect = TRANS_EMISOR_OESTE;
@@ -337,7 +355,7 @@ BaseType_t muxOutputSelect(mux_transSelect_enum ch) {
     return pdTRUE;
 }
 
-float anemometroTestCoord(mux_transSelect_enum coord) {
+float anemometroGetVcoord(mux_transSelect_enum coord) {
     float valMed = 0;
     float valAcum = 0;
     float valProm = 0;
@@ -345,43 +363,50 @@ float anemometroTestCoord(mux_transSelect_enum coord) {
     uint32_t ulNotificationValue;
     uint8_t i = 0;
     uint8_t n = 0;
+    uint8_t m = 0;
+    uint8_t nTimerProm[2] = {N_TIMER_PROM, N_TIMER_PROM};
     uint8_t nMedProm = N_MED_PROM;
     float timeConv[2];
     BaseType_t notifyStatus = pdFAIL;
 
-    for (n = 0; n < N_MED_PROM; n++) {
-        for (i = 0; i < 2; i++) {
-            anemometroEmiterSelect(coord + i);
+    for (m = 0; m < N_MED_PROM; m++) {
+        for (n = 0; n < N_TIMER_PROM; n++) {
+            for (i = 0; i < 2; i++) {
+                anemometroEmiterSelect(coord + i);
 
-            DELAY_50uS;
+                DELAY_50uS;
 
-            timerStart();
+                timerStart();
 
-            comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
+                comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
 
-            //Necesitaria esperar 400us
-            DELAY_400uS;
-            anemometroReceptorDelay(coord + i);
+                //Necesitaria esperar 400us
+                DELAY_400uS;
+                anemometroReceptorDelay(coord + i);
 
-            adc_start();
+                adc_start();
 
-            //        ulNotificationValue = ulTaskNotifyTake(pdTRUE, 1 / portTICK_PERIOD_MS);
-            notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 1 / portTICK_PERIOD_MS);
+                //        ulNotificationValue = ulTaskNotifyTake(pdTRUE, 1 / portTICK_PERIOD_MS);
+                notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 1 / portTICK_PERIOD_MS);
 
-            if ((ulNotificationValue & 0x1) != 0 && notifyStatus == pdPASS) {
-                timeMed[i] = timerCount();
-            } else {
-                timeMed[i] = 0;
+                if ((ulNotificationValue & 0x1) != 0 && notifyStatus == pdPASS) {
+                    timeMed[i] += timerCount();
+                } else {
+                    nTimerProm[i]--;
+                }
+                adc_stop();
+
+                timerStop();
             }
-            adc_stop();
-
-            timerStop();
+            vTaskDelay(1 / portTICK_PERIOD_MS);
         }
 
-        if (timeMed[0] == 0 || timeMed[1] == 0) {
-            valMed = 0;
-            nMedProm--;
+        if (timeMed[0] == 0 || timeMed[1] == 0 || nTimerProm[0] == 0 || nTimerProm[1] == 0) {
+            valMed = 999.99;
         } else {
+            timeMed[0] = timeMed[0] / nTimerProm[0];
+            timeMed[1] = timeMed[1] / nTimerProm[1];
+
             //    Convierto tiempos a us
             timeConv[0] = timerCount2s(timeMed[0]); // N u O
             timeConv[1] = timerCount2s(timeMed[1]); // S o E
@@ -408,22 +433,116 @@ float anemometroTestCoord(mux_transSelect_enum coord) {
                     valMed = (((float) DISTANCE_NS / 2) * (1 / timeConv[0] - 1 / timeConv[1])) - OFFSET_ERROR_NS;
                     break;
                 default:
-                    nMedProm--;
-                    valMed = 0;
+                    valMed = 888.88;
             }
-            valAcum += valMed;
         }
-        vTaskDelay(1 / portTICK_PERIOD_MS);
-
+        if (valMed < 555) {
+            valAcum += valMed;
+        } else {
+            nMedProm--;
+        }
+        timeMed[0] = 0;
+        timeMed[1] = 0;
+        nTimerProm[0] = N_TIMER_PROM;
+        nTimerProm[1] = N_TIMER_PROM;
     }
     if (nMedProm > 0) {
-        valProm = valAcum / nMedProm;
+        valMed = valAcum / nMedProm;
     } else {
-        valProm = 999.99;
+        valMed = 666.66;
     }
-
-    return valProm;
+    return valMed;
+    //    return valMed;
 }
+//float anemometroGetVcoord(mux_transSelect_enum coord) {
+//    float valMed = 0;
+//    float valAcum = 0;
+//    float valProm = 0;
+//    uint32_t timeMed[] = {0, 0};
+//    uint32_t ulNotificationValue;
+//    uint8_t i = 0;
+//    uint8_t n = 0;
+//    uint8_t nMedProm = N_MED_PROM;
+//    float timeConv[2];
+//    BaseType_t notifyStatus = pdFAIL;
+//
+//    for (n = 0; n < N_MED_PROM; n++) {
+//        for (i = 0; i < 2; i++) {
+//            anemometroEmiterSelect(coord + i);
+//
+//            DELAY_50uS;
+//
+//            timerStart();
+//
+//            comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
+//
+//            //Necesitaria esperar 400us
+//            DELAY_400uS;
+//            DELAY_400uS;
+//            anemometroReceptorDelay(coord + i);
+//
+//            adc_start();
+//
+//            //        ulNotificationValue = ulTaskNotifyTake(pdTRUE, 1 / portTICK_PERIOD_MS);
+//            notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 1 / portTICK_PERIOD_MS);
+//
+//            if ((ulNotificationValue & 0x1) != 0 && notifyStatus == pdPASS) {
+//                timeMed[i] = timerCount();
+//            } else {
+//                timeMed[i] = 0;
+//            }
+//            adc_stop();
+//
+//            timerStop();
+//        }
+//
+//        if (timeMed[0] == 0 || timeMed[1] == 0) {
+//            valMed = 0;
+//            nMedProm--;
+//        } else {
+//            //    Convierto tiempos a us
+//            timeConv[0] = timerCount2s(timeMed[0]); // N u O
+//            timeConv[1] = timerCount2s(timeMed[1]); // S o E
+//
+//            //Calculo 
+//            switch (coord) {
+//                case TRANS_EMISOR_OESTE:
+//                    //Corrijo los tiempos medidos
+//                    timeConv[0] = timeConv[0] - DETECTION_ERROR_O; //taOE
+//                    timeConv[1] = timeConv[1] - DETECTION_ERROR_E; //trOE
+//
+//                    /*La definicion de las coordenadas es tal que si el viento sopla 
+//                     * DESDE el NORTE el angulo es 0°
+//                     *si sopla DESDE el OESTE el angulo es 90°
+//                     * El angulo va de 0° a 360°
+//                     */
+//                    valMed = (((float) DISTANCE_EO / 2) * (1 / timeConv[0] - 1 / timeConv[1])) - OFFSET_ERROR_EO;
+//                    break;
+//                case TRANS_EMISOR_NORTE:
+//                    //Corrijo los tiempos medidos
+//                    timeConv[0] = timeConv[0] - DETECTION_ERROR_N;
+//                    timeConv[1] = timeConv[1] - DETECTION_ERROR_S;
+//
+//                    valMed = (((float) DISTANCE_NS / 2) * (1 / timeConv[0] - 1 / timeConv[1])) - OFFSET_ERROR_NS;
+//                    break;
+//                default:
+//                    nMedProm--;
+//                    valMed = 0;
+//            }
+//            valAcum += valMed;
+//        }
+//        vTaskDelay(1 / portTICK_PERIOD_MS);
+//
+//    }
+//    if (nMedProm > 0) {
+//        valProm = valAcum / nMedProm;
+//    } else {
+//        valProm = 999.99;
+//    }
+//
+//    return valProm;
+//    //    return valMed;
+//}
 
 wind_medicion_type anemometroTestTransd(mux_transSelect_enum coord) {
     wind_medicion_type valMed = {0, 0};
@@ -443,13 +562,13 @@ wind_medicion_type anemometroTestTransd(mux_transSelect_enum coord) {
     comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
 
     //Necesitaria esperar 400us
-    DELAY_400uS
+    DELAY_400uS;
     anemometroReceptorDelay(coord);
 
     adc_start();
 
     //    ulNotificationValue = ulTaskNotifyTake(pdTRUE, 2 / portTICK_PERIOD_MS);
-    notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 1 / portTICK_PERIOD_MS);
+    notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 2 / portTICK_PERIOD_MS);
 
     if ((ulNotificationValue & 0x01) != 0 && notifyStatus == pdPASS) {
         timeMed = timerCount();
@@ -472,28 +591,33 @@ wind_medicion_type anemometroGetMed(void) {
     float VcoordNS = 0;
 
     //Mido en la coordenada O-E
-    VcoordOE = anemometroTestCoord(TRANS_EMISOR_OESTE);
+    VcoordOE = anemometroGetVcoord(TRANS_EMISOR_OESTE);
     //Mido en la coordenada N-S
-    VcoordNS = anemometroTestCoord(TRANS_EMISOR_NORTE);
+    VcoordNS = anemometroGetVcoord(TRANS_EMISOR_NORTE);
 
     //Calculo 
-    //    valMed.mag = sqrtf(powf(VcoordOE, 2) + powf(VcoordNS, 2));
-    valMed.mag = sqrtf(VcoordOE * VcoordOE + VcoordNS * VcoordNS);
+    //    valMed.mag = sqrtf(powf(VcoordOE, 2) + powf(VcoordNS, 2
+    if (VcoordOE < 555 && VcoordNS < 555) {
+        valMed.mag = sqrtf(VcoordOE * VcoordOE + VcoordNS * VcoordNS);
 
-    if (VcoordNS != 0) {
-        if (VcoordOE > 0 && VcoordNS > 0) {
-            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS);
+        if (VcoordNS != 0) {
+            if (VcoordOE > 0 && VcoordNS > 0) {
+                valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS);
+            }
+            if (VcoordNS < 0) {
+                valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 180;
+            }
+            if (VcoordOE < 0 && VcoordNS > 0) {
+                valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 360;
+            }
+        } else if (VcoordOE > 0) {
+            valMed.deg = 90;
+        } else {
+            valMed.deg = -90;
         }
-        if (VcoordNS < 0) {
-            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 180;
-        }
-        if (VcoordOE < 0 && VcoordNS > 0) {
-            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 360;
-        }
-    } else if (VcoordOE > 0) {
-        valMed.deg = 90;
     } else {
-        valMed.deg = -90;
+        valMed.mag = 999.99;
+        valMed.deg = 999.99;
     }
 
     return valMed;
@@ -529,6 +653,29 @@ void anemometroReceptorDelay(mux_transSelect_enum emisor) {
             DELAY_S;
             break;
         default: DELAY_N;
+    }
+}
+
+float anemometroGetMedProm(uint8_t prom) {
+    uint32_t medAcum = 0;
+    uint8_t medNprom = prom;
+    uint8_t i = 0;
+    float medCoord = 0;
+    wind_medicion_type promMed = {0, 0};
+
+    for (i = 0; i < prom; i++) {
+        medCoord = anemometroGetVcoord(TRANS_EMISOR_NORTE);
+        if (medCoord < 1000) {
+            medAcum += medCoord;
+        } else {
+            medNprom--;
+        }
+    }
+
+    if (medNprom > 0) {
+        return medAcum / medNprom;
+    } else {
+        return 777.77;
     }
 }
 
