@@ -65,7 +65,7 @@
 
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 20
-#define N_MED_PROM 5
+#define N_MED_PROM 15
 
 // PLL activado
 #define _PLLACTIVATED_

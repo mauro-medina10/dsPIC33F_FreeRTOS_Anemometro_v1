@@ -7,25 +7,14 @@
 
 #include "adc.h"
 
-#define NUMSAMP 256
-#define ADC_CRUCES_CANT 150
-//uint16_t ADCvalue[1500];
-//uint16_t indice1 = 0;
-unsigned int DmaBuffer = 0;
-
 anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
 //uint16_t medicionesADC[500];
 uint32_t indexADC = 0;
-//uint16_t LIMIT_SUP = 0;
-//uint16_t LIMIT_INF = 0;
 ////Nuevo metodo de deteccion
 uint16_t ADCmaximosCount = 0;
 uint16_t ADClastRead = 0;
 uint8_t ADCsecondMaxFlag = 0;
 uint8_t ADCsafetyFlag = 1;
-//uint16_t ADClastRead = 0;
-//uint8_t ADCmaxMinCount = 0;
-//uint8_t secondRead = 0;
 
 void adc_init(void) {
 
@@ -68,22 +57,7 @@ void adc_init(void) {
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
 
     INTCON1bits.NSTDIS = 0; // Enable interrupt nesting
-
-    //    initDma0();
 }
-
-//void initDma0(void) {
-//    DMA0CONbits.AMODE = 0; // Configure DMA for Register indirect with post increment
-//    DMA0CONbits.MODE = 2; // Configure DMA for Continuous Ping-Pong mode
-//    DMA0PAD = (volatile unsigned int) &ADC1BUF0;
-//    DMA0CNT = (NUMSAMP - 1);
-//    DMA0REQ = 13;
-//    DMA0STA = __builtin_dmaoffset(BufferA);
-//    DMA0STB = __builtin_dmaoffset(BufferB);
-//    IFS0bits.DMA0IF = 0; //Clear the DMA interrupt flag bit
-//    IEC0bits.DMA0IE = 1; //Set the DMA interrupt enable bit
-//    DMA0CONbits.CHEN = 1; //enable
-//}
 
 void adc_start(void) {
     IEC0bits.AD1IE = 1; // Enable ADC1 interrupts
@@ -110,29 +84,6 @@ void adc_stop(void) {
     //    }
     //    indexADC = 0;
 }
-
-//void adc_transdSelect(mux_transSelect_enum transd) {
-//    switch (transd) {
-//        case TRANS_EMISOR_NORTE:
-//            LIMIT_SUP = LIMIT_SUP_N;
-//            LIMIT_INF = LIMIT_INF_N;
-//            break;
-//        case TRANS_EMISOR_SUR:
-//            LIMIT_SUP = LIMIT_SUP_S;
-//            LIMIT_INF = LIMIT_INF_S;
-//            break;
-//        case TRANS_EMISOR_ESTE:
-//            LIMIT_SUP = LIMIT_SUP_E;
-//            LIMIT_INF = LIMIT_INF_E;
-//            break;
-//        case TRANS_EMISOR_OESTE:
-//            LIMIT_SUP = LIMIT_SUP_O;
-//            LIMIT_INF = LIMIT_INF_O;
-//            break;
-//        default: LIMIT_SUP = LIMIT_SUP_N;
-//            LIMIT_INF = LIMIT_INF_N;
-//    }
-//}
 
 void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
     BaseType_t xTaskWoken = pdFALSE;
@@ -187,24 +138,3 @@ void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
         taskYIELD();
     }
 }
-
-//void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void) {
-//    BaseType_t xTaskWoken = pdFALSE;
-//
-//    if (DmaBuffer == 0) {
-//        //Buffer A
-//        DmaBuffer = 0;
-//    } else {
-//        //Buffer B
-//        while (1);
-//    }
-//    DmaBuffer ^= 1;
-//
-//    anemometroTdetected(&xTaskWoken, 1);
-//
-//    IFS0bits.DMA0IF = 0;
-//
-//    if (xTaskWoken != pdFALSE) {
-//        taskYIELD();
-//    }
-//}
