@@ -51,21 +51,28 @@
 //Valor ADC sin excitacion
 #define ADC_CERO 377
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUPERIOR 377
-#define LIMIT_INF 376
+#define LIMIT_SUPERIOR 379
+#define LIMIT_INF 375
 #define LIMIT_SAFETY 382
 
-#define DETECTION_ERROR_O 0.00026255
-#define DETECTION_ERROR_E 0.00026108						   						  
-#define DETECTION_ERROR_N 0.00026940   
-#define DETECTION_ERROR_S 0.00026949 
+#define DETECTION_ERROR_O 0.0002155972
+#define DETECTION_ERROR_E 0.0002145972						   						  
+#define DETECTION_ERROR_N 0.0002207792   
+#define DETECTION_ERROR_S 0.0002217792 
 
 #define OFFSET_ERROR_EO 0//4.867876	
 #define OFFSET_ERROR_NS 0//-2.3815
 
 //Numero de mediciones que se promedian
-#define N_TIMER_PROM 20
-#define N_MED_PROM 15
+#define N_TIMER_PROM 5
+#define N_MED_PROM 10
+
+//definiciones tiempos
+#define DELAY400 0.0004
+#define Ous_DELAY 0.00036053
+#define Eus_DELAY 0.00035953
+#define Nus_DELAY 0.00036753
+#define Sus_DELAY 0.00036853
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -77,12 +84,14 @@
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
 #define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
 #define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
-#define DELAY_O asm volatile ("REPEAT, #14181"); Nop();
-#define DELAY_E asm volatile ("REPEAT, #14081"); Nop();
-#define DELAY_N asm volatile ("REPEAT, #14401"); Nop();
-#define DELAY_S asm volatile ("REPEAT, #14411"); Nop();
-//#define DELAY_N asm volatile ("REPEAT, #2081"); Nop();
-//#define DELAY_S asm volatile ("REPEAT, #2091"); Nop();
+//#define DELAY_O asm volatile ("REPEAT, #14301"); Nop();
+//#define DELAY_E asm volatile ("REPEAT, #14201"); Nop();
+//#define DELAY_N asm volatile ("REPEAT, #14531"); Nop();
+//#define DELAY_S asm volatile ("REPEAT, #14541"); Nop();
+#define DELAY_O asm volatile ("REPEAT, #14421"); Nop();
+#define DELAY_E asm volatile ("REPEAT, #14381"); Nop();
+#define DELAY_N asm volatile ("REPEAT, #14701"); Nop();
+#define DELAY_S asm volatile ("REPEAT, #14741"); Nop();
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))

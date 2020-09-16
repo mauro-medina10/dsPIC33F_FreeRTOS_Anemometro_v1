@@ -45,6 +45,8 @@
 #include "timers.h"
 #include "semphr.h"
 
+#define N_DMA_SAMP 128	
+#define DMA_FREQ 1100000
 
 void adc_init(void);
 
@@ -56,9 +58,13 @@ void adc_transdSelect(mux_transSelect_enum transd);
 
 void initDma0(void);
 
+float dma_detectPulse(void);
+
 /*Global variables*/
-//static unsigned int BufferA[32] __attribute__((space(dma)));
-//static unsigned int BufferB[32] __attribute__((space(dma)));
+static unsigned int BufferA[128] __attribute__((space(dma)));
+//static unsigned int BufferB[128] __attribute__((space(dma)));
+
+
 
 #ifdef	__cplusplus
 extern "C" {
