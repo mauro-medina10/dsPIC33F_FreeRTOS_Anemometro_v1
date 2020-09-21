@@ -5,7 +5,7 @@
             <url>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/main.c</url>
             <bookmark id="1">
                 <name/>
-                <line>159</line>
+                <line>169</line>
                 <key/>
             </bookmark>
         </file>
@@ -17,6 +17,8 @@
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.c</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/anemometroDef.h</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/tasks.c</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.h</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/include/projdefs.h</file>
         </group>
     </open-files>
 </project-private>

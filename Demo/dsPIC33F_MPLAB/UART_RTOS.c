@@ -168,7 +168,7 @@ static void uart_task(void *pvParameters) {
                 //                    uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                 //                } else {
                 //                    modoActivo = Menu;
-                //        }
+                //                }
                 break;
             case Medicion_Continua:
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);

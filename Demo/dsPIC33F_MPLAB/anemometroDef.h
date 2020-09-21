@@ -55,17 +55,27 @@
 #define LIMIT_INF 375
 #define LIMIT_SAFETY 382
 
-#define DETECTION_ERROR_O 0.0002155972
-#define DETECTION_ERROR_E 0.0002145972						   						  
-#define DETECTION_ERROR_N 0.0002207792   
-#define DETECTION_ERROR_S 0.0002217792 
+
+#define DETECTION_CERO 0.0008041958
+
+#define DETECTION_ERROR_O 0.0002165070 //0.0002155972
+#define DETECTION_ERROR_E 0.0002155070 //0.0002145972						   						  
+#define DETECTION_ERROR_N 0.0002216887 //0.0002207792   
+#define DETECTION_ERROR_S 0.0002226887 //0.0002217792 
+
+#define DETECT_SCALING_OE 0.7301
+#define DETECT_SCALING_NS 0.7181				   						  
+
+#define DETECT_OFFSET_OE 0.0052				
+#define DETECT_OFFSET_NS -0.1127
 
 #define OFFSET_ERROR_EO 0//4.867876	
 #define OFFSET_ERROR_NS 0//-2.3815
 
 //Numero de mediciones que se promedian
-#define N_TIMER_PROM 5
+#define N_TIMER_PROM 10
 #define N_MED_PROM 10
+#define N_TIMER_MODE 20
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -84,10 +94,6 @@
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
 #define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
 #define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
-//#define DELAY_O asm volatile ("REPEAT, #14301"); Nop();
-//#define DELAY_E asm volatile ("REPEAT, #14201"); Nop();
-//#define DELAY_N asm volatile ("REPEAT, #14531"); Nop();
-//#define DELAY_S asm volatile ("REPEAT, #14541"); Nop();
 #define DELAY_O asm volatile ("REPEAT, #14421"); Nop();
 #define DELAY_E asm volatile ("REPEAT, #14381"); Nop();
 #define DELAY_N asm volatile ("REPEAT, #14701"); Nop();

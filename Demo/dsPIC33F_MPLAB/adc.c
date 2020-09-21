@@ -159,7 +159,15 @@ float dma_detectPulse(void) {
     uint8_t i = 0;
     unsigned int* buff = BufferA;
     float timeMed = 0;
-    
+    //    wind_medicion_type aux;
+
+    //Envio muestras por UART para graficar
+    //    for (i = 0; i < N_DMA_SAMP; i++) {
+    //        aux.mag = (float) BufferA[i];
+    //        aux.deg = 0;
+    //        uartSendMed(aux);
+    //    }
+
     //Detecto el segundo cruce por cero
     for (i = 0; i < N_DMA_SAMP; i++) {
         switch (estadoDeteccion) {
