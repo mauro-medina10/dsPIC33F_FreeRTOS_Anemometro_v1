@@ -108,6 +108,7 @@ int main(void) {
 
 static void anemometro_main_task(void *pvParameters) {
     anemometro_mode_enum anemometroModoActivo = Menu;
+    anemometro_mode_enum configOption = 9;
     wind_medicion_type simpleMed = {0, 0};
     float auxMed = 0;
     mux_transSelect_enum emisorSelect = TRANS_EMISOR_OESTE;
@@ -129,24 +130,8 @@ static void anemometro_main_task(void *pvParameters) {
                 auxV = 0;
                 anemometroModoActivo = uartGetMode();
 
-                //                emisorSelect += 2;
-
-                if (anemometroModoActivo == Medicion_Continua) emisorSelect = TRANS_EMISOR_OESTE;
-
                 break;
             case Medicion_Simple:
-                //                simpleMed = anemometroGetMed();
-
-                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
-
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                //                emisorSelect += 2;
-                //                simpleMed = anemometroGetCoordTime(TRANS_EMISOR_OESTE);
-                //                auxMed = anemometroGetCoordTime(emisorSelect);
-                //                simpleMed.mag = auxMed * 1000000;
-                //                emisorSelect++;
-
-                //                simpleMed.mag = anemometroGetMedProm(emisorSelect, N_MED_PROM);
 
                 simpleMed = anemometroGetMed();
 
@@ -155,16 +140,7 @@ static void anemometro_main_task(void *pvParameters) {
                 anemometroModoActivo = Menu;
                 break;
             case Medicion_Continua:
-                vTaskDelay(100 / portTICK_PERIOD_MS);
-
-                //                simpleMed.mag = anemometroGetMedProm(emisorSelect, N_MED_PROM);
-
-                //                auxMed = anemometroGetCoordTime(emisorSelect);
-                //                simpleMed.mag = auxMed * 1000000;
-                //                emisorSelect += 2;
-                //                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
-
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
 
                 simpleMed = anemometroGetMed();
 
@@ -185,14 +161,23 @@ static void anemometro_main_task(void *pvParameters) {
                 //                    }
                 //                }
                 anemometroModoActivo = uartGetMode();
-                if (anemometroModoActivo == Menu) {
-                    emisorSelect = TRANS_EMISOR_OESTE;
-                    auxV = 0;
-                }
+                //                if (anemometroModoActivo == Menu) {
+                //                    emisorSelect = TRANS_EMISOR_OESTE;
+                //                    auxV = 0;
+                //                }
                 break;
             case Configuracion:
-                /*TODO*/
-                anemometroCalibCero();
+                configOption = uartGetMode();
+
+                switch (configOption) {
+                    case CalCero:
+                        anemometroCalibCero();
+                        break;
+                    case Exit:
+                        anemometroModoActivo = Menu;
+                        break;
+                    default: anemometroModoActivo = Menu;
+                }
 
                 anemometroModoActivo = Menu;
                 break;

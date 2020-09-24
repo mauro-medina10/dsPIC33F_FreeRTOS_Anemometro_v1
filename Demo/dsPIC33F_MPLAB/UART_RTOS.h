@@ -56,7 +56,7 @@
 /*Global variables*/
 static const char MENU[] = "\r\n1- Medicion Simple\r\n2- Medicion Continua\r\n3- Configuracion\r\n\nIngrese opcion:\r\n\0";
 static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion:\r\n\0";
-static const char MENU_CONFIG[] = "\r\n1- Calibracion Cero\r\n";
+static const char MENU_CONFIG[] = "\r\n1- Calibracion Cero\r\n2- Salir\r\n";
 
 /*Typedef*/
 typedef enum {

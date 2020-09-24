@@ -57,7 +57,7 @@
 
 
 #define DETECTION_CERO 0.0008041958
-			
+
 #define DETECTION_ERROR_O 0.0002155979//0.0002165070
 #define DETECTION_ERROR_E 0.0002145979//0.0002155070					   						  
 #define DETECTION_ERROR_N 0.0002207797//0.0002216887   
@@ -113,7 +113,9 @@ typedef enum {
     Menu = 0,
     Medicion_Simple,
     Medicion_Continua,
-    Configuracion
+    Configuracion,
+    CalCero,
+    Exit
 } anemometro_mode_enum;
 
 typedef enum {

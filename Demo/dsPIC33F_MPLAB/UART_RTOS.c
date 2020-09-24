@@ -129,6 +129,7 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 
 static void uart_task(void *pvParameters) {
     anemometro_mode_enum modoActivo = Menu;
+    anemometro_mode_enum modoConfig = Exit;
     wind_medicion_type medSimple;
     char msg[50];
     char comando = 'z';
@@ -191,14 +192,16 @@ static void uart_task(void *pvParameters) {
                 }
                 break;
             case Configuracion:
+                xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
+                
                 uartSendMenu(menuTemplate_config);
+                
                 uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
-                if (comando == 49) {
-                    xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
+                if (comando < 51 && comando > 48) {
+                    modoConfig = comando - 45;
+                    xQueueSend(qAnemometroModo, &modoConfig, portMAX_DELAY);
                     vTaskDelay(50 / portTICK_PERIOD_MS);
                 }
-                /*TODO*/
-
                 modoActivo = Menu;
                 break;
             default: modoActivo = Medicion_Simple;
