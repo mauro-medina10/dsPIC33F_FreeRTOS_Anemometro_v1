@@ -47,7 +47,7 @@ void uartSendMenu(uart_menu_enum opcion) {
             uartSend((uint8_t *) MENU, sizeof (MENU), portMAX_DELAY);
             break;
         case menuTemplate_config:
-            uartSend((uint8_t *) MENU_COORDENADAS, sizeof (MENU_COORDENADAS), portMAX_DELAY);
+            uartSend((uint8_t *) MENU_CONFIG, sizeof (MENU_CONFIG), portMAX_DELAY);
             break;
         default: uartSend((uint8_t *) MENU, sizeof (MENU), portMAX_DELAY);
     }
@@ -174,7 +174,7 @@ static void uart_task(void *pvParameters) {
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE && exit == 'z') {
-                    if (medSimple.mag < 5550 || medSimple.mag > 10000) {
+                    if (medSimple.mag < 555 || medSimple.mag > 1000) {
                         //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
                         sprintf(msg, "\r\n %5.4f     %5.4f\0", medSimple.mag, medSimple.deg);
                     } else {
@@ -193,7 +193,10 @@ static void uart_task(void *pvParameters) {
             case Configuracion:
                 uartSendMenu(menuTemplate_config);
                 uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
-
+                if (comando == 49) {
+                    xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
+                    vTaskDelay(50 / portTICK_PERIOD_MS);
+                }
                 /*TODO*/
 
                 modoActivo = Menu;

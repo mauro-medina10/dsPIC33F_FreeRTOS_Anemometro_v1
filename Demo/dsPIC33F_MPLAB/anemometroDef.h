@@ -57,11 +57,11 @@
 
 
 #define DETECTION_CERO 0.0008041958
-
-#define DETECTION_ERROR_O 0.0002165070 //0.0002155972
-#define DETECTION_ERROR_E 0.0002155070 //0.0002145972						   						  
-#define DETECTION_ERROR_N 0.0002216887 //0.0002207792   
-#define DETECTION_ERROR_S 0.0002226887 //0.0002217792 
+			
+#define DETECTION_ERROR_O 0.0002155979//0.0002165070
+#define DETECTION_ERROR_E 0.0002145979//0.0002155070					   						  
+#define DETECTION_ERROR_N 0.0002207797//0.0002216887   
+#define DETECTION_ERROR_S 0.0002217797//0.0002226887
 
 #define DETECT_SCALING_OE 0.7301
 #define DETECT_SCALING_NS 0.7181				   						  
@@ -75,7 +75,7 @@
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 10
 #define N_MED_PROM 10
-#define N_TIMER_MODE 20
+#define N_TIMER_MODE 30
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -148,6 +148,11 @@ void anemometroEmiterSelect(mux_transSelect_enum transd);
 
 /*FreeRTOS declarations*/
 
+/*Global variables*/
+//static float DETECTION_ERROR_O = 0.0002165070;
+//static float DETECTION_ERROR_E = 0.0002155070;
+//static float DETECTION_ERROR_N = 0.0002216887;
+//static float DETECTION_ERROR_S = 0.0002226887;
 
 #ifdef	__cplusplus
 extern "C" {
