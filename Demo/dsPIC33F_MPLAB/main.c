@@ -143,11 +143,12 @@ static void anemometro_main_task(void *pvParameters) {
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
                 simpleMed = anemometroGetMed();
+                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
 
                 uartSendMed(simpleMed);
 
                 //                auxV++;
-                //                if (auxV >= 12) {
+                //                if (auxV >= 10) {
                 //                    auxV = 0;
                 //                    //                    emisorSelect++;
                 //                    emisorSelect += 2;
@@ -155,7 +156,7 @@ static void anemometro_main_task(void *pvParameters) {
                 //                    if (emisorSelect > TRANS_EMISOR_SUR) {
                 //                        emisorSelect = TRANS_EMISOR_OESTE;
                 //                        //                        uartSendMed(lineMed);
-                //                        //                        vTaskDelay(2 / portTICK_PERIOD_MS);
+                //                        vTaskDelay(2 / portTICK_PERIOD_MS);
                 //                        uartEndMode();
                 //                        //                        while (1);
                 //                    }
@@ -655,16 +656,16 @@ float anemometroCalcMode(float * pData, uint16_t nData) {
 }
 
 void anemometroCalibCero(void) {
-    float ceroMed[20];
+    float ceroMed[30];
     uint8_t i = 0, j = 0;
     float ceroMode[4];
 
     for (j = 0; j < 4; j++) {
-        for (i = 0; i < 20; i++) {
+        for (i = 0; i < 30; i++) {
             ceroMed[i] = anemometroGetCoordTime((mux_transSelect_enum) j);
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
-        ceroMode[j] = anemometroCalcMode(ceroMed, 20);
+        ceroMode[j] = anemometroCalcMode(ceroMed, 30);
     }
     detect_delta_O = ceroMode[0] - DETECTION_CERO;
     detect_delta_E = ceroMode[1] - DETECTION_CERO;
