@@ -45,7 +45,7 @@
 #include "timers.h"
 #include "semphr.h"
 
-#define N_DMA_SAMP 128	
+#define N_DMA_SAMP 255//128	
 #define DMA_FREQ 1100000
 
 void adc_init(void);
@@ -61,7 +61,7 @@ void initDma0(void);
 float dma_detectPulse(void);
 
 /*Global variables*/
-static unsigned int BufferA[128] __attribute__((space(dma)));
+static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
 //static unsigned int BufferB[128] __attribute__((space(dma)));
 
 

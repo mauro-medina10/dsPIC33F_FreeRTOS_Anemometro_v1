@@ -56,18 +56,20 @@
 #define LIMIT_SAFETY 382
 
 
-#define DETECTION_CERO 0.0008041958
+#define DETECTION_CERO 0.000803962
+#define DETECTION_CERO_MAX 0.00080397
+#define DETECTION_CERO_MIN 0.00080395
 
-#define DETECTION_ERROR_O 0.000212871//0.0002165070
-#define DETECTION_ERROR_E 0.00021278//0.0002155070					   						  
-#define DETECTION_ERROR_N 0.0002180524//0.0002216887   
-#define DETECTION_ERROR_S 0.0002190524//0.0002226887
+#define DETECTION_ERROR_O 0.00024446
+#define DETECTION_ERROR_E 0.00024346					   						  
+#define DETECTION_ERROR_N 0.00025013  
+#define DETECTION_ERROR_S 0.00025077
 
-#define DETECT_SCALING_OE 0.6552
-#define DETECT_SCALING_NS 0.61398				   						  
+#define DETECT_SCALING_OE 1//0.6552
+#define DETECT_SCALING_NS 1//0.61398				   						  
 
-#define DETECT_OFFSET_OE -0.7715				
-#define DETECT_OFFSET_NS -0.05281
+#define DETECT_OFFSET_OE 0//-0.7715				
+#define DETECT_OFFSET_NS 0//-0.05281
 
 #define OFFSET_ERROR_EO 0//4.867876	
 #define OFFSET_ERROR_NS 0//-2.3815
@@ -79,10 +81,6 @@
 
 //definiciones tiempos
 #define DELAY400 0.0004
-#define Ous_DELAY 0.00036053
-#define Eus_DELAY 0.00035953
-#define Nus_DELAY 0.00036753
-#define Sus_DELAY 0.00036853
 
 // PLL activado
 #define _PLLACTIVATED_
@@ -94,15 +92,22 @@
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
 #define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
 #define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
-#define DELAY_O asm volatile ("REPEAT, #14421"); Nop();
-#define DELAY_E asm volatile ("REPEAT, #14381"); Nop();
-#define DELAY_N asm volatile ("REPEAT, #14701"); Nop();
-#define DELAY_S asm volatile ("REPEAT, #14741"); Nop();
+#define DELAY_O asm volatile ("REPEAT, #14746"); Nop();
+#define DELAY_E asm volatile ("REPEAT, #14708"); Nop();
+#define DELAY_N asm volatile ("REPEAT, #14971"); Nop();
+#define DELAY_S asm volatile ("REPEAT, #15031"); Nop();
+
+#define Ous_DELAY 0.0003687 //14676 / 40000000
+#define Eus_DELAY 0.0003677 //14708 / 40000000
+#define Nus_DELAY 0.0003743 //14955 / 40000000
+#define Sus_DELAY 0.0003758  //14960 / 40000000
+
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
 #define MUX_INPUT_INH(b)    (PORTBbits.RB4 = (b))
 //Manejo led
+#define RB_9_SET(b) (PORTBbits.RB9 = (b))
 #define LED_ON (PORTAbits.RA4 = 1)
 #define LED_OFF (PORTAbits.RA4 = 0)
 //Longitud tren de pulsos
@@ -115,6 +120,7 @@ typedef enum {
     Medicion_Continua,
     Configuracion,
     CalCero,
+    SetEmi,
     Exit
 } anemometro_mode_enum;
 
@@ -151,6 +157,7 @@ void anemometroEmiterSelect(mux_transSelect_enum transd);
 /*FreeRTOS declarations*/
 
 /*Global variables*/
+static float SOUND_SPEED = 345.7;
 //static float DETECTION_ERROR_O = 0.0002165070;
 //static float DETECTION_ERROR_E = 0.0002155070;
 //static float DETECTION_ERROR_N = 0.0002216887;

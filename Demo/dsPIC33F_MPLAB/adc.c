@@ -13,6 +13,7 @@
 ////Nuevo metodo de deteccion
 //static uint16_t ADCmaximosCount = 0;
 //static uint16_t ADClastRead = 0;
+//unsigned int DmaBuffer = 0;
 
 void adc_init(void) {
 
@@ -68,6 +69,7 @@ void adc_start(void) {
 void initDma0(void) {
     DMA0CONbits.AMODE = 0; // Configure DMA for Register indirect with post increment	
     DMA0CONbits.MODE = 1; // One-Shot, Ping-Pong modes disabled
+    //    DMA0CONbits.MODE = 2; // Configure DMA for Continuous Ping-Pong mode
     DMA0PAD = (volatile unsigned int) &ADC1BUF0;
     DMA0CNT = (N_DMA_SAMP - 1);
     DMA0REQ = 13;
@@ -156,10 +158,10 @@ float dma_detectPulse(void) {
     anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
     uint8_t ADCcrucesCount = 0;
     unsigned int ADClastRead = 0;
-    uint8_t i = 0;
+    uint8_t i = 0, j = 0;
     unsigned int* buff = BufferA;
     float timeMed = 0;
-    //    wind_medicion_type aux;
+    wind_medicion_type aux;
 
     //Envio muestras por UART para graficar
     //    for (i = 0; i < N_DMA_SAMP; i++) {
