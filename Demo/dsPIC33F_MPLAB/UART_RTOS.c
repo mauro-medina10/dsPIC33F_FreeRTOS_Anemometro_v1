@@ -61,7 +61,7 @@ void uartInit(void) {
 
     qRecv = xQueueCreate(16, sizeof (char));
 
-    qSendMedicion = xQueueCreate(330, sizeof (wind_medicion_type));
+    qSendMedicion = xQueueCreate(120, sizeof (wind_medicion_type));
 
     if (xSemaphoreUartSend == NULL || qRecv == NULL || qSendMedicion == NULL) {
         while (1);
@@ -104,6 +104,8 @@ uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
         waitTick = portMAX_DELAY;
 
     while ((ret < size) && (xQueueReceive(qRecv, &pBuf[ret], waitTick) == pdTRUE)) {
+        //eco
+        uartSend(&pBuf[ret], 1, 0);
         ret++;
         //        waitTick = 0;
     }

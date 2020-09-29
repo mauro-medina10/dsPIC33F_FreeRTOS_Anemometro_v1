@@ -126,6 +126,7 @@ static void anemometro_main_task(void *pvParameters) {
             case Menu:
                 auxV = 0;
                 anemometroModoActivo = uartGetMode();
+                RB_9_SET(0);
 
                 break;
             case Medicion_Simple:
@@ -178,6 +179,8 @@ static void anemometro_main_task(void *pvParameters) {
                         simpleMed.mag = detect_delta_N * 1000000;
                         simpleMed.deg = detect_delta_S * 1000000;
                         uartSendMed(simpleMed);
+                        simpleMed.mag = 0;
+                        simpleMed.deg = 0;
                         break;
                     case SetEmi:
                         configOption = uartGetMode();
@@ -474,6 +477,8 @@ float anemometroGetCoordTime(mux_transSelect_enum coord) {
     uint32_t ulNotificationValue;
     BaseType_t notifyStatus = pdFAIL;
 
+    RB_9_SET(0);
+
     if (muxOutputSelect(coord) != pdTRUE) {
         return timeMed;
     }
@@ -488,15 +493,20 @@ float anemometroGetCoordTime(mux_transSelect_enum coord) {
 
     //Necesitaria esperar 400us
     DELAY_400uS;
+    //    DELAY_T;
     anemometroReceptorDelay(coord);
 
     timerStop();
 
     adc_start();
 
+    //    RB_9_SET(0);
+
     notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 2 / portTICK_PERIOD_MS);
 
     adc_stop();
+
+    //    RB_9_SET(0);
 
     if ((ulNotificationValue & 0x01) != 0 && notifyStatus == pdPASS) {
         /*Detecto Segundo maximo*/
@@ -648,21 +658,19 @@ BaseType_t muxOutputSelect(mux_transSelect_enum ch) {
 }
 
 float anemometroCalcMode(float * pData, uint16_t nData) {
-    float mode[N_TIMER_MODE];
+    //    float mode[N_TIMER_MODE];
     float c [N_TIMER_MODE];
     uint8_t i, j;
 
     for (i = 0; i < nData; i++) {
-        mode[i] = *pData;
         c [ i ] = 0;
-        pData++;
     }
 
     for (i = 0; i < nData; i++) {
         for (j = 0; j < nData; j++) {
-            if ((mode [ i ] == mode [ j ]) && (i != j) && (mode[i] != 0)) {
+            if ((*(pData + i) == *(pData + j)) && (i != j) && (*(pData + i) != 0)) {
                 c [ i ] += 1;
-                mode[j] = 0;
+                *(pData + j) = 0;
             }
         }
     }
@@ -678,7 +686,8 @@ float anemometroCalcMode(float * pData, uint16_t nData) {
             i = j;
         }
     }
-    return mode[i];
+
+    return *(pData + i);
 }
 
 void anemometroCalibCero(void) {

@@ -45,7 +45,7 @@
 #include "semphr.h"
 
 //Distancias entre transductores
-#define DISTANCE_NS 0.276  //Norte-Sur (blanco-negro)
+#define DISTANCE_NS 0.271  //Norte-Sur (blanco-negro)
 #define DISTANCE_EO 0.276   //Este-Oeste (Rosa-Nada)
 
 //Valor ADC sin excitacion
@@ -56,14 +56,15 @@
 #define LIMIT_SAFETY 382
 
 
-#define DETECTION_CERO 0.000803962
+#define DETECTION_CERO_NS 0.0008
+#define DETECTION_CERO_OE 0.0007942
 #define DETECTION_CERO_MAX 0.00080397
 #define DETECTION_CERO_MIN 0.00080395
 
-#define DETECTION_ERROR_O 0.00024446
-#define DETECTION_ERROR_E 0.00024346					   						  
-#define DETECTION_ERROR_N 0.00025013  
-#define DETECTION_ERROR_S 0.00025077
+#define DETECTION_ERROR_O 0.00024373
+#define DETECTION_ERROR_E 0.00024368					   						  
+#define DETECTION_ERROR_N 0.000264131  
+#define DETECTION_ERROR_S 0.000264181
 
 #define DETECT_SCALING_OE 1//0.6552
 #define DETECT_SCALING_NS 1//0.61398				   						  
@@ -75,9 +76,9 @@
 #define OFFSET_ERROR_NS 0//-2.3815
 
 //Numero de mediciones que se promedian
-#define N_TIMER_PROM 10
-#define N_MED_PROM 10
-#define N_TIMER_MODE 30
+#define N_TIMER_PROM 5
+#define N_MED_PROM 5
+#define N_TIMER_MODE 50
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -92,10 +93,11 @@
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
 #define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
 #define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
-#define DELAY_O asm volatile ("REPEAT, #14746"); Nop();
-#define DELAY_E asm volatile ("REPEAT, #14708"); Nop();
-#define DELAY_N asm volatile ("REPEAT, #14971"); Nop();
-#define DELAY_S asm volatile ("REPEAT, #15031"); Nop();
+#define DELAY_O asm volatile ("REPEAT, #14831"); Nop(); //14746
+#define DELAY_E asm volatile ("REPEAT, #14831"); Nop(); //14708
+#define DELAY_N asm volatile ("REPEAT, #15031"); Nop(); //14971
+#define DELAY_S asm volatile ("REPEAT, #15031"); Nop(); //15031
+#define DELAY_T asm volatile ("REPEAT, #15031"); Nop();
 
 #define Ous_DELAY 0.0003687 //14676 / 40000000
 #define Eus_DELAY 0.0003677 //14708 / 40000000

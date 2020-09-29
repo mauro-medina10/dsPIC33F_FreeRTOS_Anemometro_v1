@@ -203,6 +203,8 @@ float dma_detectPulse(void) {
 void __attribute__((interrupt, no_auto_psv))_DMA0Interrupt(void) {
     BaseType_t xTaskWoken = pdFALSE;
 
+    RB_9_SET(1);
+
     anemometroTdetected(&xTaskWoken, 0x01);
 
     IFS0bits.DMA0IF = 0;
