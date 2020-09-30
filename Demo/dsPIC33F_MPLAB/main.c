@@ -127,6 +127,7 @@ static void anemometro_main_task(void *pvParameters) {
                 auxV = 0;
                 anemometroModoActivo = uartGetMode();
                 RB_9_SET(0);
+                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
 
                 break;
             case Medicion_Simple:
@@ -143,26 +144,26 @@ static void anemometro_main_task(void *pvParameters) {
             case Medicion_Continua:
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
-                //                simpleMed = anemometroGetMed();
-                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                simpleMed = anemometroGetMed();
+                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
                 //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
 
-                auxV++;
-                if (auxV >= 12) {
-                    auxV = 0;
-                    //                    emisorSelect++;
-                    emisorSelect += 2;
-                    //                    uartSendMed(lineMed);
-                    if (emisorSelect > TRANS_EMISOR_SUR) {
-                        emisorSelect = TRANS_EMISOR_OESTE;
-                        //                        //                        uartSendMed(lineMed);
-                        //                        vTaskDelay(2 / portTICK_PERIOD_MS);
-                        uartEndMode();
-                        //                        //                        while (1);
-                    }
-                }
+                //                auxV++;
+                //                if (auxV >= 12) {
+                //                    auxV = 0;
+                //                    //                    emisorSelect++;
+                //                    emisorSelect += 2;
+                //                    //                    uartSendMed(lineMed);
+                //                    if (emisorSelect > TRANS_EMISOR_SUR) {
+                //                        emisorSelect = TRANS_EMISOR_OESTE;
+                //                        //                        //                        uartSendMed(lineMed);
+                //                        //                        vTaskDelay(2 / portTICK_PERIOD_MS);
+                //                        uartEndMode();
+                //                        //                        //                        while (1);
+                //                    }
+                //                }
                 anemometroModoActivo = uartGetMode();
                 break;
             case Configuracion:

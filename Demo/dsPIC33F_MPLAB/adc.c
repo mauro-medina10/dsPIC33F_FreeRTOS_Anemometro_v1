@@ -81,22 +81,11 @@ void initDma0(void) {
 }
 
 void adc_stop(void) {
-    //    uint8_t i = 0;
-    //    wind_medicion_type aux;
-
     AD1CON1bits.ADON = 0; // Turn off ADC1
-    IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
-    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
-    //    ADCmaximosCount = 0;
-    //    estadoDeteccion = PRIMERA_SAMPLE;
-    //    ADClastRead = 0;
 
-    //    for (i = 0; i < indexADC; i++) {
-    //        aux.mag = (float) medicionesADC[i];
-    //        aux.deg = 0;
-    //        uartSendMed(aux);
-    //    }
-    //    indexADC = 0;
+    IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
+
+    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
 }
 
 //void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
@@ -158,7 +147,7 @@ float dma_detectPulse(void) {
     anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
     uint8_t ADCcrucesCount = 0;
     unsigned int ADClastRead = 0;
-    uint8_t i = 0, j = 0;
+    uint8_t i = 0;
     unsigned int* buff = BufferA;
     float timeMed = 0;
     wind_medicion_type aux;
@@ -184,13 +173,21 @@ float dma_detectPulse(void) {
                     ADCcrucesCount++;
                     estadoDeteccion = SEMI_POSITIVO;
                 }
-                if (ADCcrucesCount == 3) {
+                if (ADCcrucesCount == 4) { 
                     timeMed = (float) (i + 1) / DMA_FREQ;
                     return timeMed;
                 }
                 break;
             case PRIMERA_SAMPLE:
-                estadoDeteccion = SEMI_NEGATIVO;
+                /* Si la señal adelanta cuento los cruces por cero,
+                 * si la señal esta atrasada necesito contar un cruce de mas.
+                 */
+                if (*buff > LIMIT_SUPERIOR) {
+                    estadoDeteccion = SEMI_POSITIVO;
+                } else {
+                    ADCcrucesCount++;
+                    estadoDeteccion = SEMI_NEGATIVO;
+                }
                 break;
             default: estadoDeteccion = PRIMERA_SAMPLE;
         }

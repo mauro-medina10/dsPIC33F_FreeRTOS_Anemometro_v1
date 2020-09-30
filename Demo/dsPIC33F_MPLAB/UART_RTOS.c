@@ -188,13 +188,13 @@ static void uart_task(void *pvParameters) {
                         sprintf(msg, "\r\n NULL     %5.4f\0", medSimple.deg);
                     }
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
-                } else {
-                    exit = 'z';
-                    modoActivo = Menu;
                 }
                 /*Si recibo cualquier caracter que no sea 'z' termino el modo continuo*/
                 if (uartRecv((uint8_t *) & exit, 1, 0) != 1) {
                     exit = 'z';
+                } else {
+                    exit = 'z';
+                    modoActivo = Menu;
                 }
                 break;
             case Configuracion:
