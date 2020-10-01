@@ -18,6 +18,7 @@ static QueueHandle_t qRecv;
 static QueueHandle_t qSendMedicion;
 static QueueHandle_t qMenuOpcion;
 static QueueHandle_t qAnemometroModo;
+static QueueHandle_t qAnemometroModoConfig;
 
 void uartInit_RTOS(void) {
 
@@ -26,9 +27,15 @@ void uartInit_RTOS(void) {
     if (qMenuOpcion == NULL) {
         while (1);
     }
-    qAnemometroModo = xQueueCreate(10, sizeof ( anemometro_mode_enum));
+    qAnemometroModo = xQueueCreate(5, sizeof ( anemometro_mode_enum));
 
     if (qAnemometroModo == NULL) {
+        while (1);
+    }
+
+    qAnemometroModoConfig = xQueueCreate(5, sizeof ( anemometro_config_enum));
+
+    if (qAnemometroModoConfig == NULL) {
         while (1);
     }
 
@@ -51,6 +58,9 @@ void uartSendMenu(uart_menu_enum opcion) {
             break;
         case menuTemplate_coord:
             uartSend((uint8_t *) MENU_COORDENADAS, sizeof (MENU_COORDENADAS), portMAX_DELAY);
+            break;
+        case menuTemplate_period:
+            uartSend((uint8_t *) MENU_PERIODOS, sizeof (MENU_PERIODOS), portMAX_DELAY);
             break;
         default: uartSend((uint8_t *) MENU, sizeof (MENU), portMAX_DELAY);
     }
@@ -134,7 +144,7 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 
 static void uart_task(void *pvParameters) {
     anemometro_mode_enum modoActivo = Menu;
-    anemometro_mode_enum modoConfig = Exit;
+    anemometro_config_enum modoConfig = Exit;
     wind_medicion_type medSimple;
     char msg[50];
     char comando = 'z';
@@ -203,8 +213,8 @@ static void uart_task(void *pvParameters) {
                 uartSendMenu(menuTemplate_config);
 
                 uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
-                if (comando < 51 && comando > 48) {
-                    modoConfig = comando - 45;
+                if (comando < 53 && comando > 48) {
+                    modoConfig = comando - 49;
                 }
                 switch (modoConfig) {
                     case CalCero:
@@ -213,8 +223,8 @@ static void uart_task(void *pvParameters) {
                         uartRecv((uint8_t *) vel, 6, portMAX_DELAY);
                         SOUND_SPEED = atof(vel);
 
-                        xQueueSend(qAnemometroModo, &modoConfig, portMAX_DELAY);
-                        
+                        xQueueSend(qAnemometroModoConfig, &modoConfig, portMAX_DELAY);
+
                         if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
                             sprintf(msg, "\r\n Deltas:\r\n\0");
                             uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
@@ -226,23 +236,38 @@ static void uart_task(void *pvParameters) {
                             sprintf(msg, " Norte: %5.4f    Sur: %5.4f\0", medSimple.mag, medSimple.deg);
                             uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                         }
+                        modoConfig = ExitConfig;
                         break;
                     case SetEmi:
-                        xQueueSend(qAnemometroModo, &modoConfig, portMAX_DELAY);
-                        
+                        xQueueSend(qAnemometroModoConfig, &modoConfig, portMAX_DELAY);
+
                         uartSendMenu(menuTemplate_coord);
 
                         uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
                         if (comando < 53 && comando > 48) {
                             modoConfig = comando - 48;
-                            xQueueSend(qAnemometroModo, &modoConfig, portMAX_DELAY);
+                            xQueueSend(qAnemometroModoConfig, &modoConfig, portMAX_DELAY);
                         }
+                        modoConfig = ExitConfig;
+                        break;
+                    case SetPeriod:
+                        xQueueSend(qAnemometroModoConfig, &modoConfig, portMAX_DELAY);
+
+                        uartSendMenu(menuTemplate_period);
+
+                        uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
+                        if (comando < 54 && comando > 48) {
+                            modoConfig = comando - 48;
+                            xQueueSend(qAnemometroModoConfig, &modoConfig, portMAX_DELAY);
+                        }
+                        modoConfig = ExitConfig;
                         break;
                     default: modoActivo = Menu;
                 }
+                modoConfig = ExitConfig;
                 modoActivo = Menu;
                 break;
-            default: modoActivo = Medicion_Simple;
+            default: modoActivo = Menu;
         }
     }
 }
@@ -254,6 +279,16 @@ anemometro_mode_enum uartGetMode(void) {
         return mod;
     } else {
         return Menu;
+    }
+}
+
+anemometro_config_enum uartGetModeConfig(void) {
+    anemometro_config_enum mod = Menu;
+
+    if (xQueueReceive(qAnemometroModoConfig, &mod, portMAX_DELAY) == pdTRUE) {
+        return mod;
+    } else {
+        return ExitConfig;
     }
 }
 

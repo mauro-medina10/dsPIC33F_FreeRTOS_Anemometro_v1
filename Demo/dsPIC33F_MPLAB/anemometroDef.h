@@ -31,7 +31,8 @@
 #ifndef ANEMOMETRO_DEF_HEADER_TEMPLATE_H
 #define	ANEMOMETRO_DEF_HEADER_TEMPLATE_H
 
-#include <xc.h> // include processor files - each processor file is guarded.  
+#include <xc.h> // include processor files - each processor file is guarded. 
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h> 
 
@@ -120,10 +121,15 @@ typedef enum {
     Medicion_Simple,
     Medicion_Continua,
     Configuracion,
-    CalCero,
-    SetEmi,
     Exit
 } anemometro_mode_enum;
+
+typedef enum {
+    CalCero = 0,
+    SetEmi,
+    SetPeriod,
+    ExitConfig = 15
+} anemometro_config_enum;
 
 typedef enum {
     SEMI_POSITIVO = 0,
@@ -159,6 +165,7 @@ void anemometroEmiterSelect(mux_transSelect_enum transd);
 
 /*Global variables*/
 static float SOUND_SPEED = 345.7;
+static uint16_t MED_PERIOD = 5;
 //static float DETECTION_ERROR_O = 0.0002165070;
 //static float DETECTION_ERROR_E = 0.0002155070;
 //static float DETECTION_ERROR_N = 0.0002216887;

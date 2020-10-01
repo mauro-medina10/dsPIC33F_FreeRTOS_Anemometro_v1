@@ -36,6 +36,7 @@
 #include <stdint.h>
 #include <stdio.h> 
 #include <stdbool.h>
+#include <stdlib.h>
 
 /*anemometro headers*/
 #include <anemometroDef.h>
@@ -56,12 +57,14 @@
 /*Global variables*/
 static const char MENU[] = "\r\n1- Medicion Simple\r\n2- Medicion Continua\r\n3- Configuracion\r\n\nIngrese opcion:\r\n\0";
 static const char MENU_COORDENADAS[] = "1- Norte\r\n2- Sur\r\n3- Este\r\n4- Oeste\r\n\nIngrese opcion:\r\n\0";
-static const char MENU_CONFIG[] = "\r\n1- Calibracion Cero\r\n2- Set Emisor\r\n3- Salir\r\n\nIngrese opcion:\r\n\0";
+static const char MENU_CONFIG[] = "\r\n1- Calibracion Cero\r\n2- Set Emisor\r\n3- Periodo Medicion\r\n4- Salir\r\n\nIngrese opcion:\r\n\0";
+static const char MENU_PERIODOS[] = "\r\n1- 5s\r\n2- 10s\r\n3- 30s\r\n4- 1m\r\n5- 10m\r\n6- Salir\r\n\nIngrese opcion:\r\n\0";
 
 /*Typedef*/
 typedef enum {
     menuTemplate = 0,
     menuTemplate_config,
+    menuTemplate_period,
     menuTemplate_coord
 } uart_menu_enum;
 
@@ -76,6 +79,8 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime);
 uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime);
 
 anemometro_mode_enum uartGetMode(void);
+
+anemometro_config_enum uartGetModeConfig(void);
 
 void uartSendMed(wind_medicion_type med);
 

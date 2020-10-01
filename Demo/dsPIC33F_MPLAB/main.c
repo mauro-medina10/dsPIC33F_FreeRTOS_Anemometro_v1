@@ -108,7 +108,7 @@ int main(void) {
 
 static void anemometro_main_task(void *pvParameters) {
     anemometro_mode_enum anemometroModoActivo = Menu;
-    anemometro_mode_enum configOption = 9;
+    anemometro_config_enum configOption = ExitConfig;
     wind_medicion_type simpleMed = {0, 0};
     mux_transSelect_enum emisorSelect = TRANS_EMISOR_OESTE;
     uint16_t auxV = 0;
@@ -125,6 +125,7 @@ static void anemometro_main_task(void *pvParameters) {
         switch (anemometroModoActivo) {
             case Menu:
                 auxV = 0;
+                configOption = ExitConfig;
                 anemometroModoActivo = uartGetMode();
                 RB_9_SET(0);
                 if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
@@ -167,7 +168,7 @@ static void anemometro_main_task(void *pvParameters) {
                 anemometroModoActivo = uartGetMode();
                 break;
             case Configuracion:
-                configOption = uartGetMode();
+                configOption = uartGetModeConfig();
 
                 switch (configOption) {
                     case CalCero:
@@ -182,14 +183,26 @@ static void anemometro_main_task(void *pvParameters) {
                         uartSendMed(simpleMed);
                         simpleMed.mag = 0;
                         simpleMed.deg = 0;
+                        configOption = ExitConfig;
                         break;
                     case SetEmi:
-                        configOption = uartGetMode();
+                        configOption = uartGetModeConfig();
                         if (configOption == 1) emisorSelect = TRANS_EMISOR_NORTE;
                         if (configOption == 2) emisorSelect = TRANS_EMISOR_SUR;
                         if (configOption == 3) emisorSelect = TRANS_EMISOR_ESTE;
                         if (configOption == 4) emisorSelect = TRANS_EMISOR_OESTE;
-                    case Exit:
+                        configOption = ExitConfig;
+                        break;
+                    case SetPeriod:
+                        configOption = uartGetModeConfig();
+                        if (configOption == 1) MED_PERIOD = 5;
+                        if (configOption == 2) MED_PERIOD = 10;
+                        if (configOption == 3) MED_PERIOD = 30;
+                        if (configOption == 4) MED_PERIOD = 60;
+                        if (configOption == 5) MED_PERIOD = 600;
+                        configOption = ExitConfig;
+                        break;
+                    case ExitConfig:
                         anemometroModoActivo = Menu;
                         break;
                     default: anemometroModoActivo = Menu;
