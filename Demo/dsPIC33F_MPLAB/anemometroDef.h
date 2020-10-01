@@ -53,8 +53,7 @@
 //Limites para deteccion de tren de pulsos
 #define LIMIT_SUPERIOR 379
 #define LIMIT_INF 375
-#define LIMIT_SAFETY 382
-
+#define LIMIT_SAFETY 383
 
 #define DETECTION_CERO_NS 0.0008
 #define DETECTION_CERO_OE 0.0007942
@@ -66,18 +65,18 @@
 #define DETECTION_ERROR_N 0.000264131  
 #define DETECTION_ERROR_S 0.000264181
 
-#define DETECT_SCALING_OE 0.773//0.6552
-#define DETECT_SCALING_NS 0.734//0.61398				   						  
+#define DETECT_SCALING_OE 0.8952//0.6552
+#define DETECT_SCALING_NS 0.8633//0.61398				   						  
 
-#define DETECT_OFFSET_OE -0.09//-0.7715				
-#define DETECT_OFFSET_NS 0.07//-0.05281
+#define DETECT_OFFSET_OE -0.1243//-0.7715				
+#define DETECT_OFFSET_NS -0.0075//-0.05281
 
 #define OFFSET_ERROR_EO 0//4.867876	
 #define OFFSET_ERROR_NS 0//-2.3815
 
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 5
-#define N_MED_PROM 5
+#define N_MED_PROM 10
 #define N_TIMER_MODE 50
 
 //definiciones tiempos

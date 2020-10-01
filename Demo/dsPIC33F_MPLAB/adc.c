@@ -146,11 +146,11 @@ void adc_stop(void) {
 float dma_detectPulse(void) {
     anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
     uint8_t ADCcrucesCount = 0;
-    unsigned int ADClastRead = 0;
     uint8_t i = 0;
     unsigned int* buff = BufferA;
     float timeMed = 0;
     wind_medicion_type aux;
+    unsigned int safetyFlag = 0;
 
     //Envio muestras por UART para graficar
     //    for (i = 0; i < N_DMA_SAMP; i++) {
@@ -173,9 +173,13 @@ float dma_detectPulse(void) {
                     ADCcrucesCount++;
                     estadoDeteccion = SEMI_POSITIVO;
                 }
-                if (ADCcrucesCount == 4) { 
-                    timeMed = (float) (i + 1) / DMA_FREQ;
-                    return timeMed;
+                if (ADCcrucesCount == 4) {
+                    if (safetyFlag == 1) {
+                        timeMed = (float) (i + 1) / DMA_FREQ;
+                        return timeMed;
+                    } else {
+                        return 776.77;
+                    }
                 }
                 break;
             case PRIMERA_SAMPLE:
@@ -191,7 +195,7 @@ float dma_detectPulse(void) {
                 break;
             default: estadoDeteccion = PRIMERA_SAMPLE;
         }
-        ADClastRead = *buff;
+        if (*buff > LIMIT_SAFETY) safetyFlag = 1;
         buff++;
     }
     return 775.77;

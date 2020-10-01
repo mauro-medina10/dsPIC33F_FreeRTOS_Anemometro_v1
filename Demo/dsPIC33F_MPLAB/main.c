@@ -132,8 +132,8 @@ static void anemometro_main_task(void *pvParameters) {
                 break;
             case Medicion_Simple:
 
-                //                simpleMed = anemometroGetMed();
-                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                simpleMed = anemometroGetMed();
+                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
                 //                emisorSelect++;
@@ -150,20 +150,20 @@ static void anemometro_main_task(void *pvParameters) {
 
                 uartSendMed(simpleMed);
 
-                //                auxV++;
-                //                if (auxV >= 12) {
-                //                    auxV = 0;
-                //                    //                    emisorSelect++;
-                //                    emisorSelect += 2;
-                //                    //                    uartSendMed(lineMed);
-                //                    if (emisorSelect > TRANS_EMISOR_SUR) {
-                //                        emisorSelect = TRANS_EMISOR_OESTE;
-                //                        //                        //                        uartSendMed(lineMed);
-                //                        //                        vTaskDelay(2 / portTICK_PERIOD_MS);
-                //                        uartEndMode();
-                //                        //                        //                        while (1);
-                //                    }
-                //                }
+                auxV++;
+                if (auxV >= 6) {
+                    auxV = 0;
+                    //                    emisorSelect++;
+                    //                    emisorSelect += 2;
+                    //                    //                    uartSendMed(lineMed);
+                    //                    if (emisorSelect > TRANS_EMISOR_SUR) {
+                    //                        emisorSelect = TRANS_EMISOR_OESTE;
+                    //                        //                        //                        uartSendMed(lineMed);
+                    //                        //                        vTaskDelay(2 / portTICK_PERIOD_MS);
+                    uartEndMode();
+                    //                        //                        //                        while (1);
+                    //                    }
+                }
                 anemometroModoActivo = uartGetMode();
                 break;
             case Configuracion:
@@ -466,7 +466,7 @@ float anemometroGetMedProm(mux_transSelect_enum coord, uint8_t prom) {
         }
     }
 
-    if (medNprom > 0) {
+    if (medNprom > (prom / 2)) {
         return medAcum / medNprom;
     } else {
         return 666.66;
@@ -574,7 +574,7 @@ wind_medicion_type anemometroGetMed(void) {
             valMed.deg = 270;
         }
     } else {
-        valMed.mag = (VcoordOE + VcoordNS) / 2;
+        valMed.mag = 999.99;
         valMed.deg = 999.99;
         return valMed;
     }
