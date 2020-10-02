@@ -20,6 +20,11 @@ static QueueHandle_t qMenuOpcion;
 static QueueHandle_t qAnemometroModo;
 static QueueHandle_t qAnemometroModoConfig;
 
+TaskHandle_t pxUartTask;
+wind_medicion_type abortMed = {9995.99, 9995.99};
+
+anemometro_mode_enum modoActivo = Menu;
+
 void uartInit_RTOS(void) {
 
     qMenuOpcion = xQueueCreate(5, sizeof (char));
@@ -39,7 +44,7 @@ void uartInit_RTOS(void) {
         while (1);
     }
 
-    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 4, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+    if (xTaskCreate(uart_task, "uart_task", configMINIMAL_STACK_SIZE * 4, NULL, tskIDLE_PRIORITY + 1, &pxUartTask) != pdPASS) {
         while (1);
     }
 
@@ -115,7 +120,7 @@ uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 
     while ((ret < size) && (xQueueReceive(qRecv, &pBuf[ret], waitTick) == pdTRUE)) {
         //eco
-        if (pBuf[ret] != '¬') uartSend(&pBuf[ret], 1, 0);
+        if ((char)pBuf[ret] != '¬') uartSend(&pBuf[ret], 1, 0);
         ret++;
         //        waitTick = 0;
     }
@@ -143,7 +148,6 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 }
 
 static void uart_task(void *pvParameters) {
-    anemometro_mode_enum modoActivo = Menu;
     anemometro_config_enum modoConfig = Exit;
     wind_medicion_type medSimple;
     char msg[50];
@@ -205,6 +209,7 @@ static void uart_task(void *pvParameters) {
                 } else {
                     exit = 'z';
                     modoActivo = Menu;
+                    //                    anemometroAbortMed();
                 }
                 break;
             case Configuracion:
@@ -310,6 +315,12 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt(void) {
 
     /* pone dato en queue */
     xQueueSendFromISR(qRecv, &data, &xHigherPriorityTaskWoken);
+
+    if (modoActivo == Medicion_Continua) {
+        //            uartSendMed(abortMed);
+        anemometroAbortMed();
+        xHigherPriorityTaskWoken = pdTRUE;
+    }
 
     IFS0bits.U1RXIF = 0;
 

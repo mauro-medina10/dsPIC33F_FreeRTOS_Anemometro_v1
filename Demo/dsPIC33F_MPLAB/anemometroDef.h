@@ -66,14 +66,14 @@
 #define DETECTION_ERROR_N 0.000264131  
 #define DETECTION_ERROR_S 0.000264181
 
-#define DETECT_SCALING_OE 0.8952//0.6552
-#define DETECT_SCALING_NS 0.8633//0.61398				   						  
+#define DETECT_SCALING_OE 1//0.8952
+#define DETECT_SCALING_NS 1//0.8633				   						  
 
-#define DETECT_OFFSET_OE -0.1243//-0.7715				
-#define DETECT_OFFSET_NS -0.0075//-0.05281
+#define DETECT_OFFSET_OE 0//-0.1243			
+#define DETECT_OFFSET_NS 0//-0.0075
 
-#define OFFSET_ERROR_EO 0//4.867876	
-#define OFFSET_ERROR_NS 0//-2.3815
+#define OFFSET_ERROR_EO 0
+#define OFFSET_ERROR_NS 0
 
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 5

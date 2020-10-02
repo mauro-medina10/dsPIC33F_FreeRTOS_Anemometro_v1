@@ -47,6 +47,8 @@ void anemometroReceptorDelay(mux_transSelect_enum emisor);
 float anemometroCalcMode(float * pData, uint16_t nData);
 
 void anemometroCalibCero(void);
+
+void anemometroAbortMed(void);
 /*--------Tasks declaration---------*/
 //static void led_test_task(void *pvParameters);
 //static void transductor_test_task(void *pvParameters);
@@ -62,10 +64,9 @@ float detect_delta_E = DETECTION_ERROR_E;
 float detect_delta_N = DETECTION_ERROR_N;
 float detect_delta_S = DETECTION_ERROR_S;
 
-//float velMed[15];
-//uint8_t indMed = 0;
-//uint32_t timeMedVal[50];
-//uint16_t indiceAux = 0;
+anemometro_mode_enum anemometroModoActivo = Menu;
+
+uint8_t medProgFlag = 0;
 
 int main(void) {
     //Inicio Hardware
@@ -86,7 +87,12 @@ int main(void) {
 
     //FreeRTOS inits
 
-    if (xTaskCreate(anemometro_main_task, "anemometro_main_task", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 3, &xTaskToNotify) != pdPASS) {
+    if (xTaskCreate(anemometro_main_task,
+            "anemometro_main_task",
+            configMINIMAL_STACK_SIZE * 3,
+            NULL,
+            tskIDLE_PRIORITY + 3,
+            &xTaskToNotify) != pdPASS) {
         while (1);
     }
 
@@ -107,11 +113,12 @@ int main(void) {
 }
 
 static void anemometro_main_task(void *pvParameters) {
-    anemometro_mode_enum anemometroModoActivo = Menu;
     anemometro_config_enum configOption = ExitConfig;
     wind_medicion_type simpleMed = {0, 0};
     mux_transSelect_enum emisorSelect = TRANS_EMISOR_OESTE;
     uint16_t auxV = 0;
+    TickType_t xLastWakeTime;
+    unsigned int firstPeriodFlag = 1;
     //    wind_medicion_type lineMed = {9999.99, 999.99};
 
     DELAY_100uS;
@@ -124,10 +131,13 @@ static void anemometro_main_task(void *pvParameters) {
     while (1) {
         switch (anemometroModoActivo) {
             case Menu:
-                auxV = 0;
+                //Bandera para inciar medicion periodica
+                firstPeriodFlag = 1;
+                //Enum del menu configuracion
                 configOption = ExitConfig;
+                //Espero a que se elija un modo de func
                 anemometroModoActivo = uartGetMode();
-                RB_9_SET(0);
+                
                 if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
 
                 break;
@@ -143,29 +153,44 @@ static void anemometro_main_task(void *pvParameters) {
                 anemometroModoActivo = Menu;
                 break;
             case Medicion_Continua:
-                vTaskDelay(10 / portTICK_PERIOD_MS);
 
-                simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                if (firstPeriodFlag == 1) {
+                    xLastWakeTime = xTaskGetTickCount();
+                    firstPeriodFlag = 0;
+                }
+
+                medProgFlag = 1;
+
+                //                simpleMed = anemometroGetMed();
+
+
+                simpleMed.mag = anemometroGetVcoord(emisorSelect);
                 //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
 
                 auxV++;
-                if (auxV >= 6) {
+                if (auxV >= 10) {
                     auxV = 0;
                     //                    emisorSelect++;
-                    //                    emisorSelect += 2;
+                    emisorSelect += 2;
                     //                    //                    uartSendMed(lineMed);
                     //                    if (emisorSelect > TRANS_EMISOR_SUR) {
                     //                        emisorSelect = TRANS_EMISOR_OESTE;
                     //                        //                        //                        uartSendMed(lineMed);
                     //                        //                        vTaskDelay(2 / portTICK_PERIOD_MS);
                     uartEndMode();
+                    //                        vTaskDelay(10 / portTICK_PERIOD_MS);
                     //                        //                        //                        while (1);
-                    //                    }
+                    //                }
                 }
                 anemometroModoActivo = uartGetMode();
+
+                medProgFlag = 0;
+
+                if (anemometroModoActivo == Medicion_Continua) {
+                    //                    vTaskDelayUntil(&xLastWakeTime, (MED_PERIOD * 1000) / portTICK_PERIOD_MS);
+                }
                 break;
             case Configuracion:
                 configOption = uartGetModeConfig();
@@ -721,6 +746,13 @@ void anemometroCalibCero(void) {
     detect_delta_E = ceroMode[1] - DISTANCE_EO / SOUND_SPEED;
     detect_delta_N = ceroMode[2] - DISTANCE_NS / SOUND_SPEED;
     detect_delta_S = ceroMode[3] - DISTANCE_NS / SOUND_SPEED;
+}
+
+void anemometroAbortMed(void) {
+    if (medProgFlag == 0) {
+        anemometroModoActivo = Menu;
+        xTaskAbortDelay(xTaskToNotify);
+    }
 }
 
 static void prvSetupHardware(void) {
