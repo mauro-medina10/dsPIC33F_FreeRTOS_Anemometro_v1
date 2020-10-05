@@ -143,7 +143,42 @@ void adc_stop(void) {
 //    xTaskWoken = pdFALSE;
 //}
 
-float dma_detectPulse(void) {
+BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned) {
+    if ((BufferA[0] < LIMIT_SUPERIOR && BufferA[0] > LIMIT_INF)) {
+        return pdPASS;
+    } else {
+        if (dma_ceroCalib(coordAligned) == pdPASS) return pdPASS;
+    }
+    return pdFAIL;
+}
+
+BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib) {
+    uint8_t indexCalib = 0;
+
+    while ((BufferA[indexCalib] >= LIMIT_SUPERIOR || BufferA[indexCalib] <= LIMIT_INF)) {
+        indexCalib++;
+        if (indexCalib > 255) return pdFAIL;
+    }
+
+    switch (coordCalib) {
+        case TRANS_EMISOR_OESTE:
+            detect_sample_O = indexCalib;
+            break;
+        case TRANS_EMISOR_ESTE:
+            detect_sample_E = indexCalib;
+            break;
+        case TRANS_EMISOR_NORTE:
+            detect_sample_N = indexCalib;
+            break;
+        case TRANS_EMISOR_SUR:
+            detect_sample_S = indexCalib;
+            break;
+        default: return pdFAIL;
+    }
+    return pdPASS;
+}
+
+float dma_detectPulse(mux_transSelect_enum coordDetect) {
     anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
     uint8_t ADCcrucesCount = 0;
     uint8_t i = 0;
@@ -158,6 +193,21 @@ float dma_detectPulse(void) {
     //        aux.deg = 0;
     //        uartSendMed(aux);
     //    }
+    switch (coordDetect) {
+        case TRANS_EMISOR_OESTE:
+            buff = &BufferA[detect_sample_O];
+            break;
+        case TRANS_EMISOR_ESTE:
+            buff = &BufferA[detect_sample_E];
+            break;
+        case TRANS_EMISOR_NORTE:
+            buff = &BufferA[detect_sample_N];
+            break;
+        case TRANS_EMISOR_SUR:
+            buff = &BufferA[detect_sample_S];
+            break;
+        default: buff = BufferA;
+    }
 
     //Detecto el segundo cruce por cero
     for (i = 0; i < N_DMA_SAMP; i++) {
