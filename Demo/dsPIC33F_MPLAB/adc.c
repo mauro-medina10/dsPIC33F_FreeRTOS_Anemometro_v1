@@ -154,10 +154,19 @@ BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned) {
 
 BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib) {
     uint8_t indexCalib = 0;
+    uint8_t validDerivadaFlag = 0;
 
-    while ((BufferA[indexCalib] >= LIMIT_SUPERIOR || BufferA[indexCalib] <= LIMIT_INF)) {
-        indexCalib++;
-        if (indexCalib > 255) return pdFAIL;
+    //Busco el primer cero con derivada negativa
+    while (validDerivadaFlag != 1) {
+        while ((BufferA[indexCalib] >= LIMIT_SUPERIOR || BufferA[indexCalib] <= LIMIT_INF)) {
+            indexCalib++;
+            if (indexCalib > 255) return pdFAIL;
+        }
+        if (BufferA[indexCalib] > BufferA[indexCalib + 1]) {
+            validDerivadaFlag = 1;
+        } else {
+            indexCalib++;
+        }
     }
 
     switch (coordCalib) {
@@ -196,15 +205,19 @@ float dma_detectPulse(mux_transSelect_enum coordDetect) {
     switch (coordDetect) {
         case TRANS_EMISOR_OESTE:
             buff = &BufferA[detect_sample_O];
+            timeMed = (float) detect_sample_O / DMA_FREQ;
             break;
         case TRANS_EMISOR_ESTE:
             buff = &BufferA[detect_sample_E];
+            timeMed = (float) detect_sample_E / DMA_FREQ;
             break;
         case TRANS_EMISOR_NORTE:
             buff = &BufferA[detect_sample_N];
+            timeMed = (float) detect_sample_N / DMA_FREQ;
             break;
         case TRANS_EMISOR_SUR:
             buff = &BufferA[detect_sample_S];
+            timeMed = (float) detect_sample_S / DMA_FREQ;
             break;
         default: buff = BufferA;
     }
@@ -225,7 +238,7 @@ float dma_detectPulse(mux_transSelect_enum coordDetect) {
                 }
                 if (ADCcrucesCount == 4) {
                     if (safetyFlag == 1) {
-                        timeMed = (float) (i + 1) / DMA_FREQ;
+                        timeMed += (float) (i + 1) / DMA_FREQ;
                         return timeMed;
                     } else {
                         return 776.77;
