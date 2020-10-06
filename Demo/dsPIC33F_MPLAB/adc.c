@@ -144,7 +144,8 @@ void adc_stop(void) {
 //}
 
 BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned) {
-    if ((BufferA[0] < LIMIT_SUPERIOR && BufferA[0] > LIMIT_INF)) {
+    if ((BufferA[0] < LIMIT_SUPERIOR && BufferA[0] > LIMIT_INF) &&
+            BufferA[0] > BufferA[1]) {
         return pdPASS;
     } else {
         if (dma_ceroCalib(coordAligned) == pdPASS) return pdPASS;

@@ -53,7 +53,7 @@
 //Valor ADC sin excitacion
 #define ADC_CERO 377
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUPERIOR 379
+#define LIMIT_SUPERIOR 380
 #define LIMIT_INF 375
 #define LIMIT_SAFETY 383
 
@@ -97,7 +97,7 @@
 #define DELAY_O asm volatile ("REPEAT, #14831"); Nop(); //14746
 #define DELAY_E asm volatile ("REPEAT, #14831"); Nop(); //14708
 #define DELAY_N asm volatile ("REPEAT, #15031"); Nop(); //14971
-#define DELAY_S asm volatile ("REPEAT, #15031"); Nop(); //15031
+#define DELAY_S asm volatile ("REPEAT, #15001"); Nop(); //15031
 #define DELAY_T asm volatile ("REPEAT, #15031"); Nop();
 
 #define Ous_DELAY 0.0003687 //14676 / 40000000
