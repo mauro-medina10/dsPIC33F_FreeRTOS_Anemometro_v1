@@ -11,7 +11,7 @@
 /*Standars includes*/
 #include <stdint.h>
 #include <stdio.h> 
-#include <Math.h>
+
 
 /*Config includes*/
 #include "xc.h"
@@ -46,9 +46,13 @@ void anemometroReceptorDelay(mux_transSelect_enum emisor);
 
 float anemometroCalcMode(float * pData, uint16_t nData);
 
-void anemometroCalibCero(void);
+void anemometroCalibCero(float Sspeed);
 
 void anemometroAbortMed(void);
+
+void anemometroDelayTest(void);
+
+void anememetroSendFloat(float* dat);
 /*--------Tasks declaration---------*/
 //static void led_test_task(void *pvParameters);
 //static void transductor_test_task(void *pvParameters);
@@ -57,6 +61,7 @@ static void anemometro_main_task(void *pvParameters);
 
 /*FreeRTOS declarations*/
 static TaskHandle_t xTaskToNotify = NULL;
+static QueueHandle_t qRecf;
 
 /*Global variables*/
 float detect_delta_O = DETECTION_ERROR_O;
@@ -85,8 +90,14 @@ int main(void) {
     //Timer 32bits
     timerInit();
 
-    //FreeRTOS inits
+    //Queues init
+    qRecf = xQueueCreate(5, sizeof (float));
 
+    if (qRecf == NULL) {
+        while (1);
+    }
+
+    //FreeRTOS inits
     if (xTaskCreate(anemometro_main_task,
             "anemometro_main_task",
             configMINIMAL_STACK_SIZE * 3,
@@ -119,6 +130,7 @@ static void anemometro_main_task(void *pvParameters) {
     uint16_t auxV = 0;
     TickType_t xLastWakeTime;
     unsigned int firstPeriodFlag = 1;
+    float soundSpeed = 345.7;
     //    wind_medicion_type lineMed = {9999.99, 999.99};
 
     DELAY_100uS;
@@ -195,9 +207,11 @@ static void anemometro_main_task(void *pvParameters) {
 
                 switch (configOption) {
                     case CalCero:
+                        xQueueReceive(qRecf, &soundSpeed, portMAX_DELAY);
+
                         anemometroDelayTest();
 
-                        anemometroCalibCero();
+                        anemometroCalibCero(soundSpeed);
 
                         simpleMed.mag = detect_delta_O * 1000000;
                         simpleMed.deg = detect_delta_E * 1000000;
@@ -637,6 +651,10 @@ void anemometroEmiterSelect(mux_transSelect_enum transd) {
     //    adc_transdSelect(transd);
 }
 
+void anememetroSendFloat(float* dat) {
+    xQueueSend(qRecf, dat, portMAX_DELAY);
+}
+
 void anemometroReceptorDelay(mux_transSelect_enum emisor) {
     switch (emisor) {
         case TRANS_EMISOR_OESTE:
@@ -729,7 +747,7 @@ float anemometroCalcMode(float * pData, uint16_t nData) {
     return *(pData + i);
 }
 
-void anemometroCalibCero(void) {
+void anemometroCalibCero(float Sspeed) {
     float ceroMed[N_TIMER_MODE];
     uint8_t i = 0, j = 0;
     float ceroMode[4];
@@ -742,10 +760,10 @@ void anemometroCalibCero(void) {
         }
         ceroMode[j] = anemometroCalcMode(ceroMed, N_TIMER_MODE);
     }
-    detect_delta_O = ceroMode[0] - DISTANCE_EO / SOUND_SPEED;
-    detect_delta_E = ceroMode[1] - DISTANCE_EO / SOUND_SPEED;
-    detect_delta_N = ceroMode[2] - DISTANCE_NS / SOUND_SPEED;
-    detect_delta_S = ceroMode[3] - DISTANCE_NS / SOUND_SPEED;
+    detect_delta_O = ceroMode[0] - DISTANCE_EO / Sspeed;
+    detect_delta_E = ceroMode[1] - DISTANCE_EO / Sspeed;
+    detect_delta_N = ceroMode[2] - DISTANCE_NS / Sspeed;
+    detect_delta_S = ceroMode[3] - DISTANCE_NS / Sspeed;
 }
 
 void anemometroAbortMed(void) {
@@ -760,40 +778,40 @@ void anemometroDelayTest(void) {
 
     anemometroGetCoordTime(TRANS_EMISOR_OESTE);
     if (dma_ceroAligned(TRANS_EMISOR_OESTE) == pdPASS) {
-        sprintf(msg, "\r\n Delay emisor OESTE: OK\0");
+        sprintf(msg, "\r\n Delay emisor OESTE: OK%c",'\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     } else {
-        sprintf(msg, "\r\n Delay emisor OESTE: error\0");
+        sprintf(msg, "\r\n Delay emisor OESTE: error%c",'\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
     anemometroGetCoordTime(TRANS_EMISOR_ESTE);
     if (dma_ceroAligned(TRANS_EMISOR_ESTE) == pdPASS) {
-        sprintf(msg, "  ESTE: OK\0");
+        sprintf(msg, "  ESTE: OK%c",'\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     } else {
-        sprintf(msg, "  ESTE: error\0");
+        sprintf(msg, "  ESTE: error%c",'\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
     anemometroGetCoordTime(TRANS_EMISOR_NORTE);
     if (dma_ceroAligned(TRANS_EMISOR_NORTE) == pdPASS) {
-        sprintf(msg, "  NORTE: OK\0");
+        sprintf(msg, "  NORTE: OK%c",'\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     } else {
-        sprintf(msg, "  NORTE: error\0");
+        sprintf(msg, "  NORTE: error%c",'\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
     anemometroGetCoordTime(TRANS_EMISOR_SUR);
     if (dma_ceroAligned(TRANS_EMISOR_SUR) == pdPASS) {
-        sprintf(msg, "  SUR: OK\0");
+        sprintf(msg, "  SUR: OK%c",'\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     } else {
-        sprintf(msg, "  SUR: error\0");
+        sprintf(msg, "  SUR: error%c",'\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);

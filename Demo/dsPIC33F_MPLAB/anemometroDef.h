@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h> 
+#include <Math.h>
 
 /*FreeRTOS includes*/
 #include "FreeRTOS.h"
@@ -66,11 +67,11 @@
 #define DETECTION_ERROR_N 0.000287445//0.000264131  
 #define DETECTION_ERROR_S 0.000288405//0.000264181
 
-#define DETECT_SCALING_OE 1//0.8952
-#define DETECT_SCALING_NS 1//0.8633				   						  
+#define DETECT_SCALING_OE 0.886
+#define DETECT_SCALING_NS 0.921			   						  
 
-#define DETECT_OFFSET_OE 0//-0.1243			
-#define DETECT_OFFSET_NS 0//-0.0075
+#define DETECT_OFFSET_OE -0.021		
+#define DETECT_OFFSET_NS 0.03
 
 #define OFFSET_ERROR_EO 0
 #define OFFSET_ERROR_NS 0
@@ -78,7 +79,7 @@
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 5
 #define N_MED_PROM 10
-#define N_TIMER_MODE 50
+#define N_TIMER_MODE 30
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -114,6 +115,8 @@
 #define LED_OFF (PORTAbits.RA4 = 0)
 //Longitud tren de pulsos
 #define TRAIN_PULSE_LENGTH 10
+//CALCULO TEORICO VELOCIDAD DEL SONIDO
+#define SOUND_VEL(b) (float)(331.228 * sqrtf((b + 273.16)/273.16))
 
 /*typedef definitions*/
 typedef enum {
@@ -164,7 +167,7 @@ void anemometroEmiterSelect(mux_transSelect_enum transd);
 /*FreeRTOS declarations*/
 
 /*Global variables*/
-static float SOUND_SPEED = 345.7;
+static float TEMP_AM = 25;
 static uint16_t MED_PERIOD = 5;
 //static float DETECTION_ERROR_O = 0.0002165070;
 //static float DETECTION_ERROR_E = 0.0002155070;
