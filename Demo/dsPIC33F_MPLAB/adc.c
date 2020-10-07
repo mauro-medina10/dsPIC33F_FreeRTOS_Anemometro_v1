@@ -144,8 +144,27 @@ void adc_stop(void) {
 //}
 
 BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned) {
-    if ((BufferA[0] < LIMIT_SUPERIOR && BufferA[0] > LIMIT_INF) &&
-            BufferA[0] > BufferA[1]) {
+    uint8_t indexAligned = 0;
+
+    switch (coordAligned) {
+        case TRANS_EMISOR_OESTE:
+            indexAligned = detect_sample_O;
+            break;
+        case TRANS_EMISOR_ESTE:
+            indexAligned = detect_sample_E;
+            break;
+        case TRANS_EMISOR_NORTE:
+            indexAligned = detect_sample_N;
+            break;
+        case TRANS_EMISOR_SUR:
+            indexAligned = detect_sample_S;
+            break;
+        default: indexAligned = 0;
+    }
+
+    //Verifico si estoy en un cero con derivada negativa
+    if ((BufferA[indexAligned] < LIMIT_SUPERIOR && BufferA[indexAligned] > LIMIT_INF) &&
+            BufferA[indexAligned] > BufferA[indexAligned + 1]) {
         return pdPASS;
     } else {
         if (dma_ceroCalib(coordAligned) == pdPASS) return pdPASS;
@@ -194,7 +213,6 @@ float dma_detectPulse(mux_transSelect_enum coordDetect) {
     uint8_t i = 0;
     unsigned int* buff = BufferA;
     float timeMed = 0;
-    wind_medicion_type aux;
     unsigned int safetyFlag = 0;
 
     //Envio muestras por UART para graficar
@@ -203,6 +221,11 @@ float dma_detectPulse(mux_transSelect_enum coordDetect) {
     //        aux.deg = 0;
     //        uartSendMed(aux);
     //    }
+    
+    /* Arranco a analizar la señal donde debería haber
+     * un cero con derivada negativa en ausencia de viento,
+     * ademas, sumo el retarde de las muestras que ignoro
+     */
     switch (coordDetect) {
         case TRANS_EMISOR_OESTE:
             buff = &BufferA[detect_sample_O];
@@ -223,21 +246,23 @@ float dma_detectPulse(mux_transSelect_enum coordDetect) {
         default: buff = BufferA;
     }
 
-    //Detecto el segundo cruce por cero
+    //Detecto el tercer cruce por cero
     for (i = 0; i < N_DMA_SAMP; i++) {
         switch (estadoDeteccion) {
             case SEMI_POSITIVO:
+                //Busco cruce por cero desde un maximo
                 if (*buff < LIMIT_INF) {
                     ADCcrucesCount++;
                     estadoDeteccion = SEMI_NEGATIVO;
                 }
                 break;
             case SEMI_NEGATIVO:
-                if (*buff > LIMIT_SUPERIOR) { //Maximo detectado
+                //Busco cruce por cero desde un minimo
+                if (*buff > LIMIT_SUPERIOR) { 
                     ADCcrucesCount++;
                     estadoDeteccion = SEMI_POSITIVO;
                 }
-                if (ADCcrucesCount == 4) {
+                if (ADCcrucesCount == 3) {
                     if (safetyFlag == 1) {
                         timeMed += (float) (i + 1) / DMA_FREQ;
                         return timeMed;
@@ -247,7 +272,9 @@ float dma_detectPulse(mux_transSelect_enum coordDetect) {
                 }
                 break;
             case PRIMERA_SAMPLE:
-                /* Si la señal adelanta cuento los cruces por cero,
+                /* Estoy seguro que sin viento la señal arranca en
+                 * un cero con derivada negativa
+                 * si la señal adelanta cuento los cruces por cero,
                  * si la señal esta atrasada necesito contar un cruce de mas.
                  */
                 if (*buff > LIMIT_SUPERIOR) {
@@ -270,7 +297,7 @@ void __attribute__((interrupt, no_auto_psv))_DMA0Interrupt(void) {
 
     RB_9_SET(1);
 
-    anemometroTdetected(&xTaskWoken, 0x01);
+    anemometroTdetectedFromISR(&xTaskWoken, 0x01);
 
     IFS0bits.DMA0IF = 0;
 

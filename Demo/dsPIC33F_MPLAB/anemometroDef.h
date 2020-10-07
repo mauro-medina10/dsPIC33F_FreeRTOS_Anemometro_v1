@@ -73,13 +73,16 @@
 #define DETECT_OFFSET_OE -0.021		
 #define DETECT_OFFSET_NS 0.03
 
+#define ANGLE_SCALING 1.0236
+#define ANGLE_OFFSET 1.1273
+
 #define OFFSET_ERROR_EO 0
 #define OFFSET_ERROR_NS 0
 
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 5
-#define N_MED_PROM 10
-#define N_TIMER_MODE 30
+#define N_MED_PROM 20
+#define N_TIMER_MODE 25
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -156,19 +159,34 @@ typedef struct {
 /*FreeRTOS definitions*/
 
 /*Funciones*/
-BaseType_t muxOutputSelect(mux_transSelect_enum ch);
+BaseType_t anemometroMuxOutputSelect(mux_transSelect_enum ch);
 
 wind_medicion_type anemometroGetMed(void);
 
-void anemometroTdetected(BaseType_t *pxHigherPriorityTaskWoken, uint32_t val);
+void anemometroTdetectedFromISR(BaseType_t *pxHigherPriorityTaskWoken, uint32_t val);
 
 void anemometroEmiterSelect(mux_transSelect_enum transd);
 
+float anemometroGetVcoord(mux_transSelect_enum coordV);
+
+BaseType_t anemometroGetProm(float* medOE, float* medNS, uint8_t prom);
+
+float anemometroGetCoordTime(mux_transSelect_enum coordTime);
+
+void anemometroReceptorDelay(mux_transSelect_enum emisor);
+
+float anemometroCalcMode(float * pData, uint16_t nData);
+
+void anemometroCalibCero(float Sspeed);
+
+void anemometroAbortMed(void);
+
+void anemometroDelayTest(void);
+
+void anemometroSendFloat(float* dat);
 /*FreeRTOS declarations*/
 
 /*Global variables*/
-static float TEMP_AM = 25;
-static uint16_t MED_PERIOD = 5;
 //static float DETECTION_ERROR_O = 0.0002165070;
 //static float DETECTION_ERROR_E = 0.0002155070;
 //static float DETECTION_ERROR_N = 0.0002216887;
