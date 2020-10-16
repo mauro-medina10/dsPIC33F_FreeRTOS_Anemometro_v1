@@ -7,13 +7,13 @@
 
 #include "adc.h"
 
-//static anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
-//uint16_t medicionesADC[200];
-//static uint32_t indexADC = 0;
-////Nuevo metodo de deteccion
-//static uint16_t ADCmaximosCount = 0;
-//static uint16_t ADClastRead = 0;
-//unsigned int DmaBuffer = 0;
+/*Global variables*/
+static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
+//static unsigned int BufferB[128] __attribute__((space(dma)));
+static uint8_t detect_sample_O = 0;
+static uint8_t detect_sample_E = 0;
+static uint8_t detect_sample_N = 0;
+static uint8_t detect_sample_S = 0;
 
 void adc_init(void) {
 
@@ -173,7 +173,7 @@ BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned) {
 }
 
 BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib) {
-    uint8_t indexCalib = 0;
+    uint16_t indexCalib = 0;
     uint8_t validDerivadaFlag = 0;
 
     //Busco el primer cero con derivada negativa

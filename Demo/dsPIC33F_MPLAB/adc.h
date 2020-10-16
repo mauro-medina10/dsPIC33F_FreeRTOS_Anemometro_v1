@@ -64,14 +64,6 @@ BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned);
 
 BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib);
 
-/*Global variables*/
-static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
-//static unsigned int BufferB[128] __attribute__((space(dma)));
-static uint8_t detect_sample_O = 0;
-static uint8_t detect_sample_E = 0;
-static uint8_t detect_sample_N = 0;
-static uint8_t detect_sample_S = 0;
-
 
 #ifdef	__cplusplus
 extern "C" {

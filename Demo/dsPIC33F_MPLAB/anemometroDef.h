@@ -62,22 +62,25 @@
 #define DETECTION_CERO_MAX 0.00080397
 #define DETECTION_CERO_MIN 0.00080395
 
-#define DETECTION_ERROR_O 0.000267005//0.00024373
-#define DETECTION_ERROR_E 0.000266955//0.00024368					   						  
-#define DETECTION_ERROR_N 0.000287445//0.000264131  
-#define DETECTION_ERROR_S 0.000288405//0.000264181
+#define DETECTION_ERROR_O 0.000267005
+#define DETECTION_ERROR_E 0.000266955			   						  
+#define DETECTION_ERROR_N 0.000287445  
+#define DETECTION_ERROR_S 0.000288405
 
-#define DETECT_SCALING_OE 0.886
-#define DETECT_SCALING_NS 0.921			   						  
+#define DETECT_SCALING_OE 0.7841//0.886  		
+#define DETECT_SCALING_NS 0.739//0.921			   						  
 
-#define DETECT_OFFSET_OE -0.021		
-#define DETECT_OFFSET_NS 0.03
+#define DETECT_OFFSET_OE -0.1361//-0.021		
+#define DETECT_OFFSET_NS -0.0264//0.03
 
-#define ANGLE_SCALING 1.0236
-#define ANGLE_OFFSET 1.1273
+#define ANGLE_SCALING 1//1.031
+#define ANGLE_OFFSET 0//9.5
 
 #define OFFSET_ERROR_EO 0
 #define OFFSET_ERROR_NS 0
+
+#define MED_SCALING 1//0.976558333
+#define MED_OFFSET 0//-0.356591667
 
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 5
@@ -154,6 +157,7 @@ typedef enum {
 typedef struct {
     float mag;
     float deg;
+    char coord[3];
 } wind_medicion_type;
 
 /*FreeRTOS definitions*/
@@ -184,6 +188,8 @@ void anemometroAbortMed(void);
 void anemometroDelayTest(void);
 
 void anemometroSendFloat(float* dat);
+
+void anemometroRecvFloat(float* dat);
 /*FreeRTOS declarations*/
 
 /*Global variables*/

@@ -161,8 +161,9 @@ static void anemometro_main_task(void *pvParameters) {
                     //                    emisorSelect += 2;
                     //                    if (emisorSelect > TRANS_EMISOR_SUR) {
                     //                        emisorSelect = TRANS_EMISOR_OESTE;
-                    uartEndMode();
+                    //                        uartEndMode();
                     //                    }
+                    uartEndMode();
                 }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
@@ -194,6 +195,7 @@ static void anemometro_main_task(void *pvParameters) {
                         uartSendMed(simpleMed);
                         simpleMed.mag = 0;
                         simpleMed.deg = 0;
+
                         configOption = ExitConfig;
                         break;
                     case SetEmi:
@@ -424,37 +426,77 @@ wind_medicion_type anemometroGetMed(void) {
 
         if (valMed.mag == 0) {
             valMed.deg = 0;
+            sprintf(valMed.coord, "   ");
             return valMed;
         }
+
+        //Correccion lineal de la medicion
+        valMed.mag = (valMed.mag - MED_OFFSET) / MED_SCALING;
 
         if (VcoordNS != 0) {
             //Viento desde NorOeste: 0 < deg < 90
             if (VcoordOE > 0 && VcoordNS > 0) {
                 valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS);
+                if (valMed.deg < 20) {
+                    sprintf(valMed.coord, " N ");
+                } else if (valMed.deg > 70) {
+                    sprintf(valMed.coord, " O ");
+                } else {
+                    sprintf(valMed.coord, "N-O");
+                }
             }
             //Viento desde Sur: 90 < deg < 270
             if (VcoordNS < 0) {
                 valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 180;
+                if (valMed.deg < 110) {
+                    sprintf(valMed.coord, " O ");
+                } else if (valMed.deg > 160 && valMed.deg < 200) {
+                    sprintf(valMed.coord, " S ");
+                } else if (valMed.deg > 250) {
+                    sprintf(valMed.coord, " E ");
+                } else {
+                    if (valMed.deg < 180) {
+                        sprintf(valMed.coord, "S-O");
+                    } else {
+                        sprintf(valMed.coord, "S-E");
+                    }
+                }
             }
             //Viento desde NorEste: 270 < deg < 360
             if (VcoordOE < 0 && VcoordNS > 0) {
                 valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 360;
+                if (valMed.deg > 340) {
+                    sprintf(valMed.coord, " N ");
+                } else if (valMed.deg < 290) {
+                    sprintf(valMed.coord, " E ");
+                } else {
+                    sprintf(valMed.coord, "N-E");
+                }
             }
         } else if (VcoordOE > 0) {
             //Viento desde Oeste
             valMed.deg = 90;
+            sprintf(valMed.coord, " O ");
         } else {
             //Viento desde Este
             valMed.deg = 270;
+            sprintf(valMed.coord, " E ");
         }
-        //Correccion lineal
-        valMed.deg = (valMed.deg - ANGLE_OFFSET) / ANGLE_SCALING;
-        
+        //Correccion lineal del angulo
+        if (valMed.deg >= ANGLE_OFFSET) {
+            valMed.deg = (valMed.deg - ANGLE_OFFSET) / ANGLE_SCALING;
+        }
     } else {
         //Error lectura
         valMed.mag = 999.99;
         valMed.deg = 999.99;
         return valMed;
+    }
+
+    if (valMed.deg == 180) {
+        sprintf(valMed.coord, " S ");
+    } else if (valMed.deg == 0) {
+        sprintf(valMed.coord, " N ");
     }
 
     return valMed;
@@ -473,6 +515,10 @@ void anemometroEmiterSelect(mux_transSelect_enum transd) {
 
 void anemometroSendFloat(float* dat) {
     xQueueSend(qRecf, dat, portMAX_DELAY);
+}
+
+void anemometroRecvFloat(float* dat) {
+    xQueueReceive(qRecf, dat, portMAX_DELAY);
 }
 
 void anemometroReceptorDelay(mux_transSelect_enum emisor) {
@@ -635,10 +681,10 @@ void anemometroDelayTest(void) {
 
     anemometroGetCoordTime(TRANS_EMISOR_SUR);
     if (dma_ceroAligned(TRANS_EMISOR_SUR) == pdPASS) {
-        sprintf(msg, "  SUR: OK%c", '\0');
+        sprintf(msg, "  SUR: OK\r\n%c", '\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     } else {
-        sprintf(msg, "  SUR: error%c", '\0');
+        sprintf(msg, "  SUR: error\r\n%c", '\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);

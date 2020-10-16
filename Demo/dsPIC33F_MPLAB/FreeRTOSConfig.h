@@ -117,6 +117,9 @@ to exclude the API function. */
 #define INCLUDE_xTaskAbortDelay         1
 #define INCLUDE_eTaskGetState           1
 
+//Power saving mode
+#define configUSE_TICKLESS_IDLE         1
+
 #define configKERNEL_INTERRUPT_PRIORITY	0x01
 #define pdMS_TO_TICKS( xTimeInMs ) ( ( TickType_t) ( ( ( TickType_t) ( xTimeInMs ) )) * ((( TickType_t) configTICK_RATE_HZ ) / ( TickType_t) 1000 ))
 
