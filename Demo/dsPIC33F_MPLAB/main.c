@@ -154,17 +154,17 @@ static void anemometro_main_task(void *pvParameters) {
 
                 uartSendMed(simpleMed);
 
-                auxV++;
-                if (auxV >= 5) {
-                    auxV = 0;
-                    //                    emisorSelect++;
-                    //                    emisorSelect += 2;
-                    //                    if (emisorSelect > TRANS_EMISOR_SUR) {
-                    //                        emisorSelect = TRANS_EMISOR_OESTE;
-                    //                        uartEndMode();
-                    //                    }
-                    uartEndMode();
-                }
+                //                auxV++;
+                //                if (auxV >= 5) {
+                //                    auxV = 0;
+                //                    emisorSelect++;
+                //                    emisorSelect += 2;
+                //                    if (emisorSelect > TRANS_EMISOR_SUR) {
+                //                        emisorSelect = TRANS_EMISOR_OESTE;
+                //                        uartEndMode();
+                //                    }
+                //                    uartEndMode();
+                //                }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
                 anemometroModoActivo = uartGetMode();
@@ -172,7 +172,7 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 0;
 
                 if (anemometroModoActivo == Medicion_Continua) {
-                    //                    vTaskDelayUntil(&xLastWakeTime, (MED_PERIOD * 1000) / portTICK_PERIOD_MS);
+                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
                 }
                 break;
             case Configuracion:
