@@ -46,8 +46,13 @@
 #include "timers.h"
 #include "semphr.h"
 
+/*C includes*/
+#include <stdint.h>
+
+
 #define N_DMA_SAMP 128//255
 #define DMA_FREQ 1100000
+#define DMA_TOTAL_SAMP 800
 
 void adc_init(void);
 
@@ -58,6 +63,8 @@ void adc_stop(void);
 void adc_transdSelect(mux_transSelect_enum transd);
 
 void initDma0(void);
+
+BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture);
 
 BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time);
 

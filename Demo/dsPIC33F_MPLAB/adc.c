@@ -9,7 +9,6 @@
 
 /*Global variables*/
 uint16_t DmaBuffer = 0;
-uint16_t dataIndex = 0;
 static unsigned int dataN[1024];
 
 static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
@@ -215,63 +214,160 @@ BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib) {
     return pdPASS;
 }
 
-BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
-    anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
+BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
+    uint16_t dataIndex = 0;
     uint8_t i = 0;
-    uint8_t limitH = 0;
+    uint32_t ulNotificationValue;
+    BaseType_t notifyStatus = pdFAIL;
+
+    dataIndex = 0;
+
+    while (dataIndex < DMA_TOTAL_SAMP) {
+        notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 2 / portTICK_PERIOD_MS);
+
+        if ((ulNotificationValue & 0x01) != 0 && notifyStatus == pdPASS) {
+            if (DmaBuffer & 0x01) {
+                for (i = 0; i < N_DMA_SAMP; i++) {
+                    dataN[dataIndex] = BufferA[i];
+                    dataIndex++;
+                }
+            } else {
+                for (i = 0; i < N_DMA_SAMP; i++) {
+                    dataN[dataIndex] = BufferB[i];
+                    dataIndex++;
+                }
+            }
+        } else {
+            return pdFAIL;
+        }
+    }
+    return pdPASS;
+}
+
+BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
+    anemometro_deteccion_enum estadoDeteccion = MAXIMO_GLOBAL;
+    uint16_t dataIndex = 0;
+    uint16_t i = 0;
+    uint16_t maxIndex = 0;
+    unsigned int lastMax = dataN[0];
+    unsigned int lastVal = 0;
+    unsigned int lastAux = 0;
     wind_medicion_type aux;
-    uint16_t j = 0;
-    char medMSG[7];
 
-    //Envio muestras por UART para graficar
-    if (DmaBuffer & 0x01) {
-        for (i = 0; i < N_DMA_SAMP; i++) {
-            dataN[dataIndex] = BufferA[i];
-            dataIndex++;
-        }
-    } else {
-        for (i = 0; i < N_DMA_SAMP; i++) {
-            dataN[dataIndex] = BufferB[i];
-            dataIndex++;
-        }
-    }
+    //Voy a buscar el ultimo maximo y dos maximos locales despues busco el cruce por cero (?) LOL
+    while (1) {
+        switch (estadoDeteccion) {
+            case MAXIMO_GLOBAL:
+                for (i = 0; i < DMA_TOTAL_SAMP; i++) {
+                    if (dataN[i] >= lastMax) {
+                        lastMax = dataN[i];
+                        maxIndex = i + 3;
+                    }
+                }
+                estadoDeteccion = MAXIMO_LOCAL;
+                break;
+            case MAXIMO_LOCAL:
+                lastVal = dataN[maxIndex];
 
-    if (dataIndex > 850) {
-        adc_stop();
+                maxIndex++;
 
-        for (j = 0; j < dataIndex; j++) {
-            sprintf(medMSG, "%d\r\n%c", dataN[j], '\0');
-            uartSend((uint8_t *) medMSG, 6, portMAX_DELAY);
-        }
+                i = maxIndex;
 
-        dataIndex = 0;
-        return pdTRUE;
-    }
+                while (lastVal >= dataN[i]) {
+                    lastVal = dataN[i];
+                    i++;
 
-    return pdFALSE;
-    //Si dmaBuffer es impar
+                    if (i > DMA_TOTAL_SAMP) return pdFAIL;
+                }
+                maxIndex = i + 3;
 
-    if (DmaBuffer & 0x01) {
-        for (i = 0; i < N_DMA_SAMP; i++) {
-            if (BufferA[i] >= LIMIT_HIGH) limitH = 1;
+                estadoDeteccion = MINIMO_LOCAL;
+                break;
+            case MINIMO_LOCAL:
+                lastVal = dataN[maxIndex];
 
-            if (limitH == 1 && (BufferA[i] < LIMIT_SUPERIOR && BufferA[i] > LIMIT_INF)) {
+                maxIndex++;
+
+                i = maxIndex;
+
+                while (lastVal <= dataN[i]) {
+                    lastVal = dataN[i];
+                    i++;
+
+                    if (i > DMA_TOTAL_SAMP) return pdFAIL;
+                }
+                maxIndex = i;
+
+                estadoDeteccion = CRUCE_CERO;
+                break;
+            case CRUCE_CERO:
+                i = maxIndex;
+
+                while (dataN[i] < LIMIT_INF || dataN[i] > LIMIT_SUPERIOR) {
+                    lastVal = dataN[i];
+                    i++;
+
+                    if (i > DMA_TOTAL_SAMP) return pdFAIL;
+                }
                 *time = (float) (i + 1) / DMA_FREQ;
-                return pdTRUE;
-            }
-        }
-    } else {
-        for (i = 0; i < N_DMA_SAMP; i++) {
-            if (BufferB[i] >= LIMIT_HIGH) limitH = 1;
 
-            if (limitH == 1 && (BufferB[i] < LIMIT_SUPERIOR && BufferB[i] > LIMIT_INF)) {
-                *time = (float) (i + 1) / DMA_FREQ;
-                return pdTRUE;
-            }
+                return pdPASS;
+                break;
+
+            default: return pdFAIL;
         }
     }
 
-    return pdFALSE;
+    //    //Envio muestras por UART para graficar
+    //    if (DmaBuffer & 0x01) {
+    //        for (i = 0; i < N_DMA_SAMP; i++) {
+    //            dataN[dataIndex] = BufferA[i];
+    //            dataIndex++;
+    //        }
+    //    } else {
+    //        for (i = 0; i < N_DMA_SAMP; i++) {
+    //            dataN[dataIndex] = BufferB[i];
+    //            dataIndex++;
+    //        }
+    //    }
+    //
+    //    if (dataIndex > 850) {
+    //        adc_stop();
+    //
+    //        for (j = 0; j < dataIndex; j++) {
+    //            sprintf(medMSG, "%d\r\n%c", dataN[j], '\0');
+    //            uartSend((uint8_t *) medMSG, 6, portMAX_DELAY);
+    //        }
+    //
+    //        dataIndex = 0;
+    //        return pdTRUE;
+    //    }
+    //
+    //    return pdFALSE;
+
+    //    //Si dmaBuffer es impar
+    //    if (DmaBuffer & 0x01) {
+    //        for (i = 0; i < N_DMA_SAMP; i++) {
+    //            if (BufferA[i] >= LIMIT_HIGH) limitH = 1;
+    //
+    //            if (limitH == 1 && (BufferA[i] < LIMIT_SUPERIOR && BufferA[i] > LIMIT_INF)) {
+    //                *time = (float) (i + 1) / DMA_FREQ;
+    //                return pdTRUE;
+    //            }
+    //        }
+    //    } else {
+    //        for (i = 0; i < N_DMA_SAMP; i++) {
+    //            if (BufferB[i] >= LIMIT_HIGH) limitH = 1;
+    //
+    //            if (limitH == 1 && (BufferB[i] < LIMIT_SUPERIOR && BufferB[i] > LIMIT_INF)) {
+    //                *time = (float) (i + 1) / DMA_FREQ;
+    //                return pdTRUE;
+    //            }
+    //        }
+    //    }
+    //
+    //    return pdFALSE;
+
 }
 
 void __attribute__((interrupt, no_auto_psv))_DMA0Interrupt(void) {

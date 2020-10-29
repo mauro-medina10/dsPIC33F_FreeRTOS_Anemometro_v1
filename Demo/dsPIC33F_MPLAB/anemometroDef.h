@@ -148,9 +148,10 @@ typedef enum {
 } anemometro_config_enum;
 
 typedef enum {
-    SEMI_POSITIVO = 0,
-    SEMI_NEGATIVO,
-    PRIMERA_SAMPLE
+    MAXIMO_GLOBAL = 0,
+    MAXIMO_LOCAL,
+    MINIMO_LOCAL,
+    CRUCE_CERO
 } anemometro_deteccion_enum;
 
 typedef enum {

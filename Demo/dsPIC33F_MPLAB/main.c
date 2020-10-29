@@ -130,12 +130,12 @@ static void anemometro_main_task(void *pvParameters) {
                 break;
             case Medicion_Simple:
 
-                //                simpleMed = anemometroGetMed();
-                simpleMed.mag = anemometroGetCoordTime(TRANS_EMISOR_NORTE) * 1000000;
+                simpleMed = anemometroGetMed();
+                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
-                emisorSelect++;
-                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
+                //                emisorSelect++;
+                //                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
 
                 anemometroModoActivo = Menu;
                 break;
@@ -149,22 +149,22 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 1;
 
                 simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                //                                simpleMed.mag = anemometroGetVcoord(emisorSelect);
                 //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
 
-                auxV++;
-                if (auxV >= 5) {
-                    auxV = 0;
-                    //                    emisorSelect++;
-                    //                    emisorSelect += 2;
-                    //                    if (emisorSelect > TRANS_EMISOR_SUR) {
-                    //                        emisorSelect = TRANS_EMISOR_OESTE;
-                    //                        uartEndMode();
-                    //                    }
-                    uartEndMode();
-                }
+                //                auxV++;
+                //                if (auxV >= 50) {
+                //                    auxV = 0;
+                //                    emisorSelect++;
+                //                    //                    emisorSelect += 2;
+                //                    if (emisorSelect > TRANS_EMISOR_SUR) {
+                //                        emisorSelect = TRANS_EMISOR_OESTE;
+                //                        uartEndMode();
+                //                    }
+                //                    //                    uartEndMode();
+                //                }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
                 anemometroModoActivo = uartGetMode();
@@ -172,7 +172,7 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 0;
 
                 if (anemometroModoActivo == Medicion_Continua) {
-                    //                    vTaskDelayUntil(&xLastWakeTime, (MED_PERIOD * 1000) / portTICK_PERIOD_MS);
+                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
                 }
                 break;
             case Configuracion:
@@ -182,7 +182,7 @@ static void anemometro_main_task(void *pvParameters) {
                     case CalCero:
                         xQueueReceive(qRecf, &soundSpeed, portMAX_DELAY);
 
-                        anemometroDelayTest();
+                        //                        anemometroDelayTest();
 
                         anemometroCalibCero(soundSpeed);
 
@@ -344,6 +344,7 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
     uint32_t ulNotificationValue;
     BaseType_t notifyStatus = pdFAIL;
     BaseType_t pulseDetected = pdFALSE;
+    BaseType_t pulseCaptured = pdFALSE;
 
     RB_9_SET(0);
 
@@ -369,40 +370,18 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
 
     adc_start();
 
-    //    RB_9_SET(0);
-    while (pulseDetected != pdTRUE) {
-        notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 2 / portTICK_PERIOD_MS);
-
-        if ((ulNotificationValue & 0x01) != 0 && notifyStatus == pdPASS) {
-            /*Detecto Segundo maximo*/
-            pulseDetected = dma_detectPulse(coordTime, &timeMed);
-        } else {
-            timeMed = 888.88;
-        }
-    }
+    pulseCaptured = dma_capturePulse(coordTime);
 
     adc_stop();
 
-    //    RB_9_SET(0);
+    if (pulseCaptured == pdPASS) {
+        pulseDetected = dma_detectPulse(coordTime, &timeMed);
 
-    switch (coordTime) {
-        case TRANS_EMISOR_OESTE:
-            timeMed += (((float) timerCount() / configCPU_CLOCK_HZ));
-            break;
-        case TRANS_EMISOR_ESTE:
-            timeMed += (((float) timerCount() / configCPU_CLOCK_HZ));
-            break;
-        case TRANS_EMISOR_NORTE:
-            timeMed += (((float) timerCount() / configCPU_CLOCK_HZ));
-            break;
-        case TRANS_EMISOR_SUR:
-            timeMed += (((float) timerCount() / configCPU_CLOCK_HZ));
+        timeMed += (((float) timerCount() / configCPU_CLOCK_HZ));
 
-            break;
-        default: timeMed = 777.77;
+    } else {
+        timeMed = 888.88;
     }
-
-    //    RB_9_SET(0);
 
     return timeMed;
 }
