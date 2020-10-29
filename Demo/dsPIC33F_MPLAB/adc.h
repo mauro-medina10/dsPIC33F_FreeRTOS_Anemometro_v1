@@ -35,6 +35,7 @@
 #include <p33FJ128GP802.h> // include processor files - each processor file is guarded.  
 
 #include <anemometroDef.h>
+#include <UART_RTOS.h>
 
 /*FreeRTOS includes*/
 #include "FreeRTOS.h"
@@ -45,7 +46,7 @@
 #include "timers.h"
 #include "semphr.h"
 
-#define N_DMA_SAMP 255//128	
+#define N_DMA_SAMP 128//255
 #define DMA_FREQ 1100000
 
 void adc_init(void);
@@ -58,7 +59,7 @@ void adc_transdSelect(mux_transSelect_enum transd);
 
 void initDma0(void);
 
-float dma_detectPulse(mux_transSelect_enum coordDetect);
+BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time);
 
 BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned);
 

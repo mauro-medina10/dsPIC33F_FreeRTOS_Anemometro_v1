@@ -78,7 +78,7 @@ void uartInit(void) {
 
     qRecv = xQueueCreate(16, sizeof (char));
 
-    qSendMedicion = xQueueCreate(120, sizeof (wind_medicion_type));
+    qSendMedicion = xQueueCreate(64, sizeof (wind_medicion_type));
 
     if (xSemaphoreUartSend == NULL || qRecv == NULL || qSendMedicion == NULL) {
         while (1);

@@ -8,8 +8,12 @@
 #include "adc.h"
 
 /*Global variables*/
+uint16_t DmaBuffer = 0;
+uint16_t dataIndex = 0;
+static unsigned int dataN[1024];
+
 static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
-//static unsigned int BufferB[128] __attribute__((space(dma)));
+static unsigned int BufferB[N_DMA_SAMP] __attribute__((space(dma)));
 static uint8_t detect_sample_O = 0;
 static uint8_t detect_sample_E = 0;
 static uint8_t detect_sample_N = 0;
@@ -61,6 +65,8 @@ void adc_init(void) {
 }
 
 void adc_start(void) {
+    DmaBuffer = 0;
+
     //    IEC0bits.AD1IE = 1; // Enable ADC1 interrupts
     DMA0CONbits.CHEN = 1; //enable DMA
     AD1CON1bits.ADON = 1; // Turn on ADC1
@@ -68,13 +74,13 @@ void adc_start(void) {
 
 void initDma0(void) {
     DMA0CONbits.AMODE = 0; // Configure DMA for Register indirect with post increment	
-    DMA0CONbits.MODE = 1; // One-Shot, Ping-Pong modes disabled
+    DMA0CONbits.MODE = 2; // Configure DMA for Continuous Ping-Pong mode
     //    DMA0CONbits.MODE = 2; // Configure DMA for Continuous Ping-Pong mode
     DMA0PAD = (volatile unsigned int) &ADC1BUF0;
     DMA0CNT = (N_DMA_SAMP - 1);
     DMA0REQ = 13;
     DMA0STA = __builtin_dmaoffset(BufferA);
-    //    DMA0STB = __builtin_dmaoffset(BufferB);
+    DMA0STB = __builtin_dmaoffset(BufferB);
     IFS0bits.DMA0IF = 0; //Clear the DMA interrupt flag bit	
     IEC0bits.DMA0IE = 1; //Set the DMA interrupt enable bit	
     //    DMA0CONbits.CHEN = 1; //enable	
@@ -86,6 +92,8 @@ void adc_stop(void) {
     IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
 
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
+
+    DMA0CONbits.CHEN = 0;
 }
 
 //void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
@@ -207,95 +215,69 @@ BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib) {
     return pdPASS;
 }
 
-float dma_detectPulse(mux_transSelect_enum coordDetect) {
+BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
     anemometro_deteccion_enum estadoDeteccion = PRIMERA_SAMPLE;
-    uint8_t ADCcrucesCount = 0;
     uint8_t i = 0;
-    unsigned int* buff = BufferA;
-    float timeMed = 0;
-    unsigned int safetyFlag = 0;
+    uint8_t limitH = 0;
+    wind_medicion_type aux;
+    uint16_t j = 0;
+    char medMSG[7];
 
     //Envio muestras por UART para graficar
-    //    for (i = 0; i < N_DMA_SAMP; i++) {
-    //        aux.mag = (float) BufferA[i];
-    //        aux.deg = 0;
-    //        uartSendMed(aux);
-    //    }
-    
-    /* Arranco a analizar la señal donde debería haber
-     * un cero con derivada negativa en ausencia de viento,
-     * ademas, sumo el retarde de las muestras que ignoro
-     */
-    switch (coordDetect) {
-        case TRANS_EMISOR_OESTE:
-            buff = &BufferA[detect_sample_O];
-            timeMed = (float) detect_sample_O / DMA_FREQ;
-            break;
-        case TRANS_EMISOR_ESTE:
-            buff = &BufferA[detect_sample_E];
-            timeMed = (float) detect_sample_E / DMA_FREQ;
-            break;
-        case TRANS_EMISOR_NORTE:
-            buff = &BufferA[detect_sample_N];
-            timeMed = (float) detect_sample_N / DMA_FREQ;
-            break;
-        case TRANS_EMISOR_SUR:
-            buff = &BufferA[detect_sample_S];
-            timeMed = (float) detect_sample_S / DMA_FREQ;
-            break;
-        default: buff = BufferA;
+    if (DmaBuffer & 0x01) {
+        for (i = 0; i < N_DMA_SAMP; i++) {
+            dataN[dataIndex] = BufferA[i];
+            dataIndex++;
+        }
+    } else {
+        for (i = 0; i < N_DMA_SAMP; i++) {
+            dataN[dataIndex] = BufferB[i];
+            dataIndex++;
+        }
     }
 
-    //Detecto el tercer cruce por cero
-    for (i = 0; i < N_DMA_SAMP; i++) {
-        switch (estadoDeteccion) {
-            case SEMI_POSITIVO:
-                //Busco cruce por cero desde un maximo
-                if (*buff < LIMIT_INF) {
-                    ADCcrucesCount++;
-                    estadoDeteccion = SEMI_NEGATIVO;
-                }
-                break;
-            case SEMI_NEGATIVO:
-                //Busco cruce por cero desde un minimo
-                if (*buff > LIMIT_SUPERIOR) { 
-                    ADCcrucesCount++;
-                    estadoDeteccion = SEMI_POSITIVO;
-                }
-                if (ADCcrucesCount == 3) {
-                    if (safetyFlag == 1) {
-                        timeMed += (float) (i + 1) / DMA_FREQ;
-                        return timeMed;
-                    } else {
-                        return 776.77;
-                    }
-                }
-                break;
-            case PRIMERA_SAMPLE:
-                /* Estoy seguro que sin viento la señal arranca en
-                 * un cero con derivada negativa
-                 * si la señal adelanta cuento los cruces por cero,
-                 * si la señal esta atrasada necesito contar un cruce de mas.
-                 */
-                if (*buff > LIMIT_SUPERIOR) {
-                    estadoDeteccion = SEMI_POSITIVO;
-                } else {
-                    ADCcrucesCount++;
-                    estadoDeteccion = SEMI_NEGATIVO;
-                }
-                break;
-            default: estadoDeteccion = PRIMERA_SAMPLE;
+    if (dataIndex > 850) {
+        adc_stop();
+
+        for (j = 0; j < dataIndex; j++) {
+            sprintf(medMSG, "%d\r\n%c", dataN[j], '\0');
+            uartSend((uint8_t *) medMSG, 6, portMAX_DELAY);
         }
-        if (*buff > LIMIT_SAFETY) safetyFlag = 1;
-        buff++;
+
+        dataIndex = 0;
+        return pdTRUE;
     }
-    return 775.77;
+
+    return pdFALSE;
+    //Si dmaBuffer es impar
+
+    if (DmaBuffer & 0x01) {
+        for (i = 0; i < N_DMA_SAMP; i++) {
+            if (BufferA[i] >= LIMIT_HIGH) limitH = 1;
+
+            if (limitH == 1 && (BufferA[i] < LIMIT_SUPERIOR && BufferA[i] > LIMIT_INF)) {
+                *time = (float) (i + 1) / DMA_FREQ;
+                return pdTRUE;
+            }
+        }
+    } else {
+        for (i = 0; i < N_DMA_SAMP; i++) {
+            if (BufferB[i] >= LIMIT_HIGH) limitH = 1;
+
+            if (limitH == 1 && (BufferB[i] < LIMIT_SUPERIOR && BufferB[i] > LIMIT_INF)) {
+                *time = (float) (i + 1) / DMA_FREQ;
+                return pdTRUE;
+            }
+        }
+    }
+
+    return pdFALSE;
 }
 
 void __attribute__((interrupt, no_auto_psv))_DMA0Interrupt(void) {
     BaseType_t xTaskWoken = pdFALSE;
 
-    RB_9_SET(1);
+    DmaBuffer++;
 
     anemometroTdetectedFromISR(&xTaskWoken, 0x01);
 

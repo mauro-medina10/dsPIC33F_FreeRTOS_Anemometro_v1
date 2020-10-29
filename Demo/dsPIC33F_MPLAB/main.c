@@ -130,12 +130,12 @@ static void anemometro_main_task(void *pvParameters) {
                 break;
             case Medicion_Simple:
 
-                simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                //                simpleMed = anemometroGetMed();
+                simpleMed.mag = anemometroGetCoordTime(TRANS_EMISOR_NORTE) * 1000000;
 
                 uartSendMed(simpleMed);
-                //                emisorSelect++;
-                //                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
+                emisorSelect++;
+                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
 
                 anemometroModoActivo = Menu;
                 break;
@@ -343,6 +343,7 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
     float timeMed = 999.99;
     uint32_t ulNotificationValue;
     BaseType_t notifyStatus = pdFAIL;
+    BaseType_t pulseDetected = pdFALSE;
 
     RB_9_SET(0);
 
@@ -360,27 +361,29 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
 
     //Necesitaria esperar 400us
     DELAY_400uS;
+    DELAY_100uS;
     //    DELAY_T;
-    anemometroReceptorDelay(coordTime);
+    //    anemometroReceptorDelay(coordTime);
 
     timerStop();
 
     adc_start();
 
     //    RB_9_SET(0);
+    while (pulseDetected != pdTRUE) {
+        notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 2 / portTICK_PERIOD_MS);
 
-    notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 2 / portTICK_PERIOD_MS);
+        if ((ulNotificationValue & 0x01) != 0 && notifyStatus == pdPASS) {
+            /*Detecto Segundo maximo*/
+            pulseDetected = dma_detectPulse(coordTime, &timeMed);
+        } else {
+            timeMed = 888.88;
+        }
+    }
 
     adc_stop();
 
     //    RB_9_SET(0);
-
-    if ((ulNotificationValue & 0x01) != 0 && notifyStatus == pdPASS) {
-        /*Detecto Segundo maximo*/
-        timeMed = dma_detectPulse(coordTime);
-    } else {
-        timeMed = 888.88;
-    }
 
     switch (coordTime) {
         case TRANS_EMISOR_OESTE:
