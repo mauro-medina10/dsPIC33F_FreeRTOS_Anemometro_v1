@@ -43,7 +43,7 @@ static void prvSetupHardware(void);
 static void anemometro_main_task(void *pvParameters);
 
 /*FreeRTOS declarations*/
-static TaskHandle_t xTaskToNotify = NULL;
+static TaskHandle_t xMainTaskHandle = NULL;
 static QueueHandle_t qRecf;
 
 /*Global variables*/
@@ -55,6 +55,7 @@ float detect_delta_S = DETECTION_ERROR_S;
 anemometro_mode_enum anemometroModoActivo = Menu;
 
 uint8_t medProgFlag = 0;
+uint8_t medAborted = 0;
 
 int main(void) {
     //Inicio Hardware
@@ -86,7 +87,7 @@ int main(void) {
             configMINIMAL_STACK_SIZE * 3,
             NULL,
             tskIDLE_PRIORITY + 3,
-            &xTaskToNotify) != pdPASS) {
+            &xMainTaskHandle) != pdPASS) {
         while (1);
     }
 
@@ -98,6 +99,7 @@ int main(void) {
 }
 
 static void anemometro_main_task(void *pvParameters) {
+    wind_medicion_type abortMed = {9995.99, 9995.99};
     anemometro_config_enum configOption = ExitConfig;
     wind_medicion_type simpleMed = {0, 0};
     mux_transSelect_enum emisorSelect = TRANS_EMISOR_OESTE;
@@ -105,7 +107,7 @@ static void anemometro_main_task(void *pvParameters) {
     TickType_t xLastWakeTime;
     unsigned int firstPeriodFlag = 1;
     float soundSpeed = 345.7;
-    uint16_t medPeriod = 5;
+    uint32_t medPeriod = 5;
 
     DELAY_100uS;
 
@@ -172,8 +174,13 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 0;
 
                 if (anemometroModoActivo == Medicion_Continua) {
-                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
+                    vTaskDelayUntil(&xLastWakeTime, (TickType_t) (medPeriod * 1000) / portTICK_PERIOD_MS);
+                    if (medAborted == 1) {
+                        uartSendMed(abortMed);
+                        medAborted = 0;
+                    }
                 }
+
                 break;
             case Configuracion:
                 configOption = uartGetModeConfig();
@@ -503,7 +510,7 @@ wind_medicion_type anemometroGetMed(void) {
 }
 
 void anemometroTdetectedFromISR(BaseType_t * pxHigherPriorityTaskWoken, uint32_t val) {
-    xTaskNotifyFromISR(xTaskToNotify, val, eSetBits, pxHigherPriorityTaskWoken);
+    xTaskNotifyFromISR(xMainTaskHandle, val, eSetBits, pxHigherPriorityTaskWoken);
 }
 
 void anemometroEmiterSelect(mux_transSelect_enum transd) {
@@ -642,7 +649,8 @@ void anemometroCalibCero(float Sspeed) {
 void anemometroAbortMed(void) {
     if (medProgFlag == 0) {
         anemometroModoActivo = Menu;
-        xTaskAbortDelay(xTaskToNotify);
+        medAborted = 1;
+        xTaskAbortDelay(xMainTaskHandle);
     }
 }
 

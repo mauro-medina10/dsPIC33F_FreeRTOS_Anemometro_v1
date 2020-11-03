@@ -116,6 +116,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelay				1
 #define INCLUDE_xTaskAbortDelay         1
 #define INCLUDE_eTaskGetState           1
+#define INCLUDE_xTaskResumeFromISR      1
 
 //Power saving mode
 #define configUSE_TICKLESS_IDLE         1

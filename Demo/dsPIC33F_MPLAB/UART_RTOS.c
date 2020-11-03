@@ -21,7 +21,7 @@ static QueueHandle_t qAnemometroModo;
 static QueueHandle_t qAnemometroModoConfig;
 
 TaskHandle_t pxUartTask;
-wind_medicion_type abortMed = {9995.99, 9995.99};
+
 
 anemometro_mode_enum modoActivo = Menu;
 
@@ -153,7 +153,7 @@ uint32_t uartSend(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 static void uart_task(void *pvParameters) {
     anemometro_config_enum modoConfig = Exit;
     wind_medicion_type medSimple;
-    char msg[50];
+    char msg[64];
     char comando = 'z';
     char vel[6];
     float datFaux = 0;
@@ -181,7 +181,7 @@ static void uart_task(void *pvParameters) {
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
                     if (medSimple.mag < 555) {
-                        sprintf(msg, "\r\nMedición: %5.2f m/s ; %3f deg  %s\r\n%c",
+                        sprintf(msg, "\r\nMedicion: %5.2f m/s ; %3.0f deg  Coord: %s\r\n%c",
                                 (double) medSimple.mag, (double) medSimple.deg, medSimple.coord, '\0');
                     } else {
                         sprintf(msg, "\r\n NULL     NULL%c", '\0');
@@ -202,7 +202,7 @@ static void uart_task(void *pvParameters) {
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
                     if (medSimple.mag < 555) {
                         //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
-                        sprintf(msg, "\r\n %5.2f     %3f  %s%c",
+                        sprintf(msg, "\r\n %5.2f m/s    %3.0f  Coord: %s%c",
                                 (double) medSimple.mag, (double) medSimple.deg, medSimple.coord, '\0');
                     } else {
                         sprintf(msg, "\r\n NULL     NULL%c", '\0');
@@ -328,7 +328,7 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt(void) {
     xQueueSendFromISR(qRecv, &data, &xHigherPriorityTaskWoken);
 
     if (modoActivo == Medicion_Continua) {
-        //            uartSendMed(abortMed);
+        //        uartSendMed(abortMed);
         anemometroAbortMed();
         xHigherPriorityTaskWoken = pdTRUE;
     }

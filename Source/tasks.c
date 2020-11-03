@@ -2426,7 +2426,7 @@ implementations require configUSE_TICKLESS_IDLE to be set to a value other than
 
 	BaseType_t xTaskAbortDelay( TaskHandle_t xTask )
 	{
-	TCB_t *pxTCB = ( TCB_t * ) xTask;
+  	TCB_t *pxTCB = ( TCB_t * ) xTask;
 	BaseType_t xReturn = pdFALSE;
 
 		configASSERT( pxTCB );
