@@ -90,6 +90,8 @@ int main(void) {
         while (1);
     }
 
+    LED_OFF;
+
     vTaskStartScheduler();
 
     while (1);
@@ -107,12 +109,11 @@ static void anemometro_main_task(void *pvParameters) {
     float soundSpeed = 345.7;
     uint16_t medPeriod = 5;
 
-    DELAY_100uS;
+    MUX_INPUT_INH(0);
 
-    //Desactivo MUX
-    MUX_INPUT_INH(1);
+    DELAY_50uS;
 
-    DELAY_100uS;
+    LED_ON;
 
     while (1) {
         switch (anemometroModoActivo) {
@@ -135,7 +136,7 @@ static void anemometro_main_task(void *pvParameters) {
 
                 uartSendMed(simpleMed);
                 //                emisorSelect++;
-                //                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
+                //                                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
 
                 anemometroModoActivo = Menu;
                 break;
@@ -148,23 +149,23 @@ static void anemometro_main_task(void *pvParameters) {
 
                 medProgFlag = 1;
 
-                simpleMed = anemometroGetMed();
-                //                                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                //                simpleMed = anemometroGetMed();
+                simpleMed.mag = anemometroGetVcoord(emisorSelect);
                 //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
 
-                //                auxV++;
-                //                if (auxV >= 50) {
-                //                    auxV = 0;
-                //                    emisorSelect++;
-                //                    //                    emisorSelect += 2;
-                //                    if (emisorSelect > TRANS_EMISOR_SUR) {
-                //                        emisorSelect = TRANS_EMISOR_OESTE;
-                //                        uartEndMode();
-                //                    }
-                //                    //                    uartEndMode();
-                //                }
+                auxV++;
+                if (auxV >= 10) {
+                    auxV = 0;
+                    //                    emisorSelect++;
+                    emisorSelect += 2;
+                    if (emisorSelect > TRANS_EMISOR_SUR) {
+                        emisorSelect = TRANS_EMISOR_OESTE;
+                        uartEndMode();
+                    }
+                    //                    //                    uartEndMode();
+                }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
                 anemometroModoActivo = uartGetMode();
@@ -172,7 +173,7 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 0;
 
                 if (anemometroModoActivo == Medicion_Continua) {
-                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
+                    //                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
                 }
                 break;
             case Configuracion:
@@ -346,15 +347,13 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
     BaseType_t pulseDetected = pdFALSE;
     BaseType_t pulseCaptured = pdFALSE;
 
-    RB_9_SET(0);
-
     if (anemometroMuxOutputSelect(coordTime) != pdTRUE) {
         return timeMed;
     }
+    //Desactivo MUX 2
+    MUX_INPUT_INH(1);
 
     DELAY_50uS;
-
-    //    RB_9_SET(1);
 
     timerStart();
 
@@ -363,8 +362,10 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
     //Necesitaria esperar 400us
     DELAY_400uS;
     DELAY_100uS;
-    //    DELAY_T;
-    //    anemometroReceptorDelay(coordTime);
+    DELAY_50uS;
+
+    //Activo Mux 2
+    MUX_INPUT_INH(0);
 
     timerStop();
 
@@ -698,18 +699,18 @@ static void prvSetupHardware(void) {
 
     /* set LED0 pins as outputs */
     TRISAbits.TRISA4 = 0;
-    DELAY_50uS;
+    DELAY_100uS;
     //Set mux control pins as outputs
     TRISAbits.TRISA0 = 0;
-    DELAY_50uS;
+    DELAY_100uS;
     TRISAbits.TRISA1 = 0;
-    DELAY_50uS;
+    DELAY_100uS;
     TRISBbits.TRISB4 = 0;
-    DELAY_50uS;
+    DELAY_100uS;
     TRISBbits.TRISB9 = 0;
-    DELAY_50uS;
-    //Apago el LED
-    //    PORTAbits.RA4 = 0;
+    DELAY_100uS;
+    //    RB_8_SET_MODE(1);
+    //    DELAY_100uS;
 }
 
 void vApplicationIdleHook(void) {

@@ -5,7 +5,7 @@
             <url>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/main.c</url>
             <bookmark id="1">
                 <name/>
-                <line>166</line>
+                <line>165</line>
                 <key/>
             </bookmark>
         </file>
@@ -14,10 +14,13 @@
         <group>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/main.c</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/UART_RTOS.c</file>
-            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/UART_RTOS.h</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/portable/MPLAB/PIC24_dsPIC/port.c</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/pwm.h</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.c</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/anemometroDef.h</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/pwm.c</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/tasks.c</file>
+            <file>file:/C:/Program%20Files%20(x86)/Microchip/MPLABX/v5.40/packs/Microchip/dsPIC33F-GP-MC_DFP/1.2.35/xc16/support/dsPIC33F/h/p33FJ128GP802.h</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.h</file>
         </group>
     </open-files>

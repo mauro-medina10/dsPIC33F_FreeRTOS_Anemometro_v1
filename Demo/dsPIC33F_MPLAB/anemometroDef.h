@@ -53,8 +53,8 @@
 //Valor ADC sin excitacion
 #define ADC_CERO 377
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUPERIOR 380
-#define LIMIT_INF 375
+#define LIMIT_SUPERIOR 700
+#define LIMIT_INF 400
 #define LIMIT_SAFETY 383
 #define LIMIT_HIGH 386
 
@@ -68,17 +68,16 @@
 #define DETECT_LIMIT_HIGH_N 382   
 #define DETECT_LIMIT_HIGH_S 387
 
+#define DETECTION_ERROR_O 0.00034254
+#define DETECTION_ERROR_E 0.00031891			   						  
+#define DETECTION_ERROR_N 0.00031697  
+#define DETECTION_ERROR_S 0.00031697
 
-#define DETECTION_ERROR_O 0.000267005
-#define DETECTION_ERROR_E 0.000266955			   						  
-#define DETECTION_ERROR_N 0.000287445  
-#define DETECTION_ERROR_S 0.000288405
+#define DETECT_SCALING_OE 1//0.7841		
+#define DETECT_SCALING_NS 1//0.739			   						  
 
-#define DETECT_SCALING_OE 0.7841//0.886  		
-#define DETECT_SCALING_NS 0.739//0.921			   						  
-
-#define DETECT_OFFSET_OE -0.1361//-0.021		
-#define DETECT_OFFSET_NS -0.0264//0.03
+#define DETECT_OFFSET_OE 0//-0.1361		
+#define DETECT_OFFSET_NS 0//-0.0264
 
 #define ANGLE_SCALING 1//1.031
 #define ANGLE_OFFSET 0//9.5
@@ -92,7 +91,7 @@
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 5
 #define N_MED_PROM 20
-#define N_TIMER_MODE 25
+#define N_TIMER_MODE 30
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -121,9 +120,12 @@
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
-#define MUX_INPUT_INH(b)    (PORTBbits.RB4 = (b))
+#define MUX_INPUT_INH(b) (PORTBbits.RB4 = (b))
+//#define MUX_INPUT_INH(b) (PORTBbits.RB4 = (b))
 //Manejo led
 #define RB_9_SET(b) (PORTBbits.RB9 = (b))
+#define RB_8_SET_VAL(b) (PORTBbits.RB8 = (b))
+#define RB_8_SET_MODE(b) (TRISBbits.TRISB8 = (b))
 #define LED_ON (PORTAbits.RA4 = 1)
 #define LED_OFF (PORTAbits.RA4 = 0)
 //Longitud tren de pulsos

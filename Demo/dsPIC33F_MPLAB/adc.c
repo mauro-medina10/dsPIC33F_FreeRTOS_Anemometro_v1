@@ -10,6 +10,7 @@
 /*Global variables*/
 uint16_t DmaBuffer = 0;
 static unsigned int dataN[1024];
+uint16_t dataIndex = 0;
 
 static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
 static unsigned int BufferB[N_DMA_SAMP] __attribute__((space(dma)));
@@ -95,61 +96,6 @@ void adc_stop(void) {
     DMA0CONbits.CHEN = 0;
 }
 
-//void __attribute__((interrupt, no_auto_psv)) _ADC1Interrupt(void) {
-//    static BaseType_t xTaskWoken = pdFALSE;
-//    static uint16_t ADCval = 0;
-//
-//    /*Detecto el tren de pulsos directamente en la ISR*/
-//    ADCval = ADC1BUF0;
-//
-//    //    medicionesADC[indexADC] = ADCval;
-//    //
-//    //    if (indexADC == 200) {
-//    //        //                while (1);
-//    //        IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-//    //        anemometroTdetected(&xTaskWoken, 1);
-//    //    }
-//    indexADC++;
-//
-//    /*Detecto Tercer maximo*/
-//    switch (estadoDeteccion) {
-//        case SEMI_POSITIVO:
-//            if (ADCval > ADClastRead) {
-//                estadoDeteccion = SEMI_NEGATIVO;
-//            }
-//            break;
-//        case SEMI_NEGATIVO:
-//            if (ADCval < ADClastRead) { //Maximo detectado
-//                ADCmaximosCount++;
-//                estadoDeteccion = SEMI_POSITIVO;
-//            }
-//            if (ADCmaximosCount == 3) {
-//                if (ADCval > LIMIT_SAFETY) {
-//                    IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt
-//                    /*Seteo el bit 0*/
-//                    anemometroTdetected(&xTaskWoken, 0x01);
-//                } else {
-//                    IEC0bits.AD1IE = 0;
-//                    /*Seteo bit 1*/
-//                    anemometroTdetected(&xTaskWoken, 0x02);
-//                }
-//            }
-//            break;
-//        case PRIMERA_SAMPLE:
-//            estadoDeteccion = SEMI_POSITIVO;
-//            break;
-//        default: estadoDeteccion = PRIMERA_SAMPLE;
-//    }
-//    ADClastRead = ADCval;
-//
-//    IFS0bits.AD1IF = 0; // Clear ADC1 interrupt flag
-//
-//    if (xTaskWoken != pdFALSE) {
-//        taskYIELD();
-//    }
-//    xTaskWoken = pdFALSE;
-//}
-
 BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned) {
     uint8_t indexAligned = 0;
 
@@ -215,11 +161,11 @@ BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib) {
 }
 
 BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
-    uint16_t dataIndex = 0;
     uint8_t i = 0;
+    uint16_t j = 0;
     uint32_t ulNotificationValue;
     BaseType_t notifyStatus = pdFAIL;
-
+    char msgN[6];
     dataIndex = 0;
 
     while (dataIndex < DMA_TOTAL_SAMP) {
@@ -241,133 +187,33 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
             return pdFAIL;
         }
     }
+    //datos por UART
+    //    for(j = 0; j < dataIndex; j++){
+    //        sprintf(msgN,"%3.0d\r\n%c",dataN[j],'\0');
+    //        uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
+    //    }
     return pdPASS;
 }
 
 BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
-    anemometro_deteccion_enum estadoDeteccion = MAXIMO_GLOBAL;
-    uint16_t dataIndex = 0;
     uint16_t i = 0;
     uint16_t maxIndex = 0;
     unsigned int lastMax = dataN[0];
-    unsigned int lastVal = 0;
-    unsigned int lastAux = 0;
-    wind_medicion_type aux;
 
-    //Voy a buscar el ultimo maximo y dos maximos locales despues busco el cruce por cero (?) LOL
-    while (1) {
-        switch (estadoDeteccion) {
-            case MAXIMO_GLOBAL:
-                for (i = 0; i < DMA_TOTAL_SAMP; i++) {
-                    if (dataN[i] >= lastMax) {
-                        lastMax = dataN[i];
-                        maxIndex = i + 3;
-                    }
-                }
-                estadoDeteccion = MAXIMO_LOCAL;
-                break;
-            case MAXIMO_LOCAL:
-                lastVal = dataN[maxIndex];
-
-                maxIndex++;
-
-                i = maxIndex;
-
-                while (lastVal >= dataN[i]) {
-                    lastVal = dataN[i];
-                    i++;
-
-                    if (i > DMA_TOTAL_SAMP) return pdFAIL;
-                }
-                maxIndex = i + 3;
-
-                estadoDeteccion = MINIMO_LOCAL;
-                break;
-            case MINIMO_LOCAL:
-                lastVal = dataN[maxIndex];
-
-                maxIndex++;
-
-                i = maxIndex;
-
-                while (lastVal <= dataN[i]) {
-                    lastVal = dataN[i];
-                    i++;
-
-                    if (i > DMA_TOTAL_SAMP) return pdFAIL;
-                }
-                maxIndex = i;
-
-                estadoDeteccion = CRUCE_CERO;
-                break;
-            case CRUCE_CERO:
-                i = maxIndex;
-
-                while (dataN[i] < LIMIT_INF || dataN[i] > LIMIT_SUPERIOR) {
-                    lastVal = dataN[i];
-                    i++;
-
-                    if (i > DMA_TOTAL_SAMP) return pdFAIL;
-                }
-                *time = (float) (i + 1) / DMA_FREQ;
-
-                return pdPASS;
-                break;
-
-            default: return pdFAIL;
+    //Busco el primer maximo
+    for (i = 0; i < dataIndex; i++) {
+        if (dataN[i] > lastMax) {
+            lastMax = dataN[i];
+            maxIndex = i;
         }
     }
 
-    //    //Envio muestras por UART para graficar
-    //    if (DmaBuffer & 0x01) {
-    //        for (i = 0; i < N_DMA_SAMP; i++) {
-    //            dataN[dataIndex] = BufferA[i];
-    //            dataIndex++;
-    //        }
-    //    } else {
-    //        for (i = 0; i < N_DMA_SAMP; i++) {
-    //            dataN[dataIndex] = BufferB[i];
-    //            dataIndex++;
-    //        }
-    //    }
-    //
-    //    if (dataIndex > 850) {
-    //        adc_stop();
-    //
-    //        for (j = 0; j < dataIndex; j++) {
-    //            sprintf(medMSG, "%d\r\n%c", dataN[j], '\0');
-    //            uartSend((uint8_t *) medMSG, 6, portMAX_DELAY);
-    //        }
-    //
-    //        dataIndex = 0;
-    //        return pdTRUE;
-    //    }
-    //
-    //    return pdFALSE;
+    if (dataN[maxIndex] > LIMIT_INF && dataN[maxIndex] < LIMIT_SUPERIOR) {
+        *time = (float) (maxIndex + 1) / DMA_FREQ;
 
-    //    //Si dmaBuffer es impar
-    //    if (DmaBuffer & 0x01) {
-    //        for (i = 0; i < N_DMA_SAMP; i++) {
-    //            if (BufferA[i] >= LIMIT_HIGH) limitH = 1;
-    //
-    //            if (limitH == 1 && (BufferA[i] < LIMIT_SUPERIOR && BufferA[i] > LIMIT_INF)) {
-    //                *time = (float) (i + 1) / DMA_FREQ;
-    //                return pdTRUE;
-    //            }
-    //        }
-    //    } else {
-    //        for (i = 0; i < N_DMA_SAMP; i++) {
-    //            if (BufferB[i] >= LIMIT_HIGH) limitH = 1;
-    //
-    //            if (limitH == 1 && (BufferB[i] < LIMIT_SUPERIOR && BufferB[i] > LIMIT_INF)) {
-    //                *time = (float) (i + 1) / DMA_FREQ;
-    //                return pdTRUE;
-    //            }
-    //        }
-    //    }
-    //
-    //    return pdFALSE;
-
+        return pdPASS;
+    }
+    return pdFAIL;
 }
 
 void __attribute__((interrupt, no_auto_psv))_DMA0Interrupt(void) {
