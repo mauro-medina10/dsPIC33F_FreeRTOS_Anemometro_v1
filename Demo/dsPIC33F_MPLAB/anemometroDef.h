@@ -51,10 +51,10 @@
 #define DISTANCE_EO 0.276   //Este-Oeste (Rosa-Nada)
 
 //Valor ADC sin excitacion
-#define ADC_CERO 377
+#define ADC_CERO 384
 //Limites para deteccion de tren de pulsos
 #define LIMIT_SUPERIOR 700
-#define LIMIT_INF 400
+#define LIMIT_INF 200
 #define LIMIT_SAFETY 383
 #define LIMIT_HIGH 386
 
@@ -68,10 +68,10 @@
 #define DETECT_LIMIT_HIGH_N 382   
 #define DETECT_LIMIT_HIGH_S 387
 
-#define DETECTION_ERROR_O 0.00034254
-#define DETECTION_ERROR_E 0.00031891			   						  
-#define DETECTION_ERROR_N 0.00031697  
-#define DETECTION_ERROR_S 0.00031697
+#define DETECTION_ERROR_O 0.000346978//0.00034254
+#define DETECTION_ERROR_E 0.000323341//0.00031891			   						  
+#define DETECTION_ERROR_N 0.00029958//0.00031697  
+#define DETECTION_ERROR_S 0.000322304//0.00031697
 
 #define DETECT_SCALING_OE 1//0.7841		
 #define DETECT_SCALING_NS 1//0.739			   						  
@@ -91,7 +91,8 @@
 //Numero de mediciones que se promedian
 #define N_TIMER_PROM 5
 #define N_MED_PROM 20
-#define N_TIMER_MODE 30
+#define N_TIMER_MODE 32
+#define N_CALIB 64
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -189,7 +190,7 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime);
 
 void anemometroReceptorDelay(mux_transSelect_enum emisor);
 
-float anemometroCalcMode(float * pData, uint16_t nData);
+BaseType_t anemometroCalcMode(float* pData, float* pMode, uint16_t nData);
 
 void anemometroCalibCero(float Sspeed);
 

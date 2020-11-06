@@ -150,8 +150,8 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 1;
 
                 //                simpleMed = anemometroGetMed();
-                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                simpleMed.mag = anemometroGetCoordTime(TRANS_EMISOR_ESTE) * 1000000;
 
                 uartSendMed(simpleMed);
 
@@ -244,7 +244,7 @@ float anemometroGetVcoord(mux_transSelect_enum coordV) {
 
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
-        timeMed[i] = anemometroCalcMode(timeNmediciones, N_TIMER_MODE);
+        anemometroCalcMode(timeNmediciones, &timeMed[i], N_TIMER_MODE);
     }
 
     if (timeMed[0] == 0 || timeMed[1] == 0) {
@@ -563,12 +563,14 @@ BaseType_t anemometroMuxOutputSelect(mux_transSelect_enum ch) {
     return pdTRUE;
 }
 
-float anemometroCalcMode(float * pData, uint16_t nData) {
-    float c [N_TIMER_MODE];
+BaseType_t anemometroCalcMode(float* pData, float* pMode, uint16_t nData) {
+    float c[N_TIMER_MODE];
     uint8_t i, j;
 
+    if (nData > N_TIMER_MODE) return pdFAIL;
+
     //Inicializo matriz auxiliar
-    for (i = 0; i < nData; i++) {
+    for (i = 0; i < N_TIMER_MODE; i++) {
         c [ i ] = 0;
     }
     /* Comparo cada elemento de los datos
@@ -593,13 +595,14 @@ float anemometroCalcMode(float * pData, uint16_t nData) {
         if (c[i] > c[j] && (i != j)) {
             c[j] = 0;
         } else if (i != j) {
-
             c[i] = 0;
             i = j;
         }
     }
 
-    return *(pData + i);
+    *pMode = *(pData + i);
+
+    return pdPASS;
 }
 
 void anemometroCalibCero(float Sspeed) {
@@ -614,7 +617,7 @@ void anemometroCalibCero(float Sspeed) {
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
         //Mido el tiempo de pulso sin viento para cada coordenada
-        ceroMode[j] = anemometroCalcMode(ceroMed, N_TIMER_MODE);
+        anemometroCalcMode(ceroMed, &ceroMode[j], N_TIMER_MODE);
     }
     detect_delta_O = ceroMode[0] - DISTANCE_EO / Sspeed;
     detect_delta_E = ceroMode[1] - DISTANCE_EO / Sspeed;

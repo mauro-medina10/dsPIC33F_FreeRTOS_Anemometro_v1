@@ -10,7 +10,7 @@
 /*Global variables*/
 uint16_t DmaBuffer = 0;
 static unsigned int dataN[1024];
-uint16_t dataIndex = 0;
+uint16_t dataSamples = 0;
 
 static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
 static unsigned int BufferB[N_DMA_SAMP] __attribute__((space(dma)));
@@ -162,25 +162,26 @@ BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib) {
 
 BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
     uint8_t i = 0;
-    uint16_t j = 0;
     uint32_t ulNotificationValue;
     BaseType_t notifyStatus = pdFAIL;
-    char msgN[6];
-    dataIndex = 0;
+    //    char msgN[6];
+    //    uint16_t j = 0;
 
-    while (dataIndex < DMA_TOTAL_SAMP) {
+    dataSamples = 0;
+
+    while (dataSamples < DMA_TOTAL_SAMP) {
         notifyStatus = xTaskNotifyWait(0, UINT32_MAX, &ulNotificationValue, 2 / portTICK_PERIOD_MS);
 
         if ((ulNotificationValue & 0x01) != 0 && notifyStatus == pdPASS) {
             if (DmaBuffer & 0x01) {
                 for (i = 0; i < N_DMA_SAMP; i++) {
-                    dataN[dataIndex] = BufferA[i];
-                    dataIndex++;
+                    dataN[dataSamples] = BufferA[i];
+                    dataSamples++;
                 }
             } else {
                 for (i = 0; i < N_DMA_SAMP; i++) {
-                    dataN[dataIndex] = BufferB[i];
-                    dataIndex++;
+                    dataN[dataSamples] = BufferB[i];
+                    dataSamples++;
                 }
             }
         } else {
@@ -201,15 +202,22 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
     unsigned int lastMax = dataN[0];
 
     //Busco el primer maximo
-    for (i = 0; i < dataIndex; i++) {
+    for (i = 0; i < dataSamples; i++) {
         if (dataN[i] > lastMax) {
             lastMax = dataN[i];
             maxIndex = i;
         }
     }
+    //Busco el siguiente cruce por cero
+    i = maxIndex + 1;
+
+    while (dataN[i] < (ADC_CERO - 30) || dataN[i] > (ADC_CERO + 30)) {
+        i++;
+        if (i > (maxIndex + 10)) return pdFAIL;
+    }
 
     if (dataN[maxIndex] > LIMIT_INF && dataN[maxIndex] < LIMIT_SUPERIOR) {
-        *time = (float) (maxIndex + 1) / DMA_FREQ;
+        *time = (float) (i + 1) / DMA_FREQ;
 
         return pdPASS;
     }
