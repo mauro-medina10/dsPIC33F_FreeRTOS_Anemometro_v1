@@ -197,30 +197,127 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
 }
 
 BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
+    anemometro_deteccion_enum maxDetectionState = PRIMERA_MUESTRA;
     uint16_t i = 0;
     uint16_t maxIndex = 0;
     unsigned int lastMax = dataN[0];
+    //    unsigned int lastVal = dataN[0];
 
-    //Busco el primer maximo
-    for (i = 0; i < dataSamples; i++) {
-        if (dataN[i] > lastMax) {
-            lastMax = dataN[i];
-            maxIndex = i;
+    while (1) {
+        switch (maxDetectionState) {
+            case PRIMERA_MUESTRA:
+                //Veo si estoy bajando o subiendo
+                if (dataN[i] > dataN[i + 1]) {
+                    maxDetectionState = MINIMO_LOCAL;
+                } else if (dataN[i] < dataN[i + 1]) {
+                    maxDetectionState = MAXIMO_LOCAL;
+                } else {
+                    i++;
+                    if (i >= dataSamples) return pdFAIL;
+                }
+                break;
+            case MAXIMO_LOCAL:
+                //Busco el maximo local
+                while (dataN[i + 1] >= dataN[i]) {
+                    i++;
+                    if (i >= dataSamples) maxDetectionState = MAXIMO_GLOBAL;
+                }
+                //Busco el maximo global (comparo con el mayor 'maximo local' encontrado)
+                if (dataN[i] > (lastMax + MAX_THRESHOLD)) {
+                    lastMax = dataN[i];
+                    maxIndex = i;
+                    i++;
+                    maxDetectionState = MINIMO_LOCAL;
+                } else {
+                    i++;
+                    maxDetectionState = MINIMO_LOCAL;
+                    if (i >= dataSamples) maxDetectionState = MAXIMO_GLOBAL;
+                }
+                break;
+            case MINIMO_LOCAL:
+                //Avanzo hasta que cambie la derivada a positiva
+                while (dataN[i + 1] <= dataN[i]) {
+                    i++;
+                    if (i >= dataSamples) maxDetectionState = MAXIMO_GLOBAL;
+                }
+                maxDetectionState = MAXIMO_LOCAL;
+                break;
+            case MAXIMO_GLOBAL:
+                //termino la busqueda 
+                if (coordDetect == TRANS_EMISOR_NORTE) { //Coordenada de mierda
+                    if (lastMax > LIMIT_SAFETY_NORTE) {
+                        *time = (float) (maxIndex + 1) / DMA_FREQ;
+
+                        return pdPASS;
+                    }
+                } else if (lastMax > LIMIT_SAFETY) {
+                    *time = (float) (maxIndex + 1) / DMA_FREQ;
+
+                    return pdPASS;
+                }
+                return pdFAIL;
+                break;
+            default: maxDetectionState = PRIMERA_MUESTRA;
         }
     }
-    //Busco el siguiente cruce por cero
-    i = maxIndex + 1;
-
-    while (dataN[i] < (ADC_CERO - 30) || dataN[i] > (ADC_CERO + 30)) {
-        i++;
-        if (i > (maxIndex + 10)) return pdFAIL;
-    }
-
-    if (dataN[maxIndex] > LIMIT_INF && dataN[maxIndex] < LIMIT_SUPERIOR) {
-        *time = (float) (i + 1) / DMA_FREQ;
-
-        return pdPASS;
-    }
+    //
+    //    //Busco el primer maximo
+    //    for (i = 1; i < dataSamples; i++) {
+    //        //Maximo local
+    //        while (dataN[i] >= dataN[i - 1]) {
+    //            i++;
+    //            if (i >= dataSamples) return pdFAIL;
+    //        }
+    //        lastMax = dataN[i];
+    //
+    //        if (dataN[i] > (lastMax + MAX_THRESHOLD)) {
+    //            lastMax = dataN[i];
+    //            maxIndex = i;
+    //        }
+    //    }
+    //    //    switch (coordDetect) {
+    //    //        case TRANS_EMISOR_OESTE:
+    //    //            if (maxIndex < 355) {
+    //    //                i++;
+    //    //            }
+    //    //            break;
+    //    //        case TRANS_EMISOR_ESTE:
+    //    //            if (maxIndex < 330) {
+    //    //                i++;
+    //    //            }
+    //    //            break;
+    //    //        case TRANS_EMISOR_NORTE:
+    //    //            if (maxIndex < 290) {
+    //    //                i++;
+    //    //            }
+    //    //            break;
+    //    //        case TRANS_EMISOR_SUR:
+    //    //            if (maxIndex < 330) {
+    //    //                i++;
+    //    //            }
+    //    //            break;
+    //    //    }
+    //    //Busco el siguiente cruce por cero
+    //    //    i = maxIndex + 1;
+    //    //
+    //    //    while (dataN[i] < (ADC_CERO - 30) || dataN[i] > (ADC_CERO + 30)) {
+    //    //        i++;
+    //    //        if (i > (maxIndex + 10)) return pdFAIL;
+    //    //    }
+    //
+    //    //Detecto el siguiente minimo
+    //    i = maxIndex + 1;
+    //
+    //    while (dataN[i] <= dataN[i - 1]) {
+    //        i++;
+    //        if (i > (maxIndex + 20)) return pdFAIL;
+    //    }
+    //
+    //    if (dataN[i] > LIMIT_INF && dataN[i] < LIMIT_SUPERIOR) {
+    //        *time = (float) (i + 1) / DMA_FREQ;
+    //
+    //        return pdPASS;
+    //    }
     return pdFAIL;
 }
 

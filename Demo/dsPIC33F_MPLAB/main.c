@@ -150,8 +150,8 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 1;
 
                 //                simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                simpleMed.mag = anemometroGetCoordTime(TRANS_EMISOR_ESTE) * 1000000;
+                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
 
@@ -295,6 +295,9 @@ float anemometroGetVcoord(mux_transSelect_enum coordV) {
                 valMed = 444.44;
         }
     }
+    if(valMed > 1 || valMed < -1){
+        valMed++;
+    }
     return valMed;
 }
 
@@ -379,6 +382,8 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
         pulseDetected = dma_detectPulse(coordTime, &timeMed);
 
         timeMed += (((float) timerCount() / configCPU_CLOCK_HZ));
+
+        if (pulseDetected == pdFAIL) timeMed = 888.77;
 
     } else {
         timeMed = 888.88;
@@ -619,10 +624,10 @@ void anemometroCalibCero(float Sspeed) {
         //Mido el tiempo de pulso sin viento para cada coordenada
         anemometroCalcMode(ceroMed, &ceroMode[j], N_TIMER_MODE);
     }
-    detect_delta_O = ceroMode[0] - DISTANCE_EO / Sspeed;
-    detect_delta_E = ceroMode[1] - DISTANCE_EO / Sspeed;
-    detect_delta_N = ceroMode[2] - DISTANCE_NS / Sspeed;
-    detect_delta_S = ceroMode[3] - DISTANCE_NS / Sspeed;
+    detect_delta_O = (float) ceroMode[0] - DISTANCE_EO / Sspeed;
+    detect_delta_E = (float) ceroMode[1] - DISTANCE_EO / Sspeed;
+    detect_delta_N = (float) ceroMode[2] - DISTANCE_NS / Sspeed;
+    detect_delta_S = (float) ceroMode[3] - DISTANCE_NS / Sspeed;
 }
 
 void anemometroAbortMed(void) {

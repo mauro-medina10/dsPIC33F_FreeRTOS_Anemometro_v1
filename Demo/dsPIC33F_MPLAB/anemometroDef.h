@@ -54,9 +54,12 @@
 #define ADC_CERO 384
 //Limites para deteccion de tren de pulsos
 #define LIMIT_SUPERIOR 700
-#define LIMIT_INF 200
-#define LIMIT_SAFETY 383
+#define LIMIT_INF 100
+#define LIMIT_SAFETY 465
+#define LIMIT_SAFETY_NORTE 655
 #define LIMIT_HIGH 386
+#define MAX_THRESHOLD 5
+#define MAX_LOSE_LIMIT 30
 
 #define DETECTION_CERO_NS 0.0008
 #define DETECTION_CERO_OE 0.0007942
@@ -68,10 +71,10 @@
 #define DETECT_LIMIT_HIGH_N 382   
 #define DETECT_LIMIT_HIGH_S 387
 
-#define DETECTION_ERROR_O 0.000346978//0.00034254
-#define DETECTION_ERROR_E 0.000323341//0.00031891			   						  
-#define DETECTION_ERROR_N 0.00029958//0.00031697  
-#define DETECTION_ERROR_S 0.000322304//0.00031697
+#define DETECTION_ERROR_O 0.000331654//0.00034254
+#define DETECTION_ERROR_E 0.000308024//0.00031891			   						  
+#define DETECTION_ERROR_N 0.000306085//0.00031697  
+#define DETECTION_ERROR_S 0.000328815//0.00031697
 
 #define DETECT_SCALING_OE 1//0.7841		
 #define DETECT_SCALING_NS 1//0.739			   						  
@@ -147,14 +150,15 @@ typedef enum {
     CalCero = 0,
     SetEmi,
     SetPeriod,
-    ExitConfig = 15
+    ExitConfig
 } anemometro_config_enum;
 
 typedef enum {
     MAXIMO_GLOBAL = 0,
     MAXIMO_LOCAL,
     MINIMO_LOCAL,
-    CRUCE_CERO
+    CRUCE_CERO,
+    PRIMERA_MUESTRA
 } anemometro_deteccion_enum;
 
 typedef enum {
