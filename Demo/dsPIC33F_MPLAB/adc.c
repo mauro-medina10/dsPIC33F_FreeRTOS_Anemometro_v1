@@ -200,57 +200,60 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
     anemometro_deteccion_enum maxDetectionState = PRIMERA_MUESTRA;
     uint16_t i = 0;
     uint16_t maxIndex = 0;
-    unsigned int lastMax = dataN[0];
+    unsigned int lastMax = dataN[dataSamples];
     //    unsigned int lastVal = dataN[0];
 
+    //Analizo de atras para adelante porque el ruido es demasiado 
+    i = dataSamples;
     while (1) {
         switch (maxDetectionState) {
             case PRIMERA_MUESTRA:
                 //Veo si estoy bajando o subiendo
-                if (dataN[i] > dataN[i + 1]) {
+                if (dataN[i] > dataN[i - 1]) {
                     maxDetectionState = MINIMO_LOCAL;
-                } else if (dataN[i] < dataN[i + 1]) {
+                } else if (dataN[i] < dataN[i - 1]) {
                     maxDetectionState = MAXIMO_LOCAL;
                 } else {
-                    i++;
-                    if (i >= dataSamples) return pdFAIL;
+                    i--;
+                    if (i == 0) return pdFAIL;
                 }
                 break;
             case MAXIMO_LOCAL:
                 //Busco el maximo local
-                while (dataN[i + 1] >= dataN[i]) {
-                    i++;
-                    if (i >= dataSamples) maxDetectionState = MAXIMO_GLOBAL;
+                while (dataN[i - 1] >= dataN[i]) {
+                    i--;
+                    if (i == 0) return pdFAIL;
                 }
                 //Busco el maximo global (comparo con el mayor 'maximo local' encontrado)
-                if (dataN[i] > (lastMax + MAX_THRESHOLD)) {
+                if ((dataN[i] > (lastMax + MAX_THRESHOLD_NO) &&
+                        (coordDetect == TRANS_EMISOR_NORTE || coordDetect == TRANS_EMISOR_OESTE)) ||
+                        (dataN[i] > (lastMax + MAX_THRESHOLD_ES) &&
+                        (coordDetect == TRANS_EMISOR_SUR || coordDetect == TRANS_EMISOR_ESTE))
+                        ) {
                     lastMax = dataN[i];
                     maxIndex = i;
-                    i++;
+                    i--;
+                    if (i == 0) maxDetectionState = MAXIMO_GLOBAL;
                     maxDetectionState = MINIMO_LOCAL;
+                } else if (dataN[i] < (lastMax * (1 - 0.014)) && lastMax > LIMIT_SAFETY) { //Si los maximos empiezan a decaer dejo de buscar
+                    maxDetectionState = MAXIMO_GLOBAL;
                 } else {
-                    i++;
+                    i--;
                     maxDetectionState = MINIMO_LOCAL;
-                    if (i >= dataSamples) maxDetectionState = MAXIMO_GLOBAL;
+                    if (i == 0) return pdFAIL;
                 }
                 break;
             case MINIMO_LOCAL:
                 //Avanzo hasta que cambie la derivada a positiva
-                while (dataN[i + 1] <= dataN[i]) {
-                    i++;
-                    if (i >= dataSamples) maxDetectionState = MAXIMO_GLOBAL;
+                while (dataN[i - 1] <= dataN[i]) {
+                    i--;
+                    if (i == 0) return pdFAIL;
                 }
                 maxDetectionState = MAXIMO_LOCAL;
                 break;
             case MAXIMO_GLOBAL:
                 //termino la busqueda 
-                if (coordDetect == TRANS_EMISOR_NORTE) { //Coordenada de mierda
-                    if (lastMax > LIMIT_SAFETY_NORTE) {
-                        *time = (float) (maxIndex + 1) / DMA_FREQ;
-
-                        return pdPASS;
-                    }
-                } else if (lastMax > LIMIT_SAFETY) {
+                if (lastMax > LIMIT_SAFETY) {
                     *time = (float) (maxIndex + 1) / DMA_FREQ;
 
                     return pdPASS;

@@ -247,7 +247,7 @@ float anemometroGetVcoord(mux_transSelect_enum coordV) {
         anemometroCalcMode(timeNmediciones, &timeMed[i], N_TIMER_MODE);
     }
 
-    if (timeMed[0] == 0 || timeMed[1] == 0) {
+    if (timeMed[0] == 0 || timeMed[1] == 0 || timeMed[0] > 100 || timeMed[1] > 100) {
         valMed = 666.66;
     } else {
         //Calculo 
@@ -295,9 +295,7 @@ float anemometroGetVcoord(mux_transSelect_enum coordV) {
                 valMed = 444.44;
         }
     }
-    if(valMed > 1 || valMed < -1){
-        valMed++;
-    }
+
     return valMed;
 }
 
@@ -365,7 +363,7 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
     //Necesitaria esperar 400us
     DELAY_400uS;
     DELAY_100uS;
-    DELAY_50uS;
+    //    DELAY_50uS;
 
     //Activo Mux 2
     MUX_INPUT_INH(0);
