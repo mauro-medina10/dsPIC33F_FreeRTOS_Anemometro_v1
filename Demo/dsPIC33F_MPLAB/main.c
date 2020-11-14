@@ -133,7 +133,6 @@ static void anemometro_main_task(void *pvParameters) {
 
                 simpleMed = anemometroGetMed();
                 //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
-
                 uartSendMed(simpleMed);
                 //                emisorSelect++;
                 //                                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
@@ -150,21 +149,21 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 1;
 
                 //                simpleMed = anemometroGetMed();
-                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                simpleMed.mag = anemometroGetCoordTime(TRANS_EMISOR_NORTE) * 1000000;
 
                 uartSendMed(simpleMed);
 
                 auxV++;
-                if (auxV >= 10) {
+                if (auxV >= 5) {
                     auxV = 0;
-                    //                    emisorSelect++;
-                    emisorSelect += 2;
+                    emisorSelect++;
+                    //                    emisorSelect += 2;
                     if (emisorSelect > TRANS_EMISOR_SUR) {
                         emisorSelect = TRANS_EMISOR_OESTE;
                         uartEndMode();
                     }
-                    //                    //                    uartEndMode();
+                    uartEndMode();
                 }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
@@ -363,7 +362,7 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
     //Necesitaria esperar 400us
     DELAY_400uS;
     DELAY_100uS;
-    //    DELAY_50uS;
+    DELAY_50uS;
 
     //Activo Mux 2
     MUX_INPUT_INH(0);

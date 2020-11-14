@@ -51,7 +51,7 @@
 #include "semphr.h"
 
 /*Defines*/
-#define BAUDRATE 115200
+#define BAUDRATE 57600
 #define BRGVAL ((40000000/BAUDRATE)/16)-1
 
 /*Global variables*/

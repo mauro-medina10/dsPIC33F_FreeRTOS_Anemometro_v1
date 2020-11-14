@@ -58,8 +58,6 @@
 #define LIMIT_SAFETY 465
 #define LIMIT_SAFETY_NORTE 600
 #define LIMIT_HIGH 386
-#define MAX_THRESHOLD_NO 1
-#define MAX_THRESHOLD_ES 0
 #define MAX_LOSE_LIMIT 30
 
 #define DETECTION_CERO_NS 0.0008
@@ -72,10 +70,17 @@
 #define DETECT_LIMIT_HIGH_N 382   
 #define DETECT_LIMIT_HIGH_S 387
 
-#define DETECTION_ERROR_O 0.000316392
-#define DETECTION_ERROR_E 0.000292755			   						  
-#define DETECTION_ERROR_N 0.000290802 
-#define DETECTION_ERROR_S 0.000315353
+//Retardo de cada coordenada respecto al tiempo teorico (calc y medido para viento cero)
+#define DETECTION_ERROR_O 0.0003390458
+#define DETECTION_ERROR_E 0.0003163158		   						  
+#define DETECTION_ERROR_N 0.0002907765
+#define DETECTION_ERROR_S 0.0003144165
+
+//Histeresis para tomar el maximo del tren de pulsos
+#define MAX_THRESHOLD_O 1//0
+#define MAX_THRESHOLD_E 4//6//1
+#define MAX_THRESHOLD_N 8//1
+#define MAX_THRESHOLD_S 6//0
 
 #define DETECT_SCALING_OE 1//0.7841		
 #define DETECT_SCALING_NS 1//0.739			   						  
@@ -93,10 +98,8 @@
 #define MED_OFFSET 0//-0.356591667
 
 //Numero de mediciones que se promedian
-#define N_TIMER_PROM 5
 #define N_MED_PROM 20
 #define N_TIMER_MODE 32
-#define N_CALIB 64
 
 //definiciones tiempos
 #define DELAY400 0.0004

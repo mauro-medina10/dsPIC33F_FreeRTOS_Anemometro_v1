@@ -12,6 +12,9 @@ uint16_t DmaBuffer = 0;
 static unsigned int dataN[1024];
 uint16_t dataSamples = 0;
 
+uint16_t thrN = DETECTION_ERROR_N;
+uint16_t thrE = DETECTION_ERROR_E;
+
 static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
 static unsigned int BufferB[N_DMA_SAMP] __attribute__((space(dma)));
 static uint8_t detect_sample_O = 0;
@@ -164,8 +167,8 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
     uint8_t i = 0;
     uint32_t ulNotificationValue;
     BaseType_t notifyStatus = pdFAIL;
-    //    char msgN[6];
-    //    uint16_t j = 0;
+    char msgN[6];
+    uint16_t j = 0;
 
     dataSamples = 0;
 
@@ -189,10 +192,10 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
         }
     }
     //datos por UART
-    //    for(j = 0; j < dataIndex; j++){
-    //        sprintf(msgN,"%3.0d\r\n%c",dataN[j],'\0');
-    //        uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
-    //    }
+    for (j = 0; j < dataSamples; j++) {
+        sprintf(msgN, "%3.0d\r\n%c", dataN[j], '\0');
+        uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
+    }
     return pdPASS;
 }
 
@@ -202,6 +205,7 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
     uint16_t maxIndex = 0;
     unsigned int lastMax = dataN[dataSamples];
     //    unsigned int lastVal = dataN[0];
+    char msgN[9];
 
     //Analizo de atras para adelante porque el ruido es demasiado 
     i = dataSamples;
@@ -225,10 +229,12 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
                     if (i == 0) return pdFAIL;
                 }
                 //Busco el maximo global (comparo con el mayor 'maximo local' encontrado)
-                if ((dataN[i] > (lastMax + MAX_THRESHOLD_NO) &&
-                        (coordDetect == TRANS_EMISOR_NORTE || coordDetect == TRANS_EMISOR_OESTE)) ||
-                        (dataN[i] > (lastMax + MAX_THRESHOLD_ES) &&
-                        (coordDetect == TRANS_EMISOR_SUR || coordDetect == TRANS_EMISOR_ESTE))
+
+                if (
+                        (coordDetect == TRANS_EMISOR_OESTE && (dataN[i] > (lastMax + MAX_THRESHOLD_O))) ||
+                        (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] > (lastMax + thrN))) ||
+                        (coordDetect == TRANS_EMISOR_NORTE && (dataN[i] > (lastMax + thrE))) ||
+                        (coordDetect == TRANS_EMISOR_SUR && (dataN[i] > (lastMax + MAX_THRESHOLD_S)))
                         ) {
                     lastMax = dataN[i];
                     maxIndex = i;
@@ -252,6 +258,9 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
                 maxDetectionState = MAXIMO_LOCAL;
                 break;
             case MAXIMO_GLOBAL:
+                //muestro indice (debug)
+                sprintf(msgN, "\r\nI: %3.0d%c", maxIndex, '\0');
+                uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
                 //termino la busqueda 
                 if (lastMax > LIMIT_SAFETY) {
                     *time = (float) (maxIndex + 1) / DMA_FREQ;
@@ -259,6 +268,7 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
                     return pdPASS;
                 }
                 return pdFAIL;
+
                 break;
             default: maxDetectionState = PRIMERA_MUESTRA;
         }
