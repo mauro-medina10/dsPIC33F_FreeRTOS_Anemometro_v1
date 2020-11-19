@@ -131,8 +131,8 @@ static void anemometro_main_task(void *pvParameters) {
                 break;
             case Medicion_Simple:
 
-                simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                //                simpleMed = anemometroGetMed();
+                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
                 uartSendMed(simpleMed);
                 //                emisorSelect++;
                 //                                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
@@ -150,14 +150,14 @@ static void anemometro_main_task(void *pvParameters) {
 
                 //                simpleMed = anemometroGetMed();
                 //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                simpleMed.mag = anemometroGetCoordTime(TRANS_EMISOR_NORTE) * 1000000;
+                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
 
                 auxV++;
-                if (auxV >= 5) {
+                if (auxV >= N_TIMER_MODE) {
                     auxV = 0;
-                    emisorSelect++;
+                    //                    emisorSelect++;
                     //                    emisorSelect += 2;
                     if (emisorSelect > TRANS_EMISOR_SUR) {
                         emisorSelect = TRANS_EMISOR_OESTE;
@@ -177,7 +177,7 @@ static void anemometro_main_task(void *pvParameters) {
                 break;
             case Configuracion:
                 configOption = uartGetModeConfig();
-
+                
                 switch (configOption) {
                     case CalCero:
                         xQueueReceive(qRecf, &soundSpeed, portMAX_DELAY);
@@ -373,7 +373,7 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
 
     pulseCaptured = dma_capturePulse(coordTime);
 
-    adc_stop();
+    //    adc_stop();
 
     if (pulseCaptured == pdPASS) {
         pulseDetected = dma_detectPulse(coordTime, &timeMed);

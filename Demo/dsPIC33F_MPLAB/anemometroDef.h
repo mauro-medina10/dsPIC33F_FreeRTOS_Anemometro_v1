@@ -77,10 +77,10 @@
 #define DETECTION_ERROR_S 0.0003144165
 
 //Histeresis para tomar el maximo del tren de pulsos
-#define MAX_THRESHOLD_O 1//0
-#define MAX_THRESHOLD_E 4//6//1
-#define MAX_THRESHOLD_N 8//1
-#define MAX_THRESHOLD_S 6//0
+#define MAX_THRESHOLD_O 1
+#define MAX_THRESHOLD_E 0
+#define MAX_THRESHOLD_N 0
+#define MAX_THRESHOLD_S 6
 
 #define DETECT_SCALING_OE 1//0.7841		
 #define DETECT_SCALING_NS 1//0.739			   						  

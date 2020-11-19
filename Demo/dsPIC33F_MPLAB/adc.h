@@ -72,7 +72,6 @@ BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned);
 
 BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib);
 
-
 #ifdef	__cplusplus
 extern "C" {
 #endif /* __cplusplus */

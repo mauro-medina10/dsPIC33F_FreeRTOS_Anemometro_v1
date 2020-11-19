@@ -12,9 +12,6 @@ uint16_t DmaBuffer = 0;
 static unsigned int dataN[1024];
 uint16_t dataSamples = 0;
 
-uint16_t thrN = DETECTION_ERROR_N;
-uint16_t thrE = DETECTION_ERROR_E;
-
 static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
 static unsigned int BufferB[N_DMA_SAMP] __attribute__((space(dma)));
 static uint8_t detect_sample_O = 0;
@@ -96,7 +93,7 @@ void adc_stop(void) {
 
     IEC0bits.AD1IE = 0; // Do Not Enable A/D interrupt 
 
-    DMA0CONbits.CHEN = 0;
+    DMA0CONbits.CHEN = 0; //Disable DMA
 }
 
 BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned) {
@@ -191,11 +188,13 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
             return pdFAIL;
         }
     }
+
+    adc_stop();
     //datos por UART
-    for (j = 0; j < dataSamples; j++) {
-        sprintf(msgN, "%3.0d\r\n%c", dataN[j], '\0');
-        uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
-    }
+    //    for (j = 0; j < dataSamples; j++) {
+    //        sprintf(msgN, "%3.0d\r\n%c", dataN[j], '\0');
+    //        uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
+    //    }
     return pdPASS;
 }
 
@@ -232,8 +231,8 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
 
                 if (
                         (coordDetect == TRANS_EMISOR_OESTE && (dataN[i] > (lastMax + MAX_THRESHOLD_O))) ||
-                        (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] > (lastMax + thrN))) ||
-                        (coordDetect == TRANS_EMISOR_NORTE && (dataN[i] > (lastMax + thrE))) ||
+                        (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] > (lastMax + MAX_THRESHOLD_E))) ||
+                        (coordDetect == TRANS_EMISOR_NORTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_N))) ||
                         (coordDetect == TRANS_EMISOR_SUR && (dataN[i] > (lastMax + MAX_THRESHOLD_S)))
                         ) {
                     lastMax = dataN[i];
