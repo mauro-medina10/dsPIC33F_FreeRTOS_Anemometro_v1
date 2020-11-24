@@ -56,7 +56,7 @@
 #define LIMIT_SUPERIOR 700
 #define LIMIT_INF 100
 #define LIMIT_SAFETY 465
-#define LIMIT_SAFETY_NORTE 600
+#define LIMIT_SAFETY_OE 300
 #define LIMIT_HIGH 386
 #define MAX_LOSE_LIMIT 30
 
@@ -71,14 +71,14 @@
 #define DETECT_LIMIT_HIGH_S 387
 
 //Retardo de cada coordenada respecto al tiempo teorico (calc y medido para viento cero)
-#define DETECTION_ERROR_O 0.0003390458
-#define DETECTION_ERROR_E 0.0003163158		   						  
-#define DETECTION_ERROR_N 0.0002907765
-#define DETECTION_ERROR_S 0.0003144165
+#define DETECTION_ERROR_O 0.000340660
+#define DETECTION_ERROR_E 0.000317020		   						  
+#define DETECTION_ERROR_N 0.000316863
+#define DETECTION_ERROR_S 0.000339583
 
 //Histeresis para tomar el maximo del tren de pulsos
-#define MAX_THRESHOLD_O 1
-#define MAX_THRESHOLD_E 0
+#define MAX_THRESHOLD_O 3
+#define MAX_THRESHOLD_E 1
 #define MAX_THRESHOLD_N 0
 #define MAX_THRESHOLD_S 6
 
@@ -161,6 +161,7 @@ typedef enum {
     MAXIMO_GLOBAL = 0,
     MAXIMO_LOCAL,
     MINIMO_LOCAL,
+    MINIMO_GLOBAL,
     CRUCE_CERO,
     PRIMERA_MUESTRA
 } anemometro_deteccion_enum;

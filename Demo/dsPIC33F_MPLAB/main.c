@@ -132,6 +132,7 @@ static void anemometro_main_task(void *pvParameters) {
             case Medicion_Simple:
 
                 //                simpleMed = anemometroGetMed();
+                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
                 simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
                 uartSendMed(simpleMed);
                 //                emisorSelect++;
@@ -148,22 +149,22 @@ static void anemometro_main_task(void *pvParameters) {
 
                 medProgFlag = 1;
 
-                //                simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                //                                simpleMed = anemometroGetMed();
+                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
 
                 uartSendMed(simpleMed);
 
                 auxV++;
-                if (auxV >= N_TIMER_MODE) {
+                if (auxV >= 10) {
                     auxV = 0;
                     //                    emisorSelect++;
-                    //                    emisorSelect += 2;
+                    emisorSelect += 2;
                     if (emisorSelect > TRANS_EMISOR_SUR) {
                         emisorSelect = TRANS_EMISOR_OESTE;
                         uartEndMode();
                     }
-                    uartEndMode();
+                    // uartEndMode();
                 }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
@@ -177,7 +178,8 @@ static void anemometro_main_task(void *pvParameters) {
                 break;
             case Configuracion:
                 configOption = uartGetModeConfig();
-                
+
+                thresholdEO();
                 switch (configOption) {
                     case CalCero:
                         xQueueReceive(qRecf, &soundSpeed, portMAX_DELAY);

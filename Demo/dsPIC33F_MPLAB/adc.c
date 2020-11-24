@@ -12,6 +12,9 @@ uint16_t DmaBuffer = 0;
 static unsigned int dataN[1024];
 uint16_t dataSamples = 0;
 
+//uint8_t thE = 1;
+//uint8_t thO = 0;
+
 static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
 static unsigned int BufferB[N_DMA_SAMP] __attribute__((space(dma)));
 static uint8_t detect_sample_O = 0;
@@ -202,135 +205,147 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
     anemometro_deteccion_enum maxDetectionState = PRIMERA_MUESTRA;
     uint16_t i = 0;
     uint16_t maxIndex = 0;
+    uint16_t minIndex = 0;
     unsigned int lastMax = dataN[dataSamples];
+    unsigned int lastMin = dataN[dataSamples - 3];
     //    unsigned int lastVal = dataN[0];
     char msgN[9];
 
     //Analizo de atras para adelante porque el ruido es demasiado 
+    //N-S: aparentemente miden bien asi
+    //O: probar detectando el minimo
     i = dataSamples;
-    while (1) {
-        switch (maxDetectionState) {
-            case PRIMERA_MUESTRA:
-                //Veo si estoy bajando o subiendo
-                if (dataN[i] > dataN[i - 1]) {
+
+    //Detecto el minimo
+    if (coordDetect == TRANS_EMISOR_OESTE || coordDetect == TRANS_EMISOR_ESTE) {
+        while (1) {
+            switch (maxDetectionState) {
+                case PRIMERA_MUESTRA:
+                    //Veo si estoy bajando o subiendo
+                    if (dataN[i] > dataN[i - 1]) {
+                        maxDetectionState = MINIMO_LOCAL;
+                    } else if (dataN[i] < dataN[i - 1]) {
+                        maxDetectionState = MAXIMO_LOCAL;
+                    } else {
+                        i--;
+                        if (i == 0) return pdFAIL;
+                    }
+                    break;
+                case MAXIMO_LOCAL:
+                    //Busco el maximo local
+                    while (dataN[i - 1] >= dataN[i]) {
+                        i--;
+                        if (i == 0) return pdFAIL;
+                    }
                     maxDetectionState = MINIMO_LOCAL;
-                } else if (dataN[i] < dataN[i - 1]) {
+                    break;
+                case MINIMO_LOCAL:
+                    //Avanzo hasta que cambie la derivada a positiva
+                    while (dataN[i - 1] <= dataN[i]) {
+                        i--;
+                        if (i == 0) return pdFAIL;
+                    }
+                    if ((coordDetect == TRANS_EMISOR_OESTE && (dataN[i] < (lastMin - MAX_THRESHOLD_O)))
+                            || (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] < (lastMin - MAX_THRESHOLD_E)))
+                            ) {
+                        lastMin = dataN[i];
+                        minIndex = i;
+                        i--;
+                        if (i == 0) maxDetectionState = MINIMO_GLOBAL;
+                        maxDetectionState = MINIMO_LOCAL;
+                    } else if (dataN[i] > (lastMin * (1 + 0.014)) && lastMin < LIMIT_SAFETY_OE) { //Si los maximos empiezan a decaer dejo de buscar
+                        maxDetectionState = MINIMO_GLOBAL;
+                    } else {
+                        i--;
+                        maxDetectionState = MAXIMO_LOCAL;
+                        if (i == 0) return pdFAIL;
+                    }
+                    break;
+                case MINIMO_GLOBAL:
+                    //muestro indice (debug)
+                    //                    sprintf(msgN, "\r\nI: %3.0d%c", minIndex + 1, '\0');
+                    //                    uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
+                    //termino la busqueda 
+                    if (lastMin < LIMIT_SAFETY_OE) {
+                        *time = (float) (minIndex + 1) / DMA_FREQ;
+
+                        return pdPASS;
+                    }
+                    return pdFAIL;
+
+                    break;
+                default: maxDetectionState = PRIMERA_MUESTRA;
+            }
+        }
+    } else if (coordDetect == TRANS_EMISOR_NORTE || coordDetect == TRANS_EMISOR_SUR) {
+        while (1) {
+            switch (maxDetectionState) {
+                case PRIMERA_MUESTRA:
+                    //Veo si estoy bajando o subiendo
+                    if (dataN[i] > dataN[i - 1]) {
+                        maxDetectionState = MINIMO_LOCAL;
+                    } else if (dataN[i] < dataN[i - 1]) {
+                        maxDetectionState = MAXIMO_LOCAL;
+                    } else {
+                        i--;
+                        if (i == 0) return pdFAIL;
+                    }
+                    break;
+                case MAXIMO_LOCAL:
+                    //Busco el maximo local
+                    while (dataN[i - 1] >= dataN[i]) {
+                        i--;
+                        if (i == 0) return pdFAIL;
+                    }
+                    //Busco el maximo global (comparo con el mayor 'maximo local' encontrado)
+
+                    if (    (coordDetect == TRANS_EMISOR_NORTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_N))) ||
+                            (coordDetect == TRANS_EMISOR_SUR && (dataN[i] > (lastMax + MAX_THRESHOLD_S)))
+                            ) {
+                        lastMax = dataN[i];
+                        maxIndex = i;
+                        i--;
+                        if (i == 0) maxDetectionState = MAXIMO_GLOBAL;
+                        maxDetectionState = MINIMO_LOCAL;
+                    } else if (dataN[i] < (lastMax * (1 - 0.014)) && lastMax > LIMIT_SAFETY) { //Si los maximos empiezan a decaer dejo de buscar
+                        maxDetectionState = MAXIMO_GLOBAL;
+                    } else {
+                        i--;
+                        maxDetectionState = MINIMO_LOCAL;
+                        if (i == 0) return pdFAIL;
+                    }
+                    break;
+                case MINIMO_LOCAL:
+                    //Avanzo hasta que cambie la derivada a positiva
+                    while (dataN[i - 1] <= dataN[i]) {
+                        i--;
+                        if (i == 0) return pdFAIL;
+                    }
                     maxDetectionState = MAXIMO_LOCAL;
-                } else {
-                    i--;
-                    if (i == 0) return pdFAIL;
-                }
-                break;
-            case MAXIMO_LOCAL:
-                //Busco el maximo local
-                while (dataN[i - 1] >= dataN[i]) {
-                    i--;
-                    if (i == 0) return pdFAIL;
-                }
-                //Busco el maximo global (comparo con el mayor 'maximo local' encontrado)
+                    break;
+                case MAXIMO_GLOBAL:
+                    //muestro indice (debug)
+                    //                    sprintf(msgN, "\r\nI: %3.0d%c", maxIndex + 1, '\0');
+                    //                    uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
+                    //termino la busqueda 
+                    if (lastMax > LIMIT_SAFETY) {
+                        *time = (float) (maxIndex + 1) / DMA_FREQ;
 
-                if (
-                        (coordDetect == TRANS_EMISOR_OESTE && (dataN[i] > (lastMax + MAX_THRESHOLD_O))) ||
-                        (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] > (lastMax + MAX_THRESHOLD_E))) ||
-                        (coordDetect == TRANS_EMISOR_NORTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_N))) ||
-                        (coordDetect == TRANS_EMISOR_SUR && (dataN[i] > (lastMax + MAX_THRESHOLD_S)))
-                        ) {
-                    lastMax = dataN[i];
-                    maxIndex = i;
-                    i--;
-                    if (i == 0) maxDetectionState = MAXIMO_GLOBAL;
-                    maxDetectionState = MINIMO_LOCAL;
-                } else if (dataN[i] < (lastMax * (1 - 0.014)) && lastMax > LIMIT_SAFETY) { //Si los maximos empiezan a decaer dejo de buscar
-                    maxDetectionState = MAXIMO_GLOBAL;
-                } else {
-                    i--;
-                    maxDetectionState = MINIMO_LOCAL;
-                    if (i == 0) return pdFAIL;
-                }
-                break;
-            case MINIMO_LOCAL:
-                //Avanzo hasta que cambie la derivada a positiva
-                while (dataN[i - 1] <= dataN[i]) {
-                    i--;
-                    if (i == 0) return pdFAIL;
-                }
-                maxDetectionState = MAXIMO_LOCAL;
-                break;
-            case MAXIMO_GLOBAL:
-                //muestro indice (debug)
-                sprintf(msgN, "\r\nI: %3.0d%c", maxIndex, '\0');
-                uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
-                //termino la busqueda 
-                if (lastMax > LIMIT_SAFETY) {
-                    *time = (float) (maxIndex + 1) / DMA_FREQ;
+                        return pdPASS;
+                    }
+                    return pdFAIL;
 
-                    return pdPASS;
-                }
-                return pdFAIL;
-
-                break;
-            default: maxDetectionState = PRIMERA_MUESTRA;
+                    break;
+                default: maxDetectionState = PRIMERA_MUESTRA;
+            }
         }
     }
-    //
-    //    //Busco el primer maximo
-    //    for (i = 1; i < dataSamples; i++) {
-    //        //Maximo local
-    //        while (dataN[i] >= dataN[i - 1]) {
-    //            i++;
-    //            if (i >= dataSamples) return pdFAIL;
-    //        }
-    //        lastMax = dataN[i];
-    //
-    //        if (dataN[i] > (lastMax + MAX_THRESHOLD)) {
-    //            lastMax = dataN[i];
-    //            maxIndex = i;
-    //        }
-    //    }
-    //    //    switch (coordDetect) {
-    //    //        case TRANS_EMISOR_OESTE:
-    //    //            if (maxIndex < 355) {
-    //    //                i++;
-    //    //            }
-    //    //            break;
-    //    //        case TRANS_EMISOR_ESTE:
-    //    //            if (maxIndex < 330) {
-    //    //                i++;
-    //    //            }
-    //    //            break;
-    //    //        case TRANS_EMISOR_NORTE:
-    //    //            if (maxIndex < 290) {
-    //    //                i++;
-    //    //            }
-    //    //            break;
-    //    //        case TRANS_EMISOR_SUR:
-    //    //            if (maxIndex < 330) {
-    //    //                i++;
-    //    //            }
-    //    //            break;
-    //    //    }
-    //    //Busco el siguiente cruce por cero
-    //    //    i = maxIndex + 1;
-    //    //
-    //    //    while (dataN[i] < (ADC_CERO - 30) || dataN[i] > (ADC_CERO + 30)) {
-    //    //        i++;
-    //    //        if (i > (maxIndex + 10)) return pdFAIL;
-    //    //    }
-    //
-    //    //Detecto el siguiente minimo
-    //    i = maxIndex + 1;
-    //
-    //    while (dataN[i] <= dataN[i - 1]) {
-    //        i++;
-    //        if (i > (maxIndex + 20)) return pdFAIL;
-    //    }
-    //
-    //    if (dataN[i] > LIMIT_INF && dataN[i] < LIMIT_SUPERIOR) {
-    //        *time = (float) (i + 1) / DMA_FREQ;
-    //
-    //        return pdPASS;
-    //    }
     return pdFAIL;
+}
+
+void thresholdEO(void) {
+    //    thE++;
+    //    thO++;
 }
 
 void __attribute__((interrupt, no_auto_psv))_DMA0Interrupt(void) {
