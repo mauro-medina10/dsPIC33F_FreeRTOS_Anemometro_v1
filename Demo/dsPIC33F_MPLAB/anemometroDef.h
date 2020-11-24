@@ -71,16 +71,22 @@
 #define DETECT_LIMIT_HIGH_S 387
 
 //Retardo de cada coordenada respecto al tiempo teorico (calc y medido para viento cero)
-#define DETECTION_ERROR_O 0.000340660
-#define DETECTION_ERROR_E 0.000317020		   						  
-#define DETECTION_ERROR_N 0.000316863
-#define DETECTION_ERROR_S 0.000339583
+#define DETECTION_ERROR_O 0.000250824
+#define DETECTION_ERROR_E 0.000227194		   						  
+#define DETECTION_ERROR_N 0.000266925
+#define DETECTION_ERROR_S 0.000245105
 
 //Histeresis para tomar el maximo del tren de pulsos
 #define MAX_THRESHOLD_O 3
 #define MAX_THRESHOLD_E 1
 #define MAX_THRESHOLD_N 0
 #define MAX_THRESHOLD_S 6
+
+#define DETECTION_THRESHOLD_O 0.96
+#define DETECTION_THRESHOLD_E 0.97
+#define DETECTION_THRESHOLD_N 0.986
+#define DETECTION_THRESHOLD_S 0.97
+
 
 #define DETECT_SCALING_OE 1//0.7841		
 #define DETECT_SCALING_NS 1//0.739			   						  

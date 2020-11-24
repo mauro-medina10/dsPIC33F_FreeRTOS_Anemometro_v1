@@ -132,8 +132,8 @@ static void anemometro_main_task(void *pvParameters) {
             case Medicion_Simple:
 
                 //                simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
                 uartSendMed(simpleMed);
                 //                emisorSelect++;
                 //                                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
@@ -156,15 +156,15 @@ static void anemometro_main_task(void *pvParameters) {
                 uartSendMed(simpleMed);
 
                 auxV++;
-                if (auxV >= 10) {
+                if (auxV >= 20) {
                     auxV = 0;
                     //                    emisorSelect++;
                     emisorSelect += 2;
                     if (emisorSelect > TRANS_EMISOR_SUR) {
                         emisorSelect = TRANS_EMISOR_OESTE;
-                        uartEndMode();
+                        //                        uartEndMode();
                     }
-                    // uartEndMode();
+                    uartEndMode();
                 }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
@@ -179,7 +179,6 @@ static void anemometro_main_task(void *pvParameters) {
             case Configuracion:
                 configOption = uartGetModeConfig();
 
-                thresholdEO();
                 switch (configOption) {
                     case CalCero:
                         xQueueReceive(qRecf, &soundSpeed, portMAX_DELAY);
