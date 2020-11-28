@@ -47,7 +47,7 @@
 #include "semphr.h"
 
 //Distancias entre transductores
-#define DISTANCE_NS 0.271  //Norte-Sur (blanco-negro)
+#define DISTANCE_NS 0.269//0.271  //Norte-Sur (blanco-negro)
 #define DISTANCE_EO 0.276   //Este-Oeste (Rosa-Nada)
 
 //Valor ADC sin excitacion
@@ -71,21 +71,21 @@
 #define DETECT_LIMIT_HIGH_S 387
 
 //Retardo de cada coordenada respecto al tiempo teorico (calc y medido para viento cero)
-#define DETECTION_ERROR_O 0.000250824
-#define DETECTION_ERROR_E 0.000227194		   						  
-#define DETECTION_ERROR_N 0.000266925
-#define DETECTION_ERROR_S 0.000245105
+#define DETECTION_ERROR_O 0.000249775//250824
+#define DETECTION_ERROR_E 0.000248865//227194		   						  
+#define DETECTION_ERROR_N 0.000265945//266925
+#define DETECTION_ERROR_S 0.000243215//245105
 
 //Histeresis para tomar el maximo del tren de pulsos
-#define MAX_THRESHOLD_O 3
-#define MAX_THRESHOLD_E 1
+#define MAX_THRESHOLD_O 2//3
+#define MAX_THRESHOLD_E 2//1
 #define MAX_THRESHOLD_N 0
-#define MAX_THRESHOLD_S 6
+#define MAX_THRESHOLD_S 0//1
 
-#define DETECTION_THRESHOLD_O 0.96
-#define DETECTION_THRESHOLD_E 0.97
+#define DETECTION_THRESHOLD_O 0.954//0.96
+#define DETECTION_THRESHOLD_E 0.977//0.97  
 #define DETECTION_THRESHOLD_N 0.986
-#define DETECTION_THRESHOLD_S 0.97
+#define DETECTION_THRESHOLD_S 0.958//0.97
 
 
 #define DETECT_SCALING_OE 1//0.7841		
@@ -105,7 +105,9 @@
 
 //Numero de mediciones que se promedian
 #define N_MED_PROM 20
+#define N_MED_MODE 13
 #define N_TIMER_MODE 32
+
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -199,7 +201,11 @@ void anemometroEmiterSelect(mux_transSelect_enum transd);
 
 float anemometroGetVcoord(mux_transSelect_enum coordV);
 
-BaseType_t anemometroGetProm(float* medOE, float* medNS, uint8_t prom);
+void anemometroGetTmode(wind_medicion_type * modes, mux_transSelect_enum coordV);
+
+BaseType_t anemometroVprom(float* medOE, float* medNS, uint8_t Nprom);
+
+BaseType_t anemometroVmode(float* medOE, float* medNS, uint8_t Nmode);
 
 float anemometroGetCoordTime(mux_transSelect_enum coordTime);
 
