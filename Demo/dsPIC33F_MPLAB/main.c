@@ -150,9 +150,10 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 1;
 
                 //                                simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                anemometroGetTmode(&simpleMed, emisorSelect);
-                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                //                                simpleMed.mag = anemometroGetVcoord(emisorSelect);
+                //                anemometroGetTmode(&simpleMed.mag, &simpleMed.deg, emisorSelect);
+                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+
 
                 //                if (anemometroVmode(&simpleMed.mag, &simpleMed.deg, N_MED_MODE) == pdPASS) {
                 //                    emisorSelect = TRANS_EMISOR_NORTE;
@@ -178,10 +179,10 @@ static void anemometro_main_task(void *pvParameters) {
                 uartSendMed(simpleMed);
 
                 auxV++;
-                if (auxV >= 32) {
+                if (auxV >= 20) {
                     auxV = 0;
-                    //                                        emisorSelect++;
-                    emisorSelect += 2;
+                    emisorSelect++;
+                    //                    emisorSelect += 2;
                     if (emisorSelect > TRANS_EMISOR_SUR) {
                         emisorSelect = TRANS_EMISOR_OESTE;
                         //                        uartEndMode();
@@ -257,13 +258,14 @@ static void anemometro_main_task(void *pvParameters) {
     }
 }
 
-void anemometroGetTmode(wind_medicion_type* modes, mux_transSelect_enum coordV) {
+BaseType_t anemometroGetTmode(float* modeA, float* modeB, mux_transSelect_enum coordV) {
     float valMed = 0;
     float timeMed[] = {0, 0};
     float timeNmediciones[N_TIMER_MODE];
     uint8_t i = 0;
     uint8_t n = 0;
     float timeCorr[2];
+    BaseType_t medState = pdFAIL;
 
     for (i = 0; i < 2; i++) {
         for (n = 0; n < N_TIMER_MODE; n++) {
@@ -272,26 +274,16 @@ void anemometroGetTmode(wind_medicion_type* modes, mux_transSelect_enum coordV) 
 
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
-        anemometroCalcMode(timeNmediciones, &timeMed[i], N_TIMER_MODE);
+        medState = anemometroCalcMode(timeNmediciones, &timeMed[i], N_TIMER_MODE);
     }
     //DEBUG: ajuste ventanas
-    modes->mag = timeMed[0] * 1000000;
-    modes->deg = timeMed[1] * 1000000;
+    //    *modeA = timeMed[0] * 1000000;
+    //    *modeB = timeMed[1] * 1000000;
 
-    switch (coordV) {
-        case TRANS_EMISOR_OESTE:
-            sprintf(modes->coord, " O ");
-            break;
-        case TRANS_EMISOR_ESTE:
-            sprintf(modes->coord, " E ");
-            break;
-        case TRANS_EMISOR_NORTE:
-            sprintf(modes->coord, " N ");
-            break;
-        case TRANS_EMISOR_SUR:
-            sprintf(modes->coord, " S ");
-            break;
-    }
+    *modeA = timeMed[0];
+    *modeB = timeMed[1];
+
+    return medState;
 }
 
 float anemometroGetVcoord(mux_transSelect_enum coordV) {
@@ -365,27 +357,48 @@ float anemometroGetVcoord(mux_transSelect_enum coordV) {
 }
 
 BaseType_t anemometroVmode(float* medOE, float* medNS, uint8_t Nmode) {
-    BaseType_t modeState = pdFAIL;
-    uint8_t medNmodeOE = Nmode;
-    uint8_t medNmodeNS = Nmode;
-    float velNmedicionesEO[N_MED_MODE];
-    float velNmedicionesNS[N_MED_MODE];
-    uint8_t n = 0;
+    BaseType_t modeState = pdPASS;
+    float velNmedicionesR[N_MED_MODE];
+    float velNmedicionesT[N_MED_MODE];
+    float timeMode[4];
+    uint8_t n = 0, i = 0;
+    float timeCorr[] = {0, 0};
 
-    for (n = 0; n < N_MED_MODE; n++) {
+    for (i = 0; i < 4; i += 2) {
+        for (n = 0; n < N_MED_MODE; n++) {
 
-        velNmedicionesEO[n] = anemometroGetVcoord(TRANS_EMISOR_OESTE);
+            anemometroGetTmode(&velNmedicionesR[n], &velNmedicionesT[n], TRANS_EMISOR_OESTE + i);
 
-        vTaskDelay(1 / portTICK_PERIOD_MS);
+            vTaskDelay(1 / portTICK_PERIOD_MS);
 
-        velNmedicionesNS[n] = anemometroGetVcoord(TRANS_EMISOR_NORTE);
+        }
+        modeState *= anemometroCalcMode(velNmedicionesR, &timeMode[i], N_MED_MODE);
 
-
-        vTaskDelay(1 / portTICK_PERIOD_MS);
+        modeState *= anemometroCalcMode(velNmedicionesT, &timeMode[1 + i], N_MED_MODE);
     }
-    modeState = anemometroCalcMode(velNmedicionesEO, medOE, N_MED_MODE);
 
-    modeState *= anemometroCalcMode(velNmedicionesNS, medNS, N_MED_MODE);
+    if (modeState == pdFAIL) return modeState;
+
+    //Calculo V para OE
+    timeCorr[0] = timeMode[0] - detect_delta_O; //taOE
+    timeCorr[1] = timeMode[1] - detect_delta_E; //trOE
+
+    if (timeCorr[0] == timeCorr[1]) {
+        *medOE = 0;
+    } else {
+        *medOE = (((float) DISTANCE_EO / 2) * (1 / timeCorr[0] - 1 / timeCorr[1])) - OFFSET_ERROR_EO;
+        *medOE = (*medOE - DETECT_OFFSET_OE) / DETECT_SCALING_OE;
+    }
+    //Calculo V para NS
+    timeCorr[0] = timeMode[2] - detect_delta_N; //taNS
+    timeCorr[1] = timeMode[3] - detect_delta_S; //trNS
+
+    if (timeCorr[0] == timeCorr[1]) {
+        *medNS = 0;
+    } else {
+        *medNS = (((float) DISTANCE_NS / 2) * (1 / timeCorr[0] - 1 / timeCorr[1])) - OFFSET_ERROR_NS;
+        *medNS = (*medNS - DETECT_OFFSET_NS) / DETECT_SCALING_NS;
+    }
 
     return modeState;
 }
@@ -449,16 +462,20 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
 
     timerStart();
 
-    comparadorPulseTrain_NObloq(TRAIN_PULSE_LENGTH);
+    //    RB_9_SET_VAL(1);
+    //    DELAY_10uS;
+    //    RB_9_SET_VAL(0);
+    comparadorPulseTrain_NObloq(2);
+    DELAY_100uS;
+    comparadorPulseTrain_NObloq(4);
 
     //Necesitaria esperar 400us
     DELAY_400uS;
-    DELAY_100uS;
+    //    DELAY_100uS;
     DELAY_50uS;
 
     //Activo Mux 2
     MUX_INPUT_INH(0);
-
     timerStop();
 
     adc_start();
@@ -808,6 +825,8 @@ static void prvSetupHardware(void) {
     DELAY_100uS;
     //    RB_8_SET_MODE(1);
     //    DELAY_100uS;
+    RB_9_SET_MODE(0);
+    DELAY_100uS;
 }
 
 void vApplicationIdleHook(void) {

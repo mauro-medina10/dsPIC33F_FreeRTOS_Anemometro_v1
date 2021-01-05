@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2">
         <file>
             <url>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/main.c</url>
             <bookmark id="1">
                 <name/>
-                <line>166</line>
+                <line>188</line>
+                <key/>
+            </bookmark>
+            <bookmark id="2">
+                <name/>
+                <line>796</line>
                 <key/>
             </bookmark>
         </file>
@@ -20,7 +25,6 @@
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/anemometroDef.h</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/pwm.c</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/tasks.c</file>
-            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.h</file>
         </group>
     </open-files>
 </project-private>

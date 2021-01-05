@@ -47,8 +47,8 @@
 #include "semphr.h"
 
 //Distancias entre transductores
-#define DISTANCE_NS 0.269//0.271  //Norte-Sur (blanco-negro)
-#define DISTANCE_EO 0.276   //Este-Oeste (Rosa-Nada)
+#define DISTANCE_NS 0.297//0.269 //Norte-Sur (blanco-negro)
+#define DISTANCE_EO 0.295//0.276 //Este-Oeste (Rosa-Nada)
 
 //Valor ADC sin excitacion
 #define ADC_CERO 384
@@ -71,21 +71,21 @@
 #define DETECT_LIMIT_HIGH_S 387
 
 //Retardo de cada coordenada respecto al tiempo teorico (calc y medido para viento cero)
-#define DETECTION_ERROR_O 0.000249775//250824
-#define DETECTION_ERROR_E 0.000248865//227194		   						  
-#define DETECTION_ERROR_N 0.000265945//266925
-#define DETECTION_ERROR_S 0.000243215//245105
+#define DETECTION_ERROR_O 0.00034282164//0.00034337
+#define DETECTION_ERROR_E 0.00036645803//0.00036701		   						  
+#define DETECTION_ERROR_N 0.0003815866//0.00038213
+#define DETECTION_ERROR_S 0.00035885943//0.0003594
 
 //Histeresis para tomar el maximo del tren de pulsos
-#define MAX_THRESHOLD_O 2//3
-#define MAX_THRESHOLD_E 2//1
+#define MAX_THRESHOLD_O 0
+#define MAX_THRESHOLD_E 0
 #define MAX_THRESHOLD_N 0
-#define MAX_THRESHOLD_S 0//1
+#define MAX_THRESHOLD_S 0
 
-#define DETECTION_THRESHOLD_O 0.954//0.96
-#define DETECTION_THRESHOLD_E 0.977//0.97  
-#define DETECTION_THRESHOLD_N 0.986
-#define DETECTION_THRESHOLD_S 0.958//0.97
+#define DETECTION_THRESHOLD_O 0.98//0.967
+#define DETECTION_THRESHOLD_E 0.975//0.977
+#define DETECTION_THRESHOLD_N 0.952
+#define DETECTION_THRESHOLD_S 0.9474
 
 
 #define DETECT_SCALING_OE 1//0.7841		
@@ -105,8 +105,8 @@
 
 //Numero de mediciones que se promedian
 #define N_MED_PROM 20
-#define N_MED_MODE 13
-#define N_TIMER_MODE 32
+#define N_MED_MODE 5
+#define N_TIMER_MODE 16
 
 
 //definiciones tiempos
@@ -119,6 +119,7 @@
 #define RTOS_AVAILABLE //El periferico se usará en contexto de un RTOS
 
 //Delay
+#define DELAY_10uS asm volatile ("REPEAT, #421"); Nop(); // 10uS delay
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
 #define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
 #define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
@@ -139,13 +140,14 @@
 #define MUX_INPUT_INH(b) (PORTBbits.RB4 = (b))
 //#define MUX_INPUT_INH(b) (PORTBbits.RB4 = (b))
 //Manejo led
-#define RB_9_SET(b) (PORTBbits.RB9 = (b))
+#define RB_9_SET_VAL(b) (PORTBbits.RB9 = (b))
+#define RB_9_SET_MODE(b) (TRISBbits.TRISB9 = (b))
 #define RB_8_SET_VAL(b) (PORTBbits.RB8 = (b))
 #define RB_8_SET_MODE(b) (TRISBbits.TRISB8 = (b))
 #define LED_ON (PORTAbits.RA4 = 1)
 #define LED_OFF (PORTAbits.RA4 = 0)
 //Longitud tren de pulsos
-#define TRAIN_PULSE_LENGTH 10
+#define TRAIN_PULSE_LENGTH 3
 //CALCULO TEORICO VELOCIDAD DEL SONIDO
 #define SOUND_VEL(b) (float)(331.228 * sqrtf((b + 273.16)/273.16))
 
@@ -201,7 +203,7 @@ void anemometroEmiterSelect(mux_transSelect_enum transd);
 
 float anemometroGetVcoord(mux_transSelect_enum coordV);
 
-void anemometroGetTmode(wind_medicion_type * modes, mux_transSelect_enum coordV);
+BaseType_t anemometroGetTmode(float* modeA, float* modeB, mux_transSelect_enum coordV);
 
 BaseType_t anemometroVprom(float* medOE, float* medNS, uint8_t Nprom);
 

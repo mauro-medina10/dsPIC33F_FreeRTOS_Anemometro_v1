@@ -239,9 +239,9 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
                 //Busco el maximo global (comparo con el mayor 'maximo local' encontrado)
 
                 if ((coordDetect == TRANS_EMISOR_OESTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_O)))
-                        || (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] > (lastMax + MAX_THRESHOLD_E)))
+                        || (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_E)))
                         || (coordDetect == TRANS_EMISOR_NORTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_N)))
-                        || (coordDetect == TRANS_EMISOR_SUR && (dataN[i] > (lastMax + MAX_THRESHOLD_S)))
+                        || (coordDetect == TRANS_EMISOR_SUR && (dataN[i] >= (lastMax + MAX_THRESHOLD_S)))
                         ) {
                     lastMax = dataN[i];
                     maxIndex = i;
@@ -253,7 +253,7 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
                         || (coordDetect == TRANS_EMISOR_NORTE && dataN[i] < (lastMax * (DETECTION_THRESHOLD_N)))
                         || (coordDetect == TRANS_EMISOR_SUR && dataN[i] < (lastMax * (DETECTION_THRESHOLD_S))))
                         && lastMax > LIMIT_SAFETY) { //Si los maximos empiezan a decaer dejo de buscar
-                    maxIndex = i;
+                    //                    maxIndex = i;
                     maxDetectionState = MAXIMO_GLOBAL;
                 } else {
                     i--;

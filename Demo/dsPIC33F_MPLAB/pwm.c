@@ -114,6 +114,7 @@ void comparadorPulseTrain_NObloq(uint8_t nPulsos) {
 
     while (pulseCount < (2 * nPulsos)) {
         xSemaphoreTake(xSemaphoreComparadorPulsos, portMAX_DELAY);
+        pulseCount++;
     }
     comparadorStop();
 
@@ -143,6 +144,7 @@ static void comparador_task(void *pvParameters) {
 
         while (pulseCount < (2 * nPulsos)) {
             xSemaphoreTake(xSemaphoreComparadorPulsos, portMAX_DELAY);
+            pulseCount++;
         }
         //Activo filtro receptor
         //filtroEnable();
@@ -171,10 +173,7 @@ void filtroDisable(void) {
 void __attribute__((interrupt, no_auto_psv)) _OC1Interrupt(void) {
 #ifdef RTOS_AVAILABLE
     BaseType_t xTaskWoken = pdFALSE;
-
-    //Contador global de pulsos (cuenta cada semi-periodo)
-    pulseCount++;
-
+    
     xSemaphoreGiveFromISR(xSemaphoreComparadorPulsos, &xTaskWoken);
 
     //Limpio bandera
