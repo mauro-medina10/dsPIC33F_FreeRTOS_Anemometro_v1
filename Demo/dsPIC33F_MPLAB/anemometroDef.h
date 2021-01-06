@@ -47,31 +47,52 @@
 #include "semphr.h"
 
 //Distancias entre transductores
-#define DISTANCE_NS 0.271  //Norte-Sur (blanco-negro)
-#define DISTANCE_EO 0.276   //Este-Oeste (Rosa-Nada)
+#define DISTANCE_NS 0.297//0.269 //Norte-Sur (blanco-negro)
+#define DISTANCE_EO 0.295//0.276 //Este-Oeste (Rosa-Nada)
 
 //Valor ADC sin excitacion
-#define ADC_CERO 377
+#define ADC_CERO 384
 //Limites para deteccion de tren de pulsos
-#define LIMIT_SUPERIOR 380
-#define LIMIT_INF 375
-#define LIMIT_SAFETY 383
+#define LIMIT_SUPERIOR 700
+#define LIMIT_INF 100
+#define LIMIT_SAFETY 465
+#define LIMIT_SAFETY_OE 300
+#define LIMIT_HIGH 386
+#define MAX_LOSE_LIMIT 30
 
 #define DETECTION_CERO_NS 0.0008
 #define DETECTION_CERO_OE 0.0007942
 #define DETECTION_CERO_MAX 0.00080397
 #define DETECTION_CERO_MIN 0.00080395
 
-#define DETECTION_ERROR_O 0.000267005
-#define DETECTION_ERROR_E 0.000266955			   						  
-#define DETECTION_ERROR_N 0.000287445  
-#define DETECTION_ERROR_S 0.000288405
+#define DETECT_LIMIT_HIGH_O 384
+#define DETECT_LIMIT_HIGH_E 385			   						  
+#define DETECT_LIMIT_HIGH_N 382   
+#define DETECT_LIMIT_HIGH_S 387
 
-#define DETECT_SCALING_OE 0.7841//0.886  		
-#define DETECT_SCALING_NS 0.739//0.921			   						  
+//Retardo de cada coordenada respecto al tiempo teorico (calc y medido para viento cero)
+#define DETECTION_ERROR_O 0.00034282164//0.00034337
+#define DETECTION_ERROR_E 0.00036645803//0.00036701		   						  
+#define DETECTION_ERROR_N 0.0003815866//0.00038213
+#define DETECTION_ERROR_S 0.00035885943//0.0003594
 
-#define DETECT_OFFSET_OE -0.1361//-0.021		
-#define DETECT_OFFSET_NS -0.0264//0.03
+//Histeresis para tomar el maximo del tren de pulsos
+#define MAX_THRESHOLD_O 0
+#define MAX_THRESHOLD_E 0
+#define MAX_THRESHOLD_N 0
+#define MAX_THRESHOLD_S 0
+
+#define DETECTION_THRESHOLD_O 0.98//0.967
+#define DETECTION_THRESHOLD_E 0.975//0.977
+#define DETECTION_THRESHOLD_N 0.952
+#define DETECTION_THRESHOLD_S 0.9474
+
+
+#define DETECT_SCALING_OE 1//0.7841		
+#define DETECT_SCALING_NS 1//0.739			   						  
+
+#define DETECT_OFFSET_OE 0//-0.1361		
+#define DETECT_OFFSET_NS 0//-0.0264
 
 #define ANGLE_SCALING 1//1.031
 #define ANGLE_OFFSET 0//9.5
@@ -83,9 +104,10 @@
 #define MED_OFFSET 0//-0.356591667
 
 //Numero de mediciones que se promedian
-#define N_TIMER_PROM 5
 #define N_MED_PROM 20
-#define N_TIMER_MODE 25
+#define N_MED_MODE 5
+#define N_TIMER_MODE 16
+
 
 //definiciones tiempos
 #define DELAY400 0.0004
@@ -97,6 +119,7 @@
 #define RTOS_AVAILABLE //El periferico se usará en contexto de un RTOS
 
 //Delay
+#define DELAY_10uS asm volatile ("REPEAT, #421"); Nop(); // 10uS delay
 #define DELAY_50uS asm volatile ("REPEAT, #2001"); Nop(); // 50uS delay
 #define DELAY_100uS asm volatile ("REPEAT, #4001"); Nop(); // 100uS delay
 #define DELAY_400uS asm volatile ("REPEAT, #16001"); Nop(); // 400uS delay
@@ -114,13 +137,17 @@
 //Entradas mux
 #define MUX_INPUT_A(b) (PORTAbits.RA1 = (b))
 #define MUX_INPUT_B(b) (PORTAbits.RA0 = (b))
-#define MUX_INPUT_INH(b)    (PORTBbits.RB4 = (b))
+#define MUX_INPUT_INH(b) (PORTBbits.RB4 = (b))
+//#define MUX_INPUT_INH(b) (PORTBbits.RB4 = (b))
 //Manejo led
-#define RB_9_SET(b) (PORTBbits.RB9 = (b))
+#define RB_9_SET_VAL(b) (PORTBbits.RB9 = (b))
+#define RB_9_SET_MODE(b) (TRISBbits.TRISB9 = (b))
+#define RB_8_SET_VAL(b) (PORTBbits.RB8 = (b))
+#define RB_8_SET_MODE(b) (TRISBbits.TRISB8 = (b))
 #define LED_ON (PORTAbits.RA4 = 1)
 #define LED_OFF (PORTAbits.RA4 = 0)
 //Longitud tren de pulsos
-#define TRAIN_PULSE_LENGTH 10
+#define TRAIN_PULSE_LENGTH 3
 //CALCULO TEORICO VELOCIDAD DEL SONIDO
 #define SOUND_VEL(b) (float)(331.228 * sqrtf((b + 273.16)/273.16))
 
@@ -137,13 +164,16 @@ typedef enum {
     CalCero = 0,
     SetEmi,
     SetPeriod,
-    ExitConfig = 15
+    ExitConfig
 } anemometro_config_enum;
 
 typedef enum {
-    SEMI_POSITIVO = 0,
-    SEMI_NEGATIVO,
-    PRIMERA_SAMPLE
+    MAXIMO_GLOBAL = 0,
+    MAXIMO_LOCAL,
+    MINIMO_LOCAL,
+    MINIMO_GLOBAL,
+    CRUCE_CERO,
+    PRIMERA_MUESTRA
 } anemometro_deteccion_enum;
 
 typedef enum {
@@ -173,13 +203,17 @@ void anemometroEmiterSelect(mux_transSelect_enum transd);
 
 float anemometroGetVcoord(mux_transSelect_enum coordV);
 
-BaseType_t anemometroGetProm(float* medOE, float* medNS, uint8_t prom);
+BaseType_t anemometroGetTmode(float* modeA, float* modeB, mux_transSelect_enum coordV);
+
+BaseType_t anemometroVprom(float* medOE, float* medNS, uint8_t Nprom);
+
+BaseType_t anemometroVmode(float* medOE, float* medNS, uint8_t Nmode);
 
 float anemometroGetCoordTime(mux_transSelect_enum coordTime);
 
 void anemometroReceptorDelay(mux_transSelect_enum emisor);
 
-float anemometroCalcMode(float * pData, uint16_t nData);
+BaseType_t anemometroCalcMode(float* pData, float* pMode, uint16_t nData);
 
 void anemometroCalibCero(float Sspeed);
 

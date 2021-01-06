@@ -49,7 +49,7 @@
 #include "semphr.h"
 
 /*Define*/
-#define OUTPUT_FREQ 43000
+#define OUTPUT_FREQ 40000//43000
 /*==================[external functions definition]==========================*/
 void comparadorInit(void);
 

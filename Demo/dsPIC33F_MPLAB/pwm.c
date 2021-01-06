@@ -21,8 +21,8 @@ void comparadorInit(void) {
     //Semaforo usado en la interrupcion
     xSemaphoreComparadorPulsos = xSemaphoreCreateBinary();
 
-    if(xSemaphoreComparadorPulsos == NULL) while(1);
-    
+    if (xSemaphoreComparadorPulsos == NULL) while (1);
+
     /* T3 is used to generate interrupts.  T4 is used to provide an accurate
        time measurement. */
     T3CONbits.TON = 0;
@@ -52,6 +52,8 @@ void comparadorInit(void) {
 
     //Configuro Pin 6 como RP2: OC1 = 10010
     RPOR1bits.RP2R = 18;
+    //Configuro Pin 18 como RP9: OC1 = 10010
+    //    RPOR4bits.RP9R = 18;
 }
 
 void comparador_rtos_init(void) {
@@ -106,16 +108,18 @@ void comparadorPulseTrain_bloq(uint8_t n) {
 void comparadorPulseTrain_NObloq(uint8_t nPulsos) {
     pulseCount = 0;
 
+    //    RB_9_SET(1);
+
     comparadorStart();
 
     while (pulseCount < (2 * nPulsos)) {
         xSemaphoreTake(xSemaphoreComparadorPulsos, portMAX_DELAY);
+        pulseCount++;
     }
     comparadorStop();
 
-    //Activo Mux 2
-    MUX_INPUT_INH(0);
-    
+    //    RB_9_SET(0);
+
     pulseCount = 0;
 }
 
@@ -140,6 +144,7 @@ static void comparador_task(void *pvParameters) {
 
         while (pulseCount < (2 * nPulsos)) {
             xSemaphoreTake(xSemaphoreComparadorPulsos, portMAX_DELAY);
+            pulseCount++;
         }
         //Activo filtro receptor
         //filtroEnable();
@@ -168,10 +173,7 @@ void filtroDisable(void) {
 void __attribute__((interrupt, no_auto_psv)) _OC1Interrupt(void) {
 #ifdef RTOS_AVAILABLE
     BaseType_t xTaskWoken = pdFALSE;
-
-    //Contador global de pulsos (cuenta cada semi-periodo)
-    pulseCount++;
-
+    
     xSemaphoreGiveFromISR(xSemaphoreComparadorPulsos, &xTaskWoken);
 
     //Limpio bandera
