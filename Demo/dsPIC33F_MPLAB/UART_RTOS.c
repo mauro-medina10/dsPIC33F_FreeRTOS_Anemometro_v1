@@ -182,16 +182,8 @@ static void uart_task(void *pvParameters) {
                 }
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    if (medSimple.mag < 555) {
-                        sprintf(msg, "\r\nMedicion: %5.2f m/s ; %3.0f deg  Coord: %s\r\n%c",
-=======
-=======
->>>>>>> dualDMA
                     if (medSimple.mag < 55500) {
                         sprintf(msg, "\r\nMedición: %5.2f m/s ; %3f deg  %s\r\n%c",
->>>>>>> dualDMA
                                 (double) medSimple.mag, (double) medSimple.deg, medSimple.coord, '\0');
                     } else {
                         sprintf(msg, "\r\n NULL     NULL%c", '\0');
@@ -212,15 +204,7 @@ static void uart_task(void *pvParameters) {
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
                     if (medSimple.mag < 55500) {
                         //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        sprintf(msg, "\r\n %5.2f m/s    %3.0f  Coord: %s%c",
-=======
                         sprintf(msg, "\r\n %3.2f     %3.2f  %s%c",
->>>>>>> dualDMA
-=======
-                        sprintf(msg, "\r\n %3.2f     %3.2f  %s%c",
->>>>>>> dualDMA
                                 (double) medSimple.mag, (double) medSimple.deg, medSimple.coord, '\0');
                     } else {
                         sprintf(msg, "\r\n NULL     NULL%c", '\0');
@@ -309,6 +293,7 @@ static void uart_task(void *pvParameters) {
                 }
                 modoConfig = ExitConfig;
                 modoActivo = Menu;
+
                 break;
             default: modoActivo = Menu;
         }
@@ -321,6 +306,7 @@ anemometro_mode_enum uartGetMode(void) {
     if (xQueueReceive(qAnemometroModo, &mod, portMAX_DELAY) == pdTRUE) {
         return mod;
     } else {
+
         return Menu;
     }
 }
@@ -331,15 +317,18 @@ anemometro_config_enum uartGetModeConfig(void) {
     if (xQueueReceive(qAnemometroModoConfig, &mod, portMAX_DELAY) == pdTRUE) {
         return mod;
     } else {
+
         return ExitConfig;
     }
 }
 
 void uartSendMed(wind_medicion_type med) {
+
     xQueueSend(qSendMedicion, &med, portMAX_DELAY);
 }
 
 void uartEndMode(void) {
+
     uint8_t end = '¬';
     xQueueSend(qRecv, &end, portMAX_DELAY);
 }
@@ -363,6 +352,7 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt(void) {
     IFS0bits.U1RXIF = 0;
 
     if (xHigherPriorityTaskWoken != pdFALSE) {
+
         taskYIELD();
     }
 }
