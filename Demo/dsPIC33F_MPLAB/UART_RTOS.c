@@ -183,9 +183,12 @@ static void uart_task(void *pvParameters) {
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                     if (medSimple.mag < 555) {
                         sprintf(msg, "\r\nMedicion: %5.2f m/s ; %3.0f deg  Coord: %s\r\n%c",
 =======
+=======
+>>>>>>> dualDMA
                     if (medSimple.mag < 55500) {
                         sprintf(msg, "\r\nMedición: %5.2f m/s ; %3f deg  %s\r\n%c",
 >>>>>>> dualDMA
@@ -210,7 +213,11 @@ static void uart_task(void *pvParameters) {
                     if (medSimple.mag < 55500) {
                         //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
 <<<<<<< HEAD
+<<<<<<< HEAD
                         sprintf(msg, "\r\n %5.2f m/s    %3.0f  Coord: %s%c",
+=======
+                        sprintf(msg, "\r\n %3.2f     %3.2f  %s%c",
+>>>>>>> dualDMA
 =======
                         sprintf(msg, "\r\n %3.2f     %3.2f  %s%c",
 >>>>>>> dualDMA

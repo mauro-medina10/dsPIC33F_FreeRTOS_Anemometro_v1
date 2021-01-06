@@ -213,11 +213,15 @@ static void anemometro_main_task(void *pvParameters) {
 
                 if (anemometroModoActivo == Medicion_Continua) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                     vTaskDelayUntil(&xLastWakeTime, (TickType_t) (medPeriod * 1000) / portTICK_PERIOD_MS);
                     if (medAborted == 1) {
                         uartSendMed(abortMed);
                         medAborted = 0;
                     }
+=======
+                    //                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
+>>>>>>> dualDMA
 =======
                     //                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
 >>>>>>> dualDMA

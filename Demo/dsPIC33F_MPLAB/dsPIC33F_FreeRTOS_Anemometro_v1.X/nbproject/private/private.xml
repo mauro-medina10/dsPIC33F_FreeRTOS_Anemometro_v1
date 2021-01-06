@@ -6,14 +6,20 @@
             <bookmark id="1">
                 <name/>
 <<<<<<< HEAD
+<<<<<<< HEAD
                 <line>164</line>
 =======
+=======
+>>>>>>> dualDMA
                 <line>188</line>
                 <key/>
             </bookmark>
             <bookmark id="2">
                 <name/>
                 <line>796</line>
+<<<<<<< HEAD
+>>>>>>> dualDMA
+=======
 >>>>>>> dualDMA
                 <key/>
             </bookmark>
@@ -26,9 +32,17 @@
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/UART_RTOS.c</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/UART_RTOS.h</file>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.c</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/anemometroDef.h</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.h</file>
+=======
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/portable/MPLAB/PIC24_dsPIC/port.c</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.c</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/anemometroDef.h</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/pwm.c</file>
+            <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/tasks.c</file>
+>>>>>>> dualDMA
 =======
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Source/portable/MPLAB/PIC24_dsPIC/port.c</file>
             <file>file:/C:/Users/mwa692/Desktop/fceia/anemometro/dspic/dsPIC33F_FreeRTOS_Anemometro_v1/Demo/dsPIC33F_MPLAB/adc.c</file>
