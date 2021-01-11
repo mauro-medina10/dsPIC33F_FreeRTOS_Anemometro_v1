@@ -82,7 +82,7 @@ anemometro_mode_enum uartGetMode(void);
 
 anemometro_config_enum uartGetModeConfig(void);
 
-void uartSendMed(wind_medicion_type med);
+void uartSendMed(wind_medicion_type* med);
 
 void uartEndMode(void);
 

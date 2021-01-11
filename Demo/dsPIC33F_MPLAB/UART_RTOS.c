@@ -78,7 +78,7 @@ void uartInit(void) {
 
     qRecv = xQueueCreate(16, sizeof (char));
 
-    qSendMedicion = xQueueCreate(32, sizeof (wind_medicion_type));
+    qSendMedicion = xQueueCreate(16, sizeof (wind_medicion_type));
 
     if (xSemaphoreUartSend == NULL || qRecv == NULL || qSendMedicion == NULL) {
         while (1);
@@ -166,7 +166,7 @@ static void uart_task(void *pvParameters) {
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 while (modoActivo == Menu || modoActivo == Exit) {
-                    uartSendMenu(menuTemplate);
+                    //                    uartSendMenu(menuTemplate);
 
                     uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
                     if (comando < 53 && comando > 48) {
@@ -322,9 +322,9 @@ anemometro_config_enum uartGetModeConfig(void) {
     }
 }
 
-void uartSendMed(wind_medicion_type med) {
+void uartSendMed(wind_medicion_type* med) {
 
-    xQueueSend(qSendMedicion, &med, portMAX_DELAY);
+    xQueueSend(qSendMedicion, med, portMAX_DELAY);
 }
 
 void uartEndMode(void) {

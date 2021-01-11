@@ -72,10 +72,10 @@
 #define DETECT_LIMIT_HIGH_S 387
 
 //Retardo de cada coordenada respecto al tiempo teorico (calc y medido para viento cero)
-#define DETECTION_ERROR_O 0.00034282164//0.00034337
-#define DETECTION_ERROR_E 0.00036645803//0.00036701		   						  
-#define DETECTION_ERROR_N 0.0003815866//0.00038213
-#define DETECTION_ERROR_S 0.00035885943//0.0003594
+#define DETECTION_ERROR_O 0.000197190
+#define DETECTION_ERROR_E 0.000219920		   						  
+#define DETECTION_ERROR_N 0.000235059
+#define DETECTION_ERROR_S 0.000211449
 
 //Histeresis para tomar el maximo del tren de pulsos
 #define MAX_THRESHOLD_O 0
@@ -108,6 +108,7 @@
 #define N_MED_PROM 20
 #define N_MED_MODE 5
 #define N_TIMER_MODE 16
+#define N_TIMER_MEDIAN 10
 
 
 //definiciones tiempos
@@ -215,6 +216,10 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime);
 void anemometroReceptorDelay(mux_transSelect_enum emisor);
 
 BaseType_t anemometroCalcMode(float* pData, float* pMode, uint16_t nData);
+
+BaseType_t anemometroFindMedian(float* pData, float* pMedian, uint16_t nData);
+
+BaseType_t anemometroGetTmedian(float* medianA, float* medianB, mux_transSelect_enum coordV); 
 
 void anemometroCalibCero(float Sspeed);
 

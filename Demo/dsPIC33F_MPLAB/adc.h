@@ -51,10 +51,11 @@
 #include <stdint.h>
 
 
-#define N_DMA_SAMP 128//255
+#define N_DMA_SAMP 128
 #define DMA_FREQ 1100000
-#define DMA_TOTAL_SAMP 800
-#define PWM_SIGNAL_SAMP 606
+#define DMA_TOTAL_SAMP 950 //Se debe cumplir: DMA_TOTAL_SAMP >= PWM_SIGNAL_SAMP
+#define PWM_SIGNAL_SAMP 911
+#define CORR_ZERO (DMA_TOTAL_SAMP + PWM_SIGNAL_SAMP) / 2
 
 void adc_init(void);
 
@@ -66,7 +67,7 @@ void adc_transdSelect(mux_transSelect_enum transd);
 
 void initDma0(void);
 
-void ads_signalInit(void);
+void adc_signalInit(void);
 
 BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture);
 
