@@ -28,6 +28,8 @@ Command:
   build/default/production/Demo/dsPIC33F_MPLAB/main.o \
   build/default/production/Demo/dsPIC33F_MPLAB/pwm.o \
   build/default/production/Demo/dsPIC33F_MPLAB/timer.o \
+  ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a \
+  ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-coff.a \
   --defsym=__MPLAB_BUILD=1 \
   -Tp33FJ128GP802.gld.00 \
   --heap=0 \
@@ -52,10 +54,20 @@ Command:
   --library=c-elf \
   -end-group \
 
-
-Optional library libp33FJ128GP802.a not found
 Archive member included because of file (symbol)
 
+..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+                              build/default/production/Demo/dsPIC33F_MPLAB/adc.o (_Float2Fract)
+..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
+                              build/default/production/Demo/dsPIC33F_MPLAB/adc.o (_Fract2Float)
+..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(vmax.deo)
+                              build/default/production/Demo/dsPIC33F_MPLAB/adc.o (_VectorMax)
+..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(vcor.deo)
+                              build/default/production/Demo/dsPIC33F_MPLAB/adc.o (_VectorCorrelate)
+..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(vcon.deo)
+                              ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(vcor.deo) (_VectorConvolve)
+
+Optional library libp33FJ128GP802.a not found
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(crt0_standard.o)
                               (__resetPRI)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(data_init_standard.o)
@@ -66,18 +78,26 @@ c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(addsf3.eo)
                               build/default/production/Demo/dsPIC33F_MPLAB/main.o (___subsf3)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(atanf.eo)
                               build/default/production/Demo/dsPIC33F_MPLAB/main.o (_atanf)
+c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(ceilf.eo)
+                              ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo) (_ceilf)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divsf3.eo)
                               build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o (___divsf3)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(errno.eo)
                               c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(atanf.eo) (_errno)
+c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fchop.eo)
+                              c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(ceilf.eo) (__fchop)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(feqltle.eo)
                               build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o (___eqsf2)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fgtge.eo)
-                              build/default/production/Demo/dsPIC33F_MPLAB/main.o (___gtsf2)
+                              build/default/production/Demo/dsPIC33F_MPLAB/adc.o (___gtsf2)
+c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fixsfsi.eo)
+                              ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo) (_(float, int, long long, short, float, short, int))
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
-                              build/default/production/Demo/dsPIC33F_MPLAB/main.o (___floatsisf)
+                              build/default/production/Demo/dsPIC33F_MPLAB/adc.o (___floatsisf)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsisf.eo)
                               build/default/production/Demo/dsPIC33F_MPLAB/adc.o (___floatunsisf)
+c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floorf.eo)
+                              ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo) (_floorf)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fne.eo)
                               build/default/production/Demo/dsPIC33F_MPLAB/main.o (___nesf2)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fpack.eo)
@@ -107,7 +127,7 @@ c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(memcpy.eo)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(stdclean.eo)
                               c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(exit.eo) (__cleanup)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(sprintf_cdnopuxX.XXeo)
-                              build/default/production/Demo/dsPIC33F_MPLAB/adc.o (__sprintf_cdnopuxX)
+                              build/default/production/Demo/dsPIC33F_MPLAB/main.o (__sprintf_cdnopuxX)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdnopuxX.XXeo)
                               c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(sprintf_cdnopuxX.XXeo) (__vfprintf_cdnopuxX)
 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(sprintf_cdfFnopsuxX.XXeo)
@@ -205,13 +225,13 @@ Default Scalar Model: Small
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-.text                        0x200              0x1ae0          0x2850  (10320)
-.const                      0x1ce0               0x57e           0x83d  (2109)
-.text                       0x225e              0x3a08          0x570c  (22284)
-.dinit                      0x5c66               0x1ce           0x2b5  (693)
-.text                       0x5e34               0x4c6           0x729  (1833)
+.text                        0x200              0x1de0          0x2cd0  (11472)
+.const                      0x1fe0               0xeec          0x1662  (5730)
+.text                       0x2ecc              0x3860          0x5490  (21648)
+.dinit                      0x672c               0x1da           0x2c7  (711)
+.text                       0x6906               0x4c6           0x729  (1833)
 
-                 Total "program" memory used (bytes):         0x9177  (37239) 28%
+                 Total "program" memory used (bytes):         0xa1b2  (41394) 31%
 
 
 "data" Memory  [Origin = 0x800, Length = 0x4000]
@@ -220,21 +240,24 @@ section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
 .nbss                        0x800                   0            0x44  (68)
 .ndata                       0x844                   0            0x10  (16)
-.nbss                        0x854                   0            0x22  (34)
-.ndata                       0x876                   0             0x2  (2)
-.nbss                        0x878                   0             0x2  (2)
-.bss                         0x87a                   0          0x1c00  (7168)
-.data                       0x247a                   0           0x160  (352)
-.bss                        0x25da                   0            0x60  (96)
-.data                       0x263a                   0            0x52  (82)
-.bss                        0x268c                   0            0x3c  (60)
-.data                       0x26c8                   0            0x26  (38)
-.bss                        0x26ee                   0             0x6  (6)
-.data                       0x26f4                   0             0x2  (2)
-_0000000002F7C0005ff5ff23    0x4600                   0           0x100  (256)
-_0000000004329F005ff5ff23    0x4700                   0           0x100  (256)
+.nbss                        0x854                   0            0x24  (36)
+.ndata                       0x878                   0             0x2  (2)
+.nbss                        0x87a                   0             0x2  (2)
+.data                        0x87c                   0             0x2  (2)
+_00000000044400005ffc4d28     0x880                   0           0x640  (1600)
+.bss                         0xec0                   0            0x3c  (60)
+_0000000004376F005ffc4d28     0xf00                   0           0x4bc  (1212)
+.bss                        0x13bc                   0          0x1400  (5120)
+.data                       0x27bc                   0           0x160  (352)
+.data                       0x291c                   0            0x52  (82)
+.bss                        0x296e                   0             0x6  (6)
+_00000000044400A05ffc4d28    0x3a80                   0           0xafa  (2810)
+.bss                        0x457a                   0            0x60  (96)
+.data                       0x45da                   0            0x26  (38)
+_00000000044402805ffc4d28    0x4600                   0           0x100  (256)
+_00000000044401E05ffc4d28    0x4700                   0           0x100  (256)
 
-                 Total "data" memory used (bytes):         0x20f6  (8438) 51%
+                 Total "data" memory used (bytes):         0x2eee  (12014) 73%
 
 
 Dynamic Memory Usage
@@ -242,9 +265,9 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                       0x26f6                              0x1f0a  (7946)
+stack                       0x2974                              0x110c  (4364)
 
-                 Maximum dynamic memory (bytes):         0x1f0a  (7946)
+                 Maximum dynamic memory (bytes):         0x110c  (4364)
 
 
 External Symbols in Data Memory (by address):
@@ -259,56 +282,68 @@ External Symbols in Data Memory (by address):
                     0x0850                  _detect_delta_S
                     0x0860                  _DmaBuffer
                     0x0862                  _dataSamples
-                    0x086c                  _anemometroModoActivo
-                    0x086e                  _medProgFlag
-                    0x086f                  _medAborted
-                    0x0870                  _xSemaphoreComparadorPulsos
-                    0x0872                  _xQueueComparadorNumPulsos
-                    0x0874                  _pulseCount
-                    0x0876                  _uxCriticalNesting
-                    0x247a                  __powers_
-                    0x252a                  __npowers_
-                    0x26c8                  __iob
-                    0x26ec                  __Files
-                    0x26ee                  __outdone
-                    0x26ef                  __sibuf
-                    0x26f1                  __sobuf
-                    0x26f4                  ___C30_UART
+                    0x0864                  _rPtr
+                    0x086e                  _anemometroModoActivo
+                    0x0870                  _medProgFlag
+                    0x0871                  _medAborted
+                    0x0872                  _xSemaphoreComparadorPulsos
+                    0x0874                  _xQueueComparadorNumPulsos
+                    0x0876                  _pulseCount
+                    0x0878                  _uxCriticalNesting
+                    0x087c                  ___C30_UART
+                    0x0880                  _xTransSignal
+                    0x0f00                  _uPwmSignal
+                    0x27bc                  __powers_
+                    0x286c                  __npowers_
+                    0x296e                  __outdone
+                    0x296f                  __sibuf
+                    0x2971                  __sobuf
+                    0x3a80                  _rCorrSignal
+                    0x45da                  __iob
+                    0x45fe                  __Files
+                    0x4600                  _BufferB
+                    0x4700                  _BufferA
 
 External Symbols in Data Memory (by name):
 
+                    0x4700                  _BufferA
+                    0x4600                  _BufferB
                     0x0860                  _DmaBuffer
-                    0x26ec                  __Files
-                    0x26f4                  ___C30_UART
-                    0x26c8                  __iob
-                    0x252a                  __npowers_
-                    0x26ee                  __outdone
-                    0x247a                  __powers_
-                    0x26ef                  __sibuf
-                    0x26f1                  __sobuf
-                    0x086c                  _anemometroModoActivo
+                    0x45fe                  __Files
+                    0x087c                  ___C30_UART
+                    0x45da                  __iob
+                    0x286c                  __npowers_
+                    0x296e                  __outdone
+                    0x27bc                  __powers_
+                    0x296f                  __sibuf
+                    0x2971                  __sobuf
+                    0x086e                  _anemometroModoActivo
                     0x0862                  _dataSamples
                     0x0848                  _detect_delta_E
                     0x084c                  _detect_delta_N
                     0x0844                  _detect_delta_O
                     0x0850                  _detect_delta_S
-                    0x086f                  _medAborted
-                    0x086e                  _medProgFlag
+                    0x0871                  _medAborted
+                    0x0870                  _medProgFlag
                     0x0842                  _modoActivo
-                    0x0874                  _pulseCount
+                    0x0876                  _pulseCount
                     0x0824                  _pxCurrentCoRoutine
                     0x0800                  _pxCurrentTCB
                     0x0840                  _pxUartTask
-                    0x0876                  _uxCriticalNesting
-                    0x0872                  _xQueueComparadorNumPulsos
-                    0x0870                  _xSemaphoreComparadorPulsos
+                    0x3a80                  _rCorrSignal
+                    0x0864                  _rPtr
+                    0x0f00                  _uPwmSignal
+                    0x0878                  _uxCriticalNesting
+                    0x0874                  _xQueueComparadorNumPulsos
+                    0x0872                  _xSemaphoreComparadorPulsos
+                    0x0880                  _xTransSignal
 
 External Symbols in Program Memory (by address):
 
                   0x000200                  __resetPRI
                   0x00023c                  __psv_init
-                  0x000252                  __data_init
                   0x000252                  __data_init_standard
+                  0x000252                  __data_init
                   0x0002dc                  __T1Interrupt
                   0x00030c                  __U1RXInterrupt
                   0x000352                  __U1TXInterrupt
@@ -316,198 +351,214 @@ External Symbols in Program Memory (by address):
                   0x0003be                  __OC1Interrupt
                   0x0003f0                  __DefaultInterrupt
                   0x0003f4                  _isspace
-                  0x00049a                  ___subsf3
-                  0x00049c                  ___addsf3
-                  0x000556                  _atanf
-                  0x000620                  ___divsf3
-                  0x0006a4                  ___ltsf2
-                  0x0006a4                  ___eqsf2
-                  0x0006a4                  ___lesf2
-                  0x0006a8                  ___gesf2
-                  0x0006a8                  ___gtsf2
-                  0x0006ac                  ___floatsisf
-                  0x0006b2                  ___floatunsisf
-                  0x0006b6                  ___nesf2
-                  0x0006ba                  __fpack
-                  0x000706                  __funpack
-                  0x000730                  __funpack2
-                  0x000740                  __fPropagateNaN
-                  0x000752                  __fbopExit
-                  0x00075a                  __fbopReturnNaN
-                  0x000760                  ___mulsf3
-                  0x0007c8                  _sqrtf
-                  0x000832                  __fcompare
-                  0x000868                  ___floatdisf
-                  0x000888                  ___floatundisf
-                  0x0008e6                  _strtof
-                  0x000aaa                  _strtod
-                  0x000aac                  _atof
-                  0x000ab0                  _exit
-                  0x000ab8                  _memcpy
-                  0x000ac8                  __sprintf_cdfFnopsuxX
-                  0x000ac8                  __sprintf_cdnopuxX
-                  0x000c84                  __vfprintf_cdnopuxX
-                  0x000c84                  __vfprintf_cdfFnopsuxX
-                  0x001750                  ___adddf3
-                  0x00184c                  ___ltdf2
-                  0x00184c                  ___ledf2
-                  0x00184c                  ___eqdf2
-                  0x001856                  ___gtdf2
-                  0x001856                  ___gedf2
-                  0x001860                  ___divdf3
-                  0x001914                  ___nedf2
-                  0x00191e                  __dpack
-                  0x001976                  __dunpack2
-                  0x001998                  __dreturnNaN
-                  0x00199e                  __dunpack2exit
-                  0x0019a8                  ___extendsfdf2
-                  0x0019e6                  ___fixunsdfdi
-                  0x001a48                  ___floatunsidf
-                  0x001a4c                  _frexpl
-                  0x001a4c                  _frexp
-                  0x001a88                  ___muldf3
-                  0x001b74                  ___subdf3
-                  0x001b78                  ___udivsi3
-                  0x001b98                  ___umodsi3
-                  0x001b9e                  ___mulsi3
-                  0x001b9e                  ___mulp32peds3
-                  0x001b9e                  ___mulp32eds3
-                  0x001baa                  __dcompare
-                  0x001bfc                  __dPropagateNaN
-                  0x001c18                  __dtype
-                  0x001c3c                  __dunpack
-                  0x001c8a                  ___floatundidf
-                  0x00225e                  _main
-                  0x002296                  build/default/production/Demo/dsPIC33F_MPLAB/main.o:_anemometro_main_task
-                  0x002522                  _anemometroGetTmode
-                  0x0025ac                  _anemometroGetVcoord
-                  0x002748                  _anemometroVmode
-                  0x0028d6                  _anemometroVprom
-                  0x0029de                  _anemometroGetCoordTime
-                  0x002a76                  _anemometroGetMed
-                  0x002dfc                  _anemometroTdetectedFromISR
-                  0x002e16                  _anemometroEmiterSelect
-                  0x002e22                  _anemometroSendFloat
-                  0x002e36                  _anemometroRecvFloat
-                  0x002e4a                  _anemometroReceptorDelay
-                  0x002e82                  _anemometroMuxOutputSelect
-                  0x002ed6                  _anemometroCalcMode
-                  0x003014                  _anemometroCalibCero
-                  0x0030d2                  _anemometroAbortMed
-                  0x0030e8                  _anemometroDelayTest
-                  0x003286                  _vApplicationIdleHook
-                  0x00328c                  _xTaskCreate
-                  0x003438                  _vTaskDelayUntil
-                  0x0034e0                  _vTaskDelay
-                  0x003512                  _eTaskGetState
-                  0x00356e                  _vTaskPrioritySet
-                  0x003644                  _vTaskSuspend
-                  0x0036da                  _vTaskResume
-                  0x003738                  _xTaskResumeFromISR
-                  0x0037a2                  _vTaskStartScheduler
-                  0x0037de                  _vTaskEndScheduler
-                  0x0037f6                  _vTaskSuspendAll
-                  0x00384a                  _xTaskResumeAll
-                  0x0038f4                  _xTaskGetTickCount
-                  0x003906                  _xTaskGetTickCountFromISR
-                  0x00391c                  _uxTaskGetNumberOfTasks
-                  0x003924                  _pcTaskGetName
-                  0x00393e                  _vTaskStepTick
-                  0x003954                  _xTaskAbortDelay
-                  0x0039c0                  _xTaskIncrementTick
-                  0x003ac4                  _vTaskSwitchContext
-                  0x003b28                  _vTaskPlaceOnEventList
-                  0x003b46                  _vTaskPlaceOnUnorderedEventList
-                  0x003b74                  _xTaskRemoveFromEventList
-                  0x003be4                  _xTaskRemoveFromUnorderedEventList
-                  0x003c4a                  _vTaskSetTimeOutState
-                  0x003c62                  _xTaskCheckForTimeOut
-                  0x003d02                  _vTaskMissedYield
-                  0x003d0c                  build/default/production/Source/tasks.o:_prvIdleTask
-                  0x003d3c                  _eTaskConfirmSleepModeStatus
-                  0x003ddc                  _uxTaskResetEventItemValue
-                  0x003e00                  _ulTaskNotifyTake
-                  0x003e74                  _xTaskNotifyWait
-                  0x003f38                  _xTaskGenericNotify
-                  0x004022                  _xTaskGenericNotifyFromISR
-                  0x00412a                  _vTaskNotifyGiveFromISR
-                  0x0041b4                  _xTaskNotifyStateClear
-                  0x004270                  _xQueueGenericReset
-                  0x0042f8                  _xQueueGenericCreate
-                  0x004372                  _xQueueGenericSend
-                  0x00445c                  _xQueueGenericSendFromISR
-                  0x0044ce                  _xQueueGiveFromISR
-                  0x00453a                  _xQueueGenericReceive
-                  0x00464c                  _xQueueReceiveFromISR
-                  0x0046bc                  _xQueuePeekFromISR
-                  0x0046f4                  _uxQueueMessagesWaiting
-                  0x004708                  _uxQueueSpacesAvailable
-                  0x004726                  _uxQueueMessagesWaitingFromISR
-                  0x004736                  _vQueueDelete
-                  0x0048c0                  _xQueueIsQueueEmptyFromISR
-                  0x004900                  _xQueueIsQueueFullFromISR
-                  0x004920                  _xQueueCRSend
-                  0x0049d2                  _xQueueCRReceive
-                  0x004ab4                  _xQueueCRSendFromISR
-                  0x004af6                  _xQueueCRReceiveFromISR
-                  0x004b76                  _uartInit_RTOS
-                  0x004bc8                  _uartSendMenu
-                  0x004c2c                  _uartInit
-                  0x004cba                  _uartRecv
-                  0x004d32                  _uartSend
-                  0x004da2                  build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o:_uart_task
-                  0x00513c                  _uartGetMode
-                  0x00515c                  _uartGetModeConfig
-                  0x00517c                  _uartSendMed
-                  0x00519a                  _uartEndMode
-                  0x0051b0                  _adc_init
-                  0x005220                  _adc_start
-                  0x00522c                  _initDma0
-                  0x00525c                  _adc_stop
-                  0x00526a                  _dma_ceroAligned
-                  0x0052fa                  _dma_ceroCalib
-                  0x00539c                  _dma_capturePulse
-                  0x005482                  _dma_detectPulse
-                  0x005720                  _xCoRoutineCreate
-                  0x0057c0                  _vCoRoutineAddToDelayedList
-                  0x00593e                  _vCoRoutineSchedule
-                  0x0059de                  _xCoRoutineRemoveFromEventList
-                  0x005a16                  _pvPortMalloc
-                  0x005afa                  _vPortFree
-                  0x005b4a                  _xPortGetFreeHeapSize
-                  0x005b52                  _xPortGetMinimumEverFreeHeapSize
-                  0x005b5a                  _vPortInitialiseBlocks
-                  0x005e34                  _comparadorInit
-                  0x005e8e                  _comparador_rtos_init
-                  0x005ebc                  _comparadorStart
-                  0x005ed0                  _comparadorStop
-                  0x005ee0                  _comparadorPulseTrain_bloq
-                  0x005f00                  _comparadorPulseTrain_NObloq
-                  0x005f30                  _comparadorPulseTrainRTOS
-                  0x005f4c                  build/default/production/Demo/dsPIC33F_MPLAB/pwm.o:_comparador_task
-                  0x005f8a                  _filtroEnable
-                  0x005f92                  _filtroDisable
-                  0x005f9c                  _vListInitialise
-                  0x005fd2                  _vListInitialiseItem
-                  0x005fe0                  _vListInsertEnd
-                  0x00601c                  _vListInsert
-                  0x00608e                  _uxListRemove
-                  0x0060d6                  _pxPortInitialiseStack
-                  0x006166                  _xPortStartScheduler
-                  0x0061aa                  _vPortEndScheduler
-                  0x0061d8                  _vPortEnterCritical
-                  0x0061f2                  _vPortExitCritical
-                  0x00620e                  _vPortYield
-                  0x00628a                  _timerInit
-                  0x0062ac                  _timerStart
-                  0x0062b8                  _timerStop
-                  0x0062c0                  _timerCount
+                  0x000498                  _Float2Fract
+                  0x00062a                  _Fract2Float
+                  0x00063e                  _VectorMax
+                  0x000658                  _VectorCorrelate
+                  0x000674                  _VectorConvolve
+                  0x0006ea                  ___subsf3
+                  0x0006ec                  ___addsf3
+                  0x0007a6                  _atanf
+                  0x000870                  _ceilf
+                  0x000880                  ___divsf3
+                  0x000904                  __fchop
+                  0x000952                  ___eqsf2
+                  0x000952                  ___ltsf2
+                  0x000952                  ___lesf2
+                  0x000956                  ___gtsf2
+                  0x000956                  ___gesf2
+                  0x00095a                  ___fixsfsi
+                  0x00099c                  ___floatsisf
+                  0x0009a2                  ___floatunsisf
+                  0x0009a6                  _floorf
+                  0x0009b6                  ___nesf2
+                  0x0009ba                  __fpack
+                  0x000a06                  __funpack
+                  0x000a30                  __funpack2
+                  0x000a40                  __fPropagateNaN
+                  0x000a52                  __fbopExit
+                  0x000a5a                  __fbopReturnNaN
+                  0x000a60                  ___mulsf3
+                  0x000ac8                  _sqrtf
+                  0x000b32                  __fcompare
+                  0x000b68                  ___floatdisf
+                  0x000b88                  ___floatundisf
+                  0x000be6                  _strtof
+                  0x000daa                  _strtod
+                  0x000dac                  _atof
+                  0x000db0                  _exit
+                  0x000db8                  _memcpy
+                  0x000dc8                  __sprintf_cdfFnopsuxX
+                  0x000dc8                  __sprintf_cdnopuxX
+                  0x000f84                  __vfprintf_cdnopuxX
+                  0x000f84                  __vfprintf_cdfFnopsuxX
+                  0x001a50                  ___adddf3
+                  0x001b4c                  ___eqdf2
+                  0x001b4c                  ___ltdf2
+                  0x001b4c                  ___ledf2
+                  0x001b56                  ___gtdf2
+                  0x001b56                  ___gedf2
+                  0x001b60                  ___divdf3
+                  0x001c14                  ___nedf2
+                  0x001c1e                  __dpack
+                  0x001c76                  __dunpack2
+                  0x001c98                  __dreturnNaN
+                  0x001c9e                  __dunpack2exit
+                  0x001ca8                  ___extendsfdf2
+                  0x001ce6                  ___fixunsdfdi
+                  0x001d48                  ___floatunsidf
+                  0x001d4c                  _frexpl
+                  0x001d4c                  _frexp
+                  0x001d88                  ___muldf3
+                  0x001e74                  ___subdf3
+                  0x001e78                  ___udivsi3
+                  0x001e98                  ___umodsi3
+                  0x001e9e                  ___mulp32eds3
+                  0x001e9e                  ___mulsi3
+                  0x001e9e                  ___mulp32peds3
+                  0x001eaa                  __dcompare
+                  0x001efc                  __dPropagateNaN
+                  0x001f18                  __dtype
+                  0x001f3c                  __dunpack
+                  0x001f8a                  ___floatundidf
+                  0x00210a                  _uSignal
+                  0x002ecc                  _main
+                  0x002f04                  build/default/production/Demo/dsPIC33F_MPLAB/main.o:_anemometro_main_task
+                  0x003190                  _anemometroGetTmode
+                  0x00321a                  _anemometroGetVcoord
+                  0x0033b6                  _anemometroVmode
+                  0x003544                  _anemometroVprom
+                  0x00364c                  _anemometroGetCoordTime
+                  0x0036e4                  _anemometroGetMed
+                  0x003a6a                  _anemometroTdetectedFromISR
+                  0x003a84                  _anemometroEmiterSelect
+                  0x003a90                  _anemometroSendFloat
+                  0x003aa4                  _anemometroRecvFloat
+                  0x003ab8                  _anemometroReceptorDelay
+                  0x003af0                  _anemometroMuxOutputSelect
+                  0x003b44                  _anemometroCalcMode
+                  0x003c82                  _anemometroCalibCero
+                  0x003d40                  _anemometroAbortMed
+                  0x003d56                  _anemometroDelayTest
+                  0x003ef4                  _vApplicationIdleHook
+                  0x003efa                  _xTaskCreate
+                  0x0040a6                  _vTaskDelayUntil
+                  0x00414e                  _vTaskDelay
+                  0x004180                  _eTaskGetState
+                  0x0041dc                  _vTaskPrioritySet
+                  0x0042b2                  _vTaskSuspend
+                  0x004348                  _vTaskResume
+                  0x0043a6                  _xTaskResumeFromISR
+                  0x004410                  _vTaskStartScheduler
+                  0x00444c                  _vTaskEndScheduler
+                  0x004464                  _vTaskSuspendAll
+                  0x0044b8                  _xTaskResumeAll
+                  0x004562                  _xTaskGetTickCount
+                  0x004574                  _xTaskGetTickCountFromISR
+                  0x00458a                  _uxTaskGetNumberOfTasks
+                  0x004592                  _pcTaskGetName
+                  0x0045ac                  _vTaskStepTick
+                  0x0045c2                  _xTaskAbortDelay
+                  0x00462e                  _xTaskIncrementTick
+                  0x004732                  _vTaskSwitchContext
+                  0x004796                  _vTaskPlaceOnEventList
+                  0x0047b4                  _vTaskPlaceOnUnorderedEventList
+                  0x0047e2                  _xTaskRemoveFromEventList
+                  0x004852                  _xTaskRemoveFromUnorderedEventList
+                  0x0048b8                  _vTaskSetTimeOutState
+                  0x0048d0                  _xTaskCheckForTimeOut
+                  0x004970                  _vTaskMissedYield
+                  0x00497a                  build/default/production/Source/tasks.o:_prvIdleTask
+                  0x0049aa                  _eTaskConfirmSleepModeStatus
+                  0x004a4a                  _uxTaskResetEventItemValue
+                  0x004a6e                  _ulTaskNotifyTake
+                  0x004ae2                  _xTaskNotifyWait
+                  0x004ba6                  _xTaskGenericNotify
+                  0x004c90                  _xTaskGenericNotifyFromISR
+                  0x004d98                  _vTaskNotifyGiveFromISR
+                  0x004e22                  _xTaskNotifyStateClear
+                  0x004ede                  _xQueueGenericReset
+                  0x004f66                  _xQueueGenericCreate
+                  0x004fe0                  _xQueueGenericSend
+                  0x0050ca                  _xQueueGenericSendFromISR
+                  0x00513c                  _xQueueGiveFromISR
+                  0x0051a8                  _xQueueGenericReceive
+                  0x0052ba                  _xQueueReceiveFromISR
+                  0x00532a                  _xQueuePeekFromISR
+                  0x005362                  _uxQueueMessagesWaiting
+                  0x005376                  _uxQueueSpacesAvailable
+                  0x005394                  _uxQueueMessagesWaitingFromISR
+                  0x0053a4                  _vQueueDelete
+                  0x00552e                  _xQueueIsQueueEmptyFromISR
+                  0x00556e                  _xQueueIsQueueFullFromISR
+                  0x00558e                  _xQueueCRSend
+                  0x005640                  _xQueueCRReceive
+                  0x005722                  _xQueueCRSendFromISR
+                  0x005764                  _xQueueCRReceiveFromISR
+                  0x0057e4                  _uartInit_RTOS
+                  0x005836                  _uartSendMenu
+                  0x00589a                  _uartInit
+                  0x005928                  _uartRecv
+                  0x0059bc                  _uartSend
+                  0x005a2c                  build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o:_uart_task
+                  0x005dc6                  _uartGetMode
+                  0x005de6                  _uartGetModeConfig
+                  0x005e06                  _uartSendMed
+                  0x005e24                  _uartEndMode
+                  0x005e3a                  _adc_init
+                  0x005eac                  _ads_signalInit
+                  0x005ede                  _adc_start
+                  0x005eea                  _initDma0
+                  0x005f1a                  _adc_stop
+                  0x005f28                  _dma_ceroAligned
+                  0x005fb8                  _dma_ceroCalib
+                  0x00605a                  _dma_capturePulse
+                  0x006180                  _dma_detectPulse
+                  0x0061e6                  _xCoRoutineCreate
+                  0x006286                  _vCoRoutineAddToDelayedList
+                  0x006404                  _vCoRoutineSchedule
+                  0x0064a4                  _xCoRoutineRemoveFromEventList
+                  0x0064dc                  _pvPortMalloc
+                  0x0065c0                  _vPortFree
+                  0x006610                  _xPortGetFreeHeapSize
+                  0x006618                  _xPortGetMinimumEverFreeHeapSize
+                  0x006620                  _vPortInitialiseBlocks
+                  0x006906                  _comparadorInit
+                  0x006960                  _comparador_rtos_init
+                  0x00698e                  _comparadorStart
+                  0x0069a2                  _comparadorStop
+                  0x0069b2                  _comparadorPulseTrain_bloq
+                  0x0069d2                  _comparadorPulseTrain_NObloq
+                  0x006a02                  _comparadorPulseTrainRTOS
+                  0x006a1e                  build/default/production/Demo/dsPIC33F_MPLAB/pwm.o:_comparador_task
+                  0x006a5c                  _filtroEnable
+                  0x006a64                  _filtroDisable
+                  0x006a6e                  _vListInitialise
+                  0x006aa4                  _vListInitialiseItem
+                  0x006ab2                  _vListInsertEnd
+                  0x006aee                  _vListInsert
+                  0x006b60                  _uxListRemove
+                  0x006ba8                  _pxPortInitialiseStack
+                  0x006c38                  _xPortStartScheduler
+                  0x006c7c                  _vPortEndScheduler
+                  0x006caa                  _vPortEnterCritical
+                  0x006cc4                  _vPortExitCritical
+                  0x006ce0                  _vPortYield
+                  0x006d5c                  _timerInit
+                  0x006d7e                  _timerStart
+                  0x006d8a                  _timerStop
+                  0x006d92                  _timerCount
                   0xf80000                  __FBS.sec
                   0xf80002                  __FSS.sec
                   0xf80004                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
+                  0x000498                  _Float2Fract
+                  0x00062a                  _Fract2Float
+                  0x000674                  _VectorConvolve
+                  0x000658                  _VectorCorrelate
+                  0x00063e                  _VectorMax
                   0x000384                  __DMA0Interrupt
                   0x0003f0                  __DefaultInterrupt
                   0xf80000                  __FBS.sec
@@ -517,197 +568,203 @@ External Symbols in Program Memory (by name):
                   0x0002dc                  __T1Interrupt
                   0x00030c                  __U1RXInterrupt
                   0x000352                  __U1TXInterrupt
-                  0x001750                  ___adddf3
-                  0x00049c                  ___addsf3
-                  0x001860                  ___divdf3
-                  0x000620                  ___divsf3
-                  0x00184c                  ___eqdf2
-                  0x0006a4                  ___eqsf2
-                  0x0019a8                  ___extendsfdf2
-                  0x0019e6                  ___fixunsdfdi
-                  0x000868                  ___floatdisf
-                  0x0006ac                  ___floatsisf
-                  0x001c8a                  ___floatundidf
-                  0x000888                  ___floatundisf
-                  0x001a48                  ___floatunsidf
-                  0x0006b2                  ___floatunsisf
-                  0x001856                  ___gedf2
-                  0x0006a8                  ___gesf2
-                  0x001856                  ___gtdf2
-                  0x0006a8                  ___gtsf2
-                  0x00184c                  ___ledf2
-                  0x0006a4                  ___lesf2
-                  0x00184c                  ___ltdf2
-                  0x0006a4                  ___ltsf2
-                  0x001a88                  ___muldf3
-                  0x001b9e                  ___mulp32eds3
-                  0x001b9e                  ___mulp32peds3
-                  0x000760                  ___mulsf3
-                  0x001b9e                  ___mulsi3
-                  0x001914                  ___nedf2
-                  0x0006b6                  ___nesf2
-                  0x001b74                  ___subdf3
-                  0x00049a                  ___subsf3
-                  0x001b78                  ___udivsi3
-                  0x001b98                  ___umodsi3
-                  0x001bfc                  __dPropagateNaN
+                  0x001a50                  ___adddf3
+                  0x0006ec                  ___addsf3
+                  0x001b60                  ___divdf3
+                  0x000880                  ___divsf3
+                  0x001b4c                  ___eqdf2
+                  0x000952                  ___eqsf2
+                  0x001ca8                  ___extendsfdf2
+                  0x00095a                  ___fixsfsi
+                  0x001ce6                  ___fixunsdfdi
+                  0x000b68                  ___floatdisf
+                  0x00099c                  ___floatsisf
+                  0x001f8a                  ___floatundidf
+                  0x000b88                  ___floatundisf
+                  0x001d48                  ___floatunsidf
+                  0x0009a2                  ___floatunsisf
+                  0x001b56                  ___gedf2
+                  0x000956                  ___gesf2
+                  0x001b56                  ___gtdf2
+                  0x000956                  ___gtsf2
+                  0x001b4c                  ___ledf2
+                  0x000952                  ___lesf2
+                  0x001b4c                  ___ltdf2
+                  0x000952                  ___ltsf2
+                  0x001d88                  ___muldf3
+                  0x001e9e                  ___mulp32eds3
+                  0x001e9e                  ___mulp32peds3
+                  0x000a60                  ___mulsf3
+                  0x001e9e                  ___mulsi3
+                  0x001c14                  ___nedf2
+                  0x0009b6                  ___nesf2
+                  0x001e74                  ___subdf3
+                  0x0006ea                  ___subsf3
+                  0x001e78                  ___udivsi3
+                  0x001e98                  ___umodsi3
+                  0x001efc                  __dPropagateNaN
                   0x000252                  __data_init
                   0x000252                  __data_init_standard
-                  0x001baa                  __dcompare
-                  0x00191e                  __dpack
-                  0x001998                  __dreturnNaN
-                  0x001c18                  __dtype
-                  0x001c3c                  __dunpack
-                  0x001976                  __dunpack2
-                  0x00199e                  __dunpack2exit
-                  0x000740                  __fPropagateNaN
-                  0x000752                  __fbopExit
-                  0x00075a                  __fbopReturnNaN
-                  0x000832                  __fcompare
-                  0x0006ba                  __fpack
-                  0x000706                  __funpack
-                  0x000730                  __funpack2
+                  0x001eaa                  __dcompare
+                  0x001c1e                  __dpack
+                  0x001c98                  __dreturnNaN
+                  0x001f18                  __dtype
+                  0x001f3c                  __dunpack
+                  0x001c76                  __dunpack2
+                  0x001c9e                  __dunpack2exit
+                  0x000a40                  __fPropagateNaN
+                  0x000a52                  __fbopExit
+                  0x000a5a                  __fbopReturnNaN
+                  0x000904                  __fchop
+                  0x000b32                  __fcompare
+                  0x0009ba                  __fpack
+                  0x000a06                  __funpack
+                  0x000a30                  __funpack2
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
-                  0x000ac8                  __sprintf_cdfFnopsuxX
-                  0x000ac8                  __sprintf_cdnopuxX
-                  0x000c84                  __vfprintf_cdfFnopsuxX
-                  0x000c84                  __vfprintf_cdnopuxX
-                  0x0051b0                  _adc_init
-                  0x005220                  _adc_start
-                  0x00525c                  _adc_stop
-                  0x0030d2                  _anemometroAbortMed
-                  0x002ed6                  _anemometroCalcMode
-                  0x003014                  _anemometroCalibCero
-                  0x0030e8                  _anemometroDelayTest
-                  0x002e16                  _anemometroEmiterSelect
-                  0x0029de                  _anemometroGetCoordTime
-                  0x002a76                  _anemometroGetMed
-                  0x002522                  _anemometroGetTmode
-                  0x0025ac                  _anemometroGetVcoord
-                  0x002e82                  _anemometroMuxOutputSelect
-                  0x002e4a                  _anemometroReceptorDelay
-                  0x002e36                  _anemometroRecvFloat
-                  0x002e22                  _anemometroSendFloat
-                  0x002dfc                  _anemometroTdetectedFromISR
-                  0x002748                  _anemometroVmode
-                  0x0028d6                  _anemometroVprom
-                  0x000556                  _atanf
-                  0x000aac                  _atof
-                  0x005e34                  _comparadorInit
-                  0x005f30                  _comparadorPulseTrainRTOS
-                  0x005f00                  _comparadorPulseTrain_NObloq
-                  0x005ee0                  _comparadorPulseTrain_bloq
-                  0x005ebc                  _comparadorStart
-                  0x005ed0                  _comparadorStop
-                  0x005e8e                  _comparador_rtos_init
-                  0x00539c                  _dma_capturePulse
-                  0x00526a                  _dma_ceroAligned
-                  0x0052fa                  _dma_ceroCalib
-                  0x005482                  _dma_detectPulse
-                  0x003d3c                  _eTaskConfirmSleepModeStatus
-                  0x003512                  _eTaskGetState
-                  0x000ab0                  _exit
-                  0x005f92                  _filtroDisable
-                  0x005f8a                  _filtroEnable
-                  0x001a4c                  _frexp
-                  0x001a4c                  _frexpl
-                  0x00522c                  _initDma0
+                  0x000dc8                  __sprintf_cdfFnopsuxX
+                  0x000dc8                  __sprintf_cdnopuxX
+                  0x000f84                  __vfprintf_cdfFnopsuxX
+                  0x000f84                  __vfprintf_cdnopuxX
+                  0x005e3a                  _adc_init
+                  0x005ede                  _adc_start
+                  0x005f1a                  _adc_stop
+                  0x005eac                  _ads_signalInit
+                  0x003d40                  _anemometroAbortMed
+                  0x003b44                  _anemometroCalcMode
+                  0x003c82                  _anemometroCalibCero
+                  0x003d56                  _anemometroDelayTest
+                  0x003a84                  _anemometroEmiterSelect
+                  0x00364c                  _anemometroGetCoordTime
+                  0x0036e4                  _anemometroGetMed
+                  0x003190                  _anemometroGetTmode
+                  0x00321a                  _anemometroGetVcoord
+                  0x003af0                  _anemometroMuxOutputSelect
+                  0x003ab8                  _anemometroReceptorDelay
+                  0x003aa4                  _anemometroRecvFloat
+                  0x003a90                  _anemometroSendFloat
+                  0x003a6a                  _anemometroTdetectedFromISR
+                  0x0033b6                  _anemometroVmode
+                  0x003544                  _anemometroVprom
+                  0x0007a6                  _atanf
+                  0x000dac                  _atof
+                  0x000870                  _ceilf
+                  0x006906                  _comparadorInit
+                  0x006a02                  _comparadorPulseTrainRTOS
+                  0x0069d2                  _comparadorPulseTrain_NObloq
+                  0x0069b2                  _comparadorPulseTrain_bloq
+                  0x00698e                  _comparadorStart
+                  0x0069a2                  _comparadorStop
+                  0x006960                  _comparador_rtos_init
+                  0x00605a                  _dma_capturePulse
+                  0x005f28                  _dma_ceroAligned
+                  0x005fb8                  _dma_ceroCalib
+                  0x006180                  _dma_detectPulse
+                  0x0049aa                  _eTaskConfirmSleepModeStatus
+                  0x004180                  _eTaskGetState
+                  0x000db0                  _exit
+                  0x006a64                  _filtroDisable
+                  0x006a5c                  _filtroEnable
+                  0x0009a6                  _floorf
+                  0x001d4c                  _frexp
+                  0x001d4c                  _frexpl
+                  0x005eea                  _initDma0
                   0x0003f4                  _isspace
-                  0x00225e                  _main
-                  0x000ab8                  _memcpy
-                  0x003924                  _pcTaskGetName
-                  0x005a16                  _pvPortMalloc
-                  0x0060d6                  _pxPortInitialiseStack
-                  0x0007c8                  _sqrtf
-                  0x000aaa                  _strtod
-                  0x0008e6                  _strtof
-                  0x0062c0                  _timerCount
-                  0x00628a                  _timerInit
-                  0x0062ac                  _timerStart
-                  0x0062b8                  _timerStop
-                  0x00519a                  _uartEndMode
-                  0x00513c                  _uartGetMode
-                  0x00515c                  _uartGetModeConfig
-                  0x004c2c                  _uartInit
-                  0x004b76                  _uartInit_RTOS
-                  0x004cba                  _uartRecv
-                  0x004d32                  _uartSend
-                  0x00517c                  _uartSendMed
-                  0x004bc8                  _uartSendMenu
-                  0x003e00                  _ulTaskNotifyTake
-                  0x00608e                  _uxListRemove
-                  0x0046f4                  _uxQueueMessagesWaiting
-                  0x004726                  _uxQueueMessagesWaitingFromISR
-                  0x004708                  _uxQueueSpacesAvailable
-                  0x00391c                  _uxTaskGetNumberOfTasks
-                  0x003ddc                  _uxTaskResetEventItemValue
-                  0x003286                  _vApplicationIdleHook
-                  0x0057c0                  _vCoRoutineAddToDelayedList
-                  0x00593e                  _vCoRoutineSchedule
-                  0x005f9c                  _vListInitialise
-                  0x005fd2                  _vListInitialiseItem
-                  0x00601c                  _vListInsert
-                  0x005fe0                  _vListInsertEnd
-                  0x0061aa                  _vPortEndScheduler
-                  0x0061d8                  _vPortEnterCritical
-                  0x0061f2                  _vPortExitCritical
-                  0x005afa                  _vPortFree
-                  0x005b5a                  _vPortInitialiseBlocks
-                  0x00620e                  _vPortYield
-                  0x004736                  _vQueueDelete
-                  0x0034e0                  _vTaskDelay
-                  0x003438                  _vTaskDelayUntil
-                  0x0037de                  _vTaskEndScheduler
-                  0x003d02                  _vTaskMissedYield
-                  0x00412a                  _vTaskNotifyGiveFromISR
-                  0x003b28                  _vTaskPlaceOnEventList
-                  0x003b46                  _vTaskPlaceOnUnorderedEventList
-                  0x00356e                  _vTaskPrioritySet
-                  0x0036da                  _vTaskResume
-                  0x003c4a                  _vTaskSetTimeOutState
-                  0x0037a2                  _vTaskStartScheduler
-                  0x00393e                  _vTaskStepTick
-                  0x003644                  _vTaskSuspend
-                  0x0037f6                  _vTaskSuspendAll
-                  0x003ac4                  _vTaskSwitchContext
-                  0x005720                  _xCoRoutineCreate
-                  0x0059de                  _xCoRoutineRemoveFromEventList
-                  0x005b4a                  _xPortGetFreeHeapSize
-                  0x005b52                  _xPortGetMinimumEverFreeHeapSize
-                  0x006166                  _xPortStartScheduler
-                  0x0049d2                  _xQueueCRReceive
-                  0x004af6                  _xQueueCRReceiveFromISR
-                  0x004920                  _xQueueCRSend
-                  0x004ab4                  _xQueueCRSendFromISR
-                  0x0042f8                  _xQueueGenericCreate
-                  0x00453a                  _xQueueGenericReceive
-                  0x004270                  _xQueueGenericReset
-                  0x004372                  _xQueueGenericSend
-                  0x00445c                  _xQueueGenericSendFromISR
-                  0x0044ce                  _xQueueGiveFromISR
-                  0x0048c0                  _xQueueIsQueueEmptyFromISR
-                  0x004900                  _xQueueIsQueueFullFromISR
-                  0x0046bc                  _xQueuePeekFromISR
-                  0x00464c                  _xQueueReceiveFromISR
-                  0x003954                  _xTaskAbortDelay
-                  0x003c62                  _xTaskCheckForTimeOut
-                  0x00328c                  _xTaskCreate
-                  0x003f38                  _xTaskGenericNotify
-                  0x004022                  _xTaskGenericNotifyFromISR
-                  0x0038f4                  _xTaskGetTickCount
-                  0x003906                  _xTaskGetTickCountFromISR
-                  0x0039c0                  _xTaskIncrementTick
-                  0x0041b4                  _xTaskNotifyStateClear
-                  0x003e74                  _xTaskNotifyWait
-                  0x003b74                  _xTaskRemoveFromEventList
-                  0x003be4                  _xTaskRemoveFromUnorderedEventList
-                  0x00384a                  _xTaskResumeAll
-                  0x003738                  _xTaskResumeFromISR
-                  0x004da2                  build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o:_uart_task
-                  0x002296                  build/default/production/Demo/dsPIC33F_MPLAB/main.o:_anemometro_main_task
-                  0x005f4c                  build/default/production/Demo/dsPIC33F_MPLAB/pwm.o:_comparador_task
-                  0x003d0c                  build/default/production/Source/tasks.o:_prvIdleTask
+                  0x002ecc                  _main
+                  0x000db8                  _memcpy
+                  0x004592                  _pcTaskGetName
+                  0x0064dc                  _pvPortMalloc
+                  0x006ba8                  _pxPortInitialiseStack
+                  0x000ac8                  _sqrtf
+                  0x000daa                  _strtod
+                  0x000be6                  _strtof
+                  0x006d92                  _timerCount
+                  0x006d5c                  _timerInit
+                  0x006d7e                  _timerStart
+                  0x006d8a                  _timerStop
+                  0x00210a                  _uSignal
+                  0x005e24                  _uartEndMode
+                  0x005dc6                  _uartGetMode
+                  0x005de6                  _uartGetModeConfig
+                  0x00589a                  _uartInit
+                  0x0057e4                  _uartInit_RTOS
+                  0x005928                  _uartRecv
+                  0x0059bc                  _uartSend
+                  0x005e06                  _uartSendMed
+                  0x005836                  _uartSendMenu
+                  0x004a6e                  _ulTaskNotifyTake
+                  0x006b60                  _uxListRemove
+                  0x005362                  _uxQueueMessagesWaiting
+                  0x005394                  _uxQueueMessagesWaitingFromISR
+                  0x005376                  _uxQueueSpacesAvailable
+                  0x00458a                  _uxTaskGetNumberOfTasks
+                  0x004a4a                  _uxTaskResetEventItemValue
+                  0x003ef4                  _vApplicationIdleHook
+                  0x006286                  _vCoRoutineAddToDelayedList
+                  0x006404                  _vCoRoutineSchedule
+                  0x006a6e                  _vListInitialise
+                  0x006aa4                  _vListInitialiseItem
+                  0x006aee                  _vListInsert
+                  0x006ab2                  _vListInsertEnd
+                  0x006c7c                  _vPortEndScheduler
+                  0x006caa                  _vPortEnterCritical
+                  0x006cc4                  _vPortExitCritical
+                  0x0065c0                  _vPortFree
+                  0x006620                  _vPortInitialiseBlocks
+                  0x006ce0                  _vPortYield
+                  0x0053a4                  _vQueueDelete
+                  0x00414e                  _vTaskDelay
+                  0x0040a6                  _vTaskDelayUntil
+                  0x00444c                  _vTaskEndScheduler
+                  0x004970                  _vTaskMissedYield
+                  0x004d98                  _vTaskNotifyGiveFromISR
+                  0x004796                  _vTaskPlaceOnEventList
+                  0x0047b4                  _vTaskPlaceOnUnorderedEventList
+                  0x0041dc                  _vTaskPrioritySet
+                  0x004348                  _vTaskResume
+                  0x0048b8                  _vTaskSetTimeOutState
+                  0x004410                  _vTaskStartScheduler
+                  0x0045ac                  _vTaskStepTick
+                  0x0042b2                  _vTaskSuspend
+                  0x004464                  _vTaskSuspendAll
+                  0x004732                  _vTaskSwitchContext
+                  0x0061e6                  _xCoRoutineCreate
+                  0x0064a4                  _xCoRoutineRemoveFromEventList
+                  0x006610                  _xPortGetFreeHeapSize
+                  0x006618                  _xPortGetMinimumEverFreeHeapSize
+                  0x006c38                  _xPortStartScheduler
+                  0x005640                  _xQueueCRReceive
+                  0x005764                  _xQueueCRReceiveFromISR
+                  0x00558e                  _xQueueCRSend
+                  0x005722                  _xQueueCRSendFromISR
+                  0x004f66                  _xQueueGenericCreate
+                  0x0051a8                  _xQueueGenericReceive
+                  0x004ede                  _xQueueGenericReset
+                  0x004fe0                  _xQueueGenericSend
+                  0x0050ca                  _xQueueGenericSendFromISR
+                  0x00513c                  _xQueueGiveFromISR
+                  0x00552e                  _xQueueIsQueueEmptyFromISR
+                  0x00556e                  _xQueueIsQueueFullFromISR
+                  0x00532a                  _xQueuePeekFromISR
+                  0x0052ba                  _xQueueReceiveFromISR
+                  0x0045c2                  _xTaskAbortDelay
+                  0x0048d0                  _xTaskCheckForTimeOut
+                  0x003efa                  _xTaskCreate
+                  0x004ba6                  _xTaskGenericNotify
+                  0x004c90                  _xTaskGenericNotifyFromISR
+                  0x004562                  _xTaskGetTickCount
+                  0x004574                  _xTaskGetTickCountFromISR
+                  0x00462e                  _xTaskIncrementTick
+                  0x004e22                  _xTaskNotifyStateClear
+                  0x004ae2                  _xTaskNotifyWait
+                  0x0047e2                  _xTaskRemoveFromEventList
+                  0x004852                  _xTaskRemoveFromUnorderedEventList
+                  0x0044b8                  _xTaskResumeAll
+                  0x0043a6                  _xTaskResumeFromISR
+                  0x005a2c                  build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o:_uart_task
+                  0x002f04                  build/default/production/Demo/dsPIC33F_MPLAB/main.o:_anemometro_main_task
+                  0x006a1e                  build/default/production/Demo/dsPIC33F_MPLAB/pwm.o:_comparador_task
+                  0x00497a                  build/default/production/Source/tasks.o:_prvIdleTask
 
 Memory Configuration
 
@@ -746,6 +803,8 @@ LOAD build/default/production/Demo/dsPIC33F_MPLAB/adc.o
 LOAD build/default/production/Demo/dsPIC33F_MPLAB/main.o
 LOAD build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
 LOAD build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+LOAD ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a
+LOAD ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-coff.a
                     0x0001                  __MPLAB_BUILD = 0x1
 LOAD p33FJ128GP802
 LOAD c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libfx-elf.a
@@ -777,7 +836,7 @@ LOAD c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libfx-elf.a
                   0x000002          0x2 SHORT 0x0 ((ABSOLUTE (__reset) >> 0x10) & 0x7f)
                   0x000003          0x2 SHORT 0x0
 
-.text             0x000200       0x1ae0
+.text             0x000200       0x1de0
  *(.init)
  .init            0x000200         0x4c c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(crt0_standard.o)
                   0x000200                  __resetPRI
@@ -810,167 +869,185 @@ LOAD c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libfx-elf.a
                   0x000414                  _write
  *(.libm)
  *(.libdsp)
+ .libdsp          0x000498        0x192 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+                  0x000498                  _Float2Fract
+ .libdsp          0x00062a         0x14 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
+                  0x00062a                  _Fract2Float
+ .libdsp          0x00063e         0x1a ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(vmax.deo)
+                  0x00063e                  _VectorMax
+ .libdsp          0x000658         0x1c ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(vcor.deo)
+                  0x000658                  _VectorCorrelate
+ .libdsp          0x000674         0x74 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(vcon.deo)
+                  0x000674                  _VectorConvolve
  *(.lib*)
  .libpic30_crt_start_mode
-                  0x000498          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(crt_start_mode_normal.eo)
-                  0x000498                  __crt_start_mode
-                  0x000498                  __crt_start_mode_normal
- .libm.subsf3     0x00049a         0xbc c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(addsf3.eo)
-                  0x00049a                  ___subsf3
-                  0x00049c                  ___addsf3
- .libm.atanf      0x000556         0xca c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(atanf.eo)
-                  0x000556                  _atanf
- .libm.divfs3     0x000620         0x84 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divsf3.eo)
-                  0x000620                  ___divsf3
- .libm.eqsf2      0x0006a4          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(feqltle.eo)
-                  0x0006a4                  ___eqsf2
-                  0x0006a4                  ___ltsf2
-                  0x0006a4                  ___lesf2
- .libm.gtsf2      0x0006a8          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fgtge.eo)
-                  0x0006a8                  ___gesf2
-                  0x0006a8                  ___gtsf2
+                  0x0006e8          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(crt_start_mode_normal.eo)
+                  0x0006e8                  __crt_start_mode
+                  0x0006e8                  __crt_start_mode_normal
+ .libm.subsf3     0x0006ea         0xbc c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(addsf3.eo)
+                  0x0006ea                  ___subsf3
+                  0x0006ec                  ___addsf3
+ .libm.atanf      0x0007a6         0xca c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(atanf.eo)
+                  0x0007a6                  _atanf
+ .libm.ceilf      0x000870         0x10 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(ceilf.eo)
+                  0x000870                  _ceilf
+ .libm.divfs3     0x000880         0x84 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divsf3.eo)
+                  0x000880                  ___divsf3
+ .libm.fchop      0x000904         0x4e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fchop.eo)
+                  0x000904                  __fchop
+ .libm.eqsf2      0x000952          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(feqltle.eo)
+                  0x000952                  ___eqsf2
+                  0x000952                  ___ltsf2
+                  0x000952                  ___lesf2
+ .libm.gtsf2      0x000956          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fgtge.eo)
+                  0x000956                  ___gesf2
+                  0x000956                  ___gtsf2
+ .libm.fixsfsi    0x00095a         0x42 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fixsfsi.eo)
+                  0x00095a                  _(float, int, long long, short, float, short, int)
  .libm.floatsisf
-                  0x0006ac          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
-                  0x0006ac                  ___floatsisf
+                  0x00099c          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
+                  0x00099c                  ___floatsisf
  .libm.floatunsisf
-                  0x0006b2          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsisf.eo)
-                  0x0006b2                  ___floatunsisf
- .libm.nesf2      0x0006b6          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fne.eo)
-                  0x0006b6                  ___nesf2
- .libm.fpack      0x0006ba         0x4c c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fpack.eo)
-                  0x0006ba                  __fpack
- .libm.funpack    0x000706         0x2a c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(funpack.eo)
-                  0x000706                  __funpack
+                  0x0009a2          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsisf.eo)
+                  0x0009a2                  ___floatunsisf
+ .libm.floorf     0x0009a6         0x10 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floorf.eo)
+                  0x0009a6                  _floorf
+ .libm.nesf2      0x0009b6          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fne.eo)
+                  0x0009b6                  ___nesf2
+ .libm.fpack      0x0009ba         0x4c c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fpack.eo)
+                  0x0009ba                  __fpack
+ .libm.funpack    0x000a06         0x2a c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(funpack.eo)
+                  0x000a06                  __funpack
  .libm.funpack2
-                  0x000730         0x10 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(funpack2.eo)
-                  0x000730                  __funpack2
+                  0x000a30         0x10 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(funpack2.eo)
+                  0x000a30                  __funpack2
  .libm.fPropagateNaN
-                  0x000740         0x12 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(futil.eo)
-                  0x000740                  __fPropagateNaN
+                  0x000a40         0x12 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(futil.eo)
+                  0x000a40                  __fPropagateNaN
  .libm.fbobExit
-                  0x000752          0x8 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(futil.eo)
-                  0x000752                  __fbopExit
+                  0x000a52          0x8 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(futil.eo)
+                  0x000a52                  __fbopExit
  .libm.fbopReturnNaN
-                  0x00075a          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(futil.eo)
-                  0x00075a                  __fbopReturnNaN
- .libm.mulsf3     0x000760         0x68 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(mulsf3.eo)
-                  0x000760                  ___mulsf3
- .libm.sqrtf      0x0007c8         0x6a c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(sqrtf.eo)
-                  0x0007c8                  _sqrtf
+                  0x000a5a          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(futil.eo)
+                  0x000a5a                  __fbopReturnNaN
+ .libm.mulsf3     0x000a60         0x68 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(mulsf3.eo)
+                  0x000a60                  ___mulsf3
+ .libm.sqrtf      0x000ac8         0x6a c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(sqrtf.eo)
+                  0x000ac8                  _sqrtf
  .libm.fcompare
-                  0x000832         0x36 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fcompare.eo)
-                  0x000832                  __fcompare
+                  0x000b32         0x36 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fcompare.eo)
+                  0x000b32                  __fcompare
  .libm.floatdisf
-                  0x000868         0x20 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatdisf.eo)
-                  0x000868                  ___floatdisf
+                  0x000b68         0x20 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatdisf.eo)
+                  0x000b68                  ___floatdisf
  .libm.floatundisf
-                  0x000888         0x5e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
-                  0x000888                  ___floatundisf
- .libc.strtof     0x0008e6        0x1c4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(atof.eo)
-                  0x0008e6                  _strtof
- .libc.strtod     0x000aaa          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(atof.eo)
-                  0x000aaa                  _strtod
- .libc.atof       0x000aac          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(atof.eo)
-                  0x000aac                  _atof
- .libc.exit       0x000ab0          0x8 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(exit.eo)
-                  0x000ab0                  _exit
- .libc.memcpy     0x000ab8          0xe c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(memcpy.eo)
-                  0x000ab8                  _memcpy
+                  0x000b88         0x5e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
+                  0x000b88                  ___floatundisf
+ .libc.strtof     0x000be6        0x1c4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(atof.eo)
+                  0x000be6                  _strtof
+ .libc.strtod     0x000daa          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(atof.eo)
+                  0x000daa                  _strtod
+ .libc.atof       0x000dac          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(atof.eo)
+                  0x000dac                  _atof
+ .libc.exit       0x000db0          0x8 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(exit.eo)
+                  0x000db0                  _exit
+ .libc.memcpy     0x000db8          0xe c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(memcpy.eo)
+                  0x000db8                  _memcpy
  .libc._cleanup
-                  0x000ac6          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(stdclean.eo)
-                  0x000ac6                  __cleanup
+                  0x000dc6          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(stdclean.eo)
+                  0x000dc6                  __cleanup
  .libc._sprintf_cdfFnopsuxX
-                  0x000ac8         0x2c c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(sprintf_cdfFnopsuxX.XXeo)
-                  0x000ac8                  __sprintf_cdnopuxX
-                  0x000ac8                  __sprintf_cdfFnopsuxX
- .libc.fround     0x000af4         0xba c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
- .libc.scale      0x000bae         0xc4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
- .libc.sputc      0x000c72         0x12 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
+                  0x000dc8         0x2c c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(sprintf_cdfFnopsuxX.XXeo)
+                  0x000dc8                  __sprintf_cdnopuxX
+                  0x000dc8                  __sprintf_cdfFnopsuxX
+ .libc.fround     0x000df4         0xba c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
+ .libc.scale      0x000eae         0xc4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
+ .libc.sputc      0x000f72         0x12 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
  .libc._vfprintf_cdfFnopsuxX
-                  0x000c84        0x9c2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
-                  0x000c84                  __vfprintf_cdnopuxX
-                  0x000c84                  __vfprintf_cdfFnopsuxX
- .libc.fputc      0x001646         0x86 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(fputc.eo)
-                  0x001646                  _fputc
- .libc._flsbuf    0x0016cc         0x7e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(flsbuf.eo)
-                  0x0016cc                  __flsbuf
- .libc.dowrite    0x00174a          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(write.eo)
- *fill*           0x00174e          0x400
- .libm.adddf3     0x001750         0xfc c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(adddf3.eo)
-                  0x001750                  ___adddf3
- .libm.eqdf2      0x00184c          0xa c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(deqltle.eo)
-                  0x00184c                  ___eqdf2
-                  0x00184c                  ___ltdf2
-                  0x00184c                  ___ledf2
- .libm.gtdf2      0x001856          0xa c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dgtge.eo)
-                  0x001856                  ___gtdf2
-                  0x001856                  ___gedf2
- .libm.divdf3     0x001860         0xb4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divdf3.eo)
-                  0x001860                  ___divdf3
- .libm.nedf2      0x001914          0xa c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dne.eo)
-                  0x001914                  ___nedf2
- .libm.dpack      0x00191e         0x58 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dpack.eo)
-                  0x00191e                  __dpack
+                  0x000f84        0x9c2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
+                  0x000f84                  __vfprintf_cdnopuxX
+                  0x000f84                  __vfprintf_cdfFnopsuxX
+ .libc.fputc      0x001946         0x86 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(fputc.eo)
+                  0x001946                  _fputc
+ .libc._flsbuf    0x0019cc         0x7e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(flsbuf.eo)
+                  0x0019cc                  __flsbuf
+ .libc.dowrite    0x001a4a          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(write.eo)
+ *fill*           0x001a4e          0x400
+ .libm.adddf3     0x001a50         0xfc c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(adddf3.eo)
+                  0x001a50                  ___adddf3
+ .libm.eqdf2      0x001b4c          0xa c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(deqltle.eo)
+                  0x001b4c                  ___eqdf2
+                  0x001b4c                  ___ltdf2
+                  0x001b4c                  ___ledf2
+ .libm.gtdf2      0x001b56          0xa c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dgtge.eo)
+                  0x001b56                  ___gtdf2
+                  0x001b56                  ___gedf2
+ .libm.divdf3     0x001b60         0xb4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divdf3.eo)
+                  0x001b60                  ___divdf3
+ .libm.nedf2      0x001c14          0xa c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dne.eo)
+                  0x001c14                  ___nedf2
+ .libm.dpack      0x001c1e         0x58 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dpack.eo)
+                  0x001c1e                  __dpack
  .libm.dunpack2
-                  0x001976         0x32 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dunpack2.eo)
-                  0x001976                  __dunpack2
-                  0x001998                  __dreturnNaN
-                  0x00199e                  __dunpack2exit
+                  0x001c76         0x32 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dunpack2.eo)
+                  0x001c76                  __dunpack2
+                  0x001c98                  __dreturnNaN
+                  0x001c9e                  __dunpack2exit
  .libm.extendsfdf2
-                  0x0019a8         0x3e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(extendsfdf.eo)
-                  0x0019a8                  ___extendsfdf2
+                  0x001ca8         0x3e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(extendsfdf.eo)
+                  0x001ca8                  ___extendsfdf2
  .libm.fixunsdfdi
-                  0x0019e6         0x62 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fixunsdfdi.eo)
-                  0x0019e6                  ___fixunsdfdi
+                  0x001ce6         0x62 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fixunsdfdi.eo)
+                  0x001ce6                  ___fixunsdfdi
  .libm.floatunsidf
-                  0x001a48          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsidf.eo)
-                  0x001a48                  ___floatunsidf
- .libm.frexp      0x001a4c         0x3a c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(frexp.eo)
-                  0x001a4c                  _frexp
-                  0x001a4c                  _frexpl
- *fill*           0x001a86          0x400
- .libm.muldf3     0x001a88         0xec c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(muldf3.eo)
-                  0x001a88                  ___muldf3
- .libm.subdf3     0x001b74          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(subdf3.eo)
-                  0x001b74                  ___subdf3
- .libm.udivsi3    0x001b78         0x20 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(udivsi3.eo)
-                  0x001b78                  ___udivsi3
- .libm.umodsi3    0x001b98          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(umodsi3.eo)
-                  0x001b98                  ___umodsi3
- .libm.mulsi3     0x001b9e          0xc c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(mulsi3.eo)
-                  0x001b9e                  ___mulp32peds3
-                  0x001b9e                  ___mulsi3
-                  0x001b9e                  ___mulp32eds3
+                  0x001d48          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsidf.eo)
+                  0x001d48                  ___floatunsidf
+ .libm.frexp      0x001d4c         0x3a c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(frexp.eo)
+                  0x001d4c                  _frexp
+                  0x001d4c                  _frexpl
+ *fill*           0x001d86          0x400
+ .libm.muldf3     0x001d88         0xec c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(muldf3.eo)
+                  0x001d88                  ___muldf3
+ .libm.subdf3     0x001e74          0x4 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(subdf3.eo)
+                  0x001e74                  ___subdf3
+ .libm.udivsi3    0x001e78         0x20 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(udivsi3.eo)
+                  0x001e78                  ___udivsi3
+ .libm.umodsi3    0x001e98          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(umodsi3.eo)
+                  0x001e98                  ___umodsi3
+ .libm.mulsi3     0x001e9e          0xc c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(mulsi3.eo)
+                  0x001e9e                  ___mulp32peds3
+                  0x001e9e                  ___mulsi3
+                  0x001e9e                  ___mulp32eds3
  .libm.dcompare
-                  0x001baa         0x52 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dcompare.eo)
-                  0x001baa                  __dcompare
+                  0x001eaa         0x52 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dcompare.eo)
+                  0x001eaa                  __dcompare
  .libm.dPropagateNaN
-                  0x001bfc         0x1c c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dpropagateNaN.eo)
-                  0x001bfc                  __dPropagateNaN
- .libm.dtype      0x001c18         0x24 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dtype.eo)
-                  0x001c18                  __dtype
- .libm.dunpack    0x001c3c         0x4e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dunpack.eo)
-                  0x001c3c                  __dunpack
+                  0x001efc         0x1c c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dpropagateNaN.eo)
+                  0x001efc                  __dPropagateNaN
+ .libm.dtype      0x001f18         0x24 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dtype.eo)
+                  0x001f18                  __dtype
+ .libm.dunpack    0x001f3c         0x4e c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dunpack.eo)
+                  0x001f3c                  __dunpack
  .libm.floatundidf
-                  0x001c8a         0x56 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatundidf.eo)
-                  0x001c8a                  ___floatundidf
+                  0x001f8a         0x56 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatundidf.eo)
+                  0x001f8a                  ___floatundidf
 
 usercode
  *(usercode)
 
 __FBS             0xf80000          0x2
  *(__FBS.sec*)
- __FBS.sec        0xf80000          0x2 /CW/_FBS`È@
+ __FBS.sec        0xf80000          0x2 /CW/_FBS€îA
                   0xf80000                  __FBS.sec
 
 __FSS             0xf80002          0x2
  *(__FSS.sec*)
- __FSS.sec        0xf80002          0x2 /CW/_FSSp×?
+ __FSS.sec        0xf80002          0x2 /CW/_FSSP¾A
                   0xf80002                  __FSS.sec
 
 __FGS             0xf80004          0x2
  *(__FGS.sec*)
- __FGS.sec        0xf80004          0x2 /CW/_FGSÐ7@
+ __FGS.sec        0xf80004          0x2 /CW/_FGSÐ=A
                   0xf80004                  __FGS.sec
 
 __FOSCSEL
@@ -1003,7 +1080,7 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000       0xa865
+.debug_info       0x000000       0xac10
  *(.debug_info)
  .debug_info      0x000000        0x990 build/default/production/Source/croutine.o
  .debug_info      0x000990        0x435 build/default/production/Source/list.o
@@ -1013,13 +1090,15 @@ __FUID3
  .debug_info      0x004740         0xaa build/default/production/Source/portable/MPLAB/PIC24_dsPIC/portasm_dsPIC.o
  .debug_info      0x0047ea        0x510 build/default/production/Source/portable/MemMang/heap_4.o
  .debug_info      0x004cfa       0x15c7 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
- .debug_info      0x0062c1       0x18a8 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
- .debug_info      0x007b69       0x182e build/default/production/Demo/dsPIC33F_MPLAB/main.o
- .debug_info      0x009397       0x1001 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
- .debug_info      0x00a398        0x4cd build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_info      0x0062c1       0x1948 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+ .debug_info      0x007c09       0x182e build/default/production/Demo/dsPIC33F_MPLAB/main.o
+ .debug_info      0x009437       0x1001 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+ .debug_info      0x00a438        0x4cd build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_info      0x00a905        0x18c ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+ .debug_info      0x00aa91        0x17f ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000       0x118b
+.debug_abbrev     0x000000       0x1291
  *(.debug_abbrev)
  .debug_abbrev    0x000000        0x207 build/default/production/Source/croutine.o
  .debug_abbrev    0x000207         0xda build/default/production/Source/list.o
@@ -1029,12 +1108,14 @@ __FUID3
  .debug_abbrev    0x000884         0x14 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/portasm_dsPIC.o
  .debug_abbrev    0x000898        0x120 build/default/production/Source/portable/MemMang/heap_4.o
  .debug_abbrev    0x0009b8        0x220 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
- .debug_abbrev    0x000bd8        0x185 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
- .debug_abbrev    0x000d5d        0x209 build/default/production/Demo/dsPIC33F_MPLAB/main.o
- .debug_abbrev    0x000f66        0x138 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
- .debug_abbrev    0x00109e         0xed build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_abbrev    0x000bd8        0x1c9 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+ .debug_abbrev    0x000da1        0x209 build/default/production/Demo/dsPIC33F_MPLAB/main.o
+ .debug_abbrev    0x000faa        0x138 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+ .debug_abbrev    0x0010e2         0xed build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_abbrev    0x0011cf         0x61 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+ .debug_abbrev    0x001230         0x61 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
 
-.debug_line       0x000000       0x18ce
+.debug_line       0x000000       0x19c6
  *(.debug_line)
  .debug_line      0x000000        0x1c7 build/default/production/Source/croutine.o
  .debug_line      0x0001c7        0x111 build/default/production/Source/list.o
@@ -1043,13 +1124,15 @@ __FUID3
  .debug_line      0x000a8b        0x1a7 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
  .debug_line      0x000c32         0x9b build/default/production/Source/portable/MPLAB/PIC24_dsPIC/portasm_dsPIC.o
  .debug_line      0x000ccd        0x10e build/default/production/Source/portable/MemMang/heap_4.o
- .debug_line      0x000ddb        0x270 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
- .debug_line      0x00104b        0x237 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
- .debug_line      0x001282        0x38d build/default/production/Demo/dsPIC33F_MPLAB/main.o
- .debug_line      0x00160f        0x1b9 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
- .debug_line      0x0017c8        0x106 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_line      0x000ddb        0x272 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
+ .debug_line      0x00104d        0x25c build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+ .debug_line      0x0012a9        0x38d build/default/production/Demo/dsPIC33F_MPLAB/main.o
+ .debug_line      0x001636        0x1b9 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+ .debug_line      0x0017ef        0x106 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_line      0x0018f5         0x7e ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+ .debug_line      0x001973         0x53 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
 
-.debug_frame      0x000000       0x120e
+.debug_frame      0x000000       0x1294
  *(.debug_frame)
  .debug_frame     0x000000         0xca build/default/production/Source/croutine.o
  .debug_frame     0x0000ca         0x96 build/default/production/Source/list.o
@@ -1058,12 +1141,14 @@ __FUID3
  .debug_frame     0x00087e         0xf6 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
  .debug_frame     0x000974         0xca build/default/production/Source/portable/MemMang/heap_4.o
  .debug_frame     0x000a3e        0x1fe build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
- .debug_frame     0x000c3c        0x13a build/default/production/Demo/dsPIC33F_MPLAB/adc.o
- .debug_frame     0x000d76        0x2c6 build/default/production/Demo/dsPIC33F_MPLAB/main.o
- .debug_frame     0x00103c        0x156 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
- .debug_frame     0x001192         0x7c build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_frame     0x000c3c        0x14c build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+ .debug_frame     0x000d88        0x2c6 build/default/production/Demo/dsPIC33F_MPLAB/main.o
+ .debug_frame     0x00104e        0x156 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+ .debug_frame     0x0011a4         0x7c build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_frame     0x001220         0x50 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+ .debug_frame     0x001270         0x24 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
 
-.debug_str        0x000000        0x5f6
+.debug_str        0x000000        0x61a
  *(.debug_str)
  .debug_str       0x000000         0x50 build/default/production/Source/croutine.o
  .debug_str       0x000050         0x2b build/default/production/Source/list.o
@@ -1071,10 +1156,10 @@ __FUID3
  .debug_str       0x0001a4        0x16b build/default/production/Source/tasks.o
  .debug_str       0x00030f         0x37 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
  .debug_str       0x000346         0x91 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
- .debug_str       0x0003d7         0xa6 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
- .debug_str       0x00047d         0xd7 build/default/production/Demo/dsPIC33F_MPLAB/main.o
- .debug_str       0x000554         0x8e build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
- .debug_str       0x0005e2         0x14 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_str       0x0003d7         0xca build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+ .debug_str       0x0004a1         0xd7 build/default/production/Demo/dsPIC33F_MPLAB/main.o
+ .debug_str       0x000578         0x8e build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+ .debug_str       0x000606         0x14 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
 
 .debug_loc
  *(.debug_loc)
@@ -1083,7 +1168,7 @@ __FUID3
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0xd05
+                  0x000000        0xdb9
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0x96 build/default/production/Source/croutine.o
@@ -1100,18 +1185,22 @@ __FUID3
  .debug_pubnames
                   0x00078a         0xe6 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
  .debug_pubnames
-                  0x000870         0xc7 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                  0x000870        0x137 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
  .debug_pubnames
-                  0x000937        0x241 build/default/production/Demo/dsPIC33F_MPLAB/main.o
+                  0x0009a7        0x241 build/default/production/Demo/dsPIC33F_MPLAB/main.o
  .debug_pubnames
-                  0x000b78        0x141 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+                  0x000be8        0x141 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
  .debug_pubnames
-                  0x000cb9         0x4c build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+                  0x000d29         0x4c build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_pubnames
+                  0x000d75         0x22 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+ .debug_pubnames
+                  0x000d97         0x22 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
 
 .debug_ranges
  *(.debug_ranges)
 
-.debug_aranges    0x000000        0x120
+.debug_aranges    0x000000        0x150
  *(.debug_aranges)
  .debug_aranges
                   0x000000         0x18 build/default/production/Source/croutine.o
@@ -1137,6 +1226,10 @@ __FUID3
                   0x0000f0         0x18 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
  .debug_aranges
                   0x000108         0x18 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_aranges
+                  0x000120         0x18 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+ .debug_aranges
+                  0x000138         0x18 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
                     0x0000                  WREG0 = 0x0
                     0x0000                  _WREG0 = 0x0
                     0x0002                  WREG1 = 0x2
@@ -2108,180 +2201,198 @@ LOAD c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a
 LOAD c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a
 END GROUP
 OUTPUT(dist/default/production/dsPIC33F_FreeRTOS_Anemometro_v2.X.production.elf elf32-pic30)
-LOAD /CW/_FGSÐ7@
-LOAD /CW/_FSSp×?
-LOAD /CW/_FBS`È@
+LOAD /CW/_FGSÐ=A
+LOAD /CW/_FSSP¾A
+LOAD /CW/_FBS€îA
 LOAD jump_table
 LOAD default_isr
 LOAD data_init
 
 .debug_pubtypes
-                  0x000120        0xdd4
+                  0x000150        0xe07
  .debug_pubtypes
-                  0x000120        0x120 build/default/production/Source/croutine.o
+                  0x000150        0x120 build/default/production/Source/croutine.o
  .debug_pubtypes
-                  0x000240         0x98 build/default/production/Source/list.o
+                  0x000270         0x98 build/default/production/Source/list.o
  .debug_pubtypes
-                  0x0002d8        0x148 build/default/production/Source/queue.o
+                  0x000308        0x148 build/default/production/Source/queue.o
  .debug_pubtypes
-                  0x000420        0x1bd build/default/production/Source/tasks.o
+                  0x000450        0x1bd build/default/production/Source/tasks.o
  .debug_pubtypes
-                  0x0005dd        0x118 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
+                  0x00060d        0x118 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
  .debug_pubtypes
-                  0x0006f5         0x4a build/default/production/Source/portable/MemMang/heap_4.o
+                  0x000725         0x4a build/default/production/Source/portable/MemMang/heap_4.o
  .debug_pubtypes
-                  0x00073f        0x1ff build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
+                  0x00076f        0x1ff build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
  .debug_pubtypes
-                  0x00093e        0x202 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                  0x00096e        0x1f3 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
  .debug_pubtypes
-                  0x000b40        0x1c8 build/default/production/Demo/dsPIC33F_MPLAB/main.o
+                  0x000b61        0x1c8 build/default/production/Demo/dsPIC33F_MPLAB/main.o
  .debug_pubtypes
-                  0x000d08        0x182 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+                  0x000d29        0x182 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
  .debug_pubtypes
-                  0x000e8a         0x6a build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+                  0x000eab         0x6a build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+ .debug_pubtypes
+                  0x000f15         0x21 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
+ .debug_pubtypes
+                  0x000f36         0x21 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
 
 __c30_signature
-                  0x000ef4        0x186
+                  0x000f57        0x1aa
  __c30_signature
-                  0x000ef4          0x6 build/default/production/Source/croutine.o
+                  0x000f57          0x6 build/default/production/Source/croutine.o
  __c30_signature
-                  0x000efa          0x6 build/default/production/Source/list.o
+                  0x000f5d          0x6 build/default/production/Source/list.o
  __c30_signature
-                  0x000f00          0x6 build/default/production/Source/queue.o
+                  0x000f63          0x6 build/default/production/Source/queue.o
  __c30_signature
-                  0x000f06          0x6 build/default/production/Source/tasks.o
+                  0x000f69          0x6 build/default/production/Source/tasks.o
  __c30_signature
-                  0x000f0c          0x6 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
+                  0x000f6f          0x6 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
  __c30_signature
-                  0x000f12          0x6 build/default/production/Source/portable/MemMang/heap_4.o
+                  0x000f75          0x6 build/default/production/Source/portable/MemMang/heap_4.o
  __c30_signature
-                  0x000f18          0x6 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
+                  0x000f7b          0x6 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
  __c30_signature
-                  0x000f1e          0x6 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                  0x000f81          0x6 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
  __c30_signature
-                  0x000f24          0x6 build/default/production/Demo/dsPIC33F_MPLAB/main.o
+                  0x000f87          0x6 build/default/production/Demo/dsPIC33F_MPLAB/main.o
  __c30_signature
-                  0x000f2a          0x6 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+                  0x000f8d          0x6 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
  __c30_signature
-                  0x000f30          0x6 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+                  0x000f93          0x6 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
  __c30_signature
-                  0x000f36          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(crt0_standard.o)
+                  0x000f99          0x6 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(flt2frct.deo)
  __c30_signature
-                  0x000f3c          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(data_init_standard.o)
+                  0x000f9f          0x6 ..\..\..\Program Files\Microchip\xc16\v1.50\lib\libdsp-elf.a(frct2flt.deo)
  __c30_signature
-                  0x000f42          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(addsf3.eo)
+                  0x000fa5          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(crt0_standard.o)
  __c30_signature
-                  0x000f48          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(atanf.eo)
+                  0x000fab          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(data_init_standard.o)
  __c30_signature
-                  0x000f4e          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divsf3.eo)
+                  0x000fb1          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(addsf3.eo)
  __c30_signature
-                  0x000f54          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(errno.eo)
+                  0x000fb7          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(atanf.eo)
  __c30_signature
-                  0x000f5a          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(feqltle.eo)
+                  0x000fbd          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(ceilf.eo)
  __c30_signature
-                  0x000f60          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fgtge.eo)
+                  0x000fc3          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divsf3.eo)
  __c30_signature
-                  0x000f66          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
+                  0x000fc9          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(errno.eo)
  __c30_signature
-                  0x000f6c          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsisf.eo)
+                  0x000fcf          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fchop.eo)
  __c30_signature
-                  0x000f72          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fne.eo)
+                  0x000fd5          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(feqltle.eo)
  __c30_signature
-                  0x000f78          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fpack.eo)
+                  0x000fdb          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fgtge.eo)
  __c30_signature
-                  0x000f7e          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(funpack.eo)
+                  0x000fe1          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fixsfsi.eo)
  __c30_signature
-                  0x000f84          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(funpack2.eo)
+                  0x000fe7          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
  __c30_signature
-                  0x000f8a          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(futil.eo)
+                  0x000fed          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsisf.eo)
  __c30_signature
-                  0x000f90          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(mulsf3.eo)
+                  0x000ff3          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floorf.eo)
  __c30_signature
-                  0x000f96          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(sqrtf.eo)
+                  0x000ff9          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fne.eo)
  __c30_signature
-                  0x000f9c          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fcompare.eo)
+                  0x000fff          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fpack.eo)
  __c30_signature
-                  0x000fa2          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatdisf.eo)
+                  0x001005          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(funpack.eo)
  __c30_signature
-                  0x000fa8          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
+                  0x00100b          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(funpack2.eo)
  __c30_signature
-                  0x000fae          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(atof.eo)
+                  0x001011          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(futil.eo)
  __c30_signature
-                  0x000fb4          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(exit.eo)
+                  0x001017          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(mulsf3.eo)
  __c30_signature
-                  0x000fba          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(memcpy.eo)
+                  0x00101d          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(sqrtf.eo)
  __c30_signature
-                  0x000fc0          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(stdclean.eo)
+                  0x001023          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fcompare.eo)
  __c30_signature
-                  0x000fc6          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(sprintf_cdfFnopsuxX.XXeo)
+                  0x001029          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatdisf.eo)
  __c30_signature
-                  0x000fcc          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
+                  0x00102f          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
  __c30_signature
-                  0x000fd2          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(fputc.eo)
+                  0x001035          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(atof.eo)
  __c30_signature
-                  0x000fd8          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(_iob.eo)
+                  0x00103b          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(exit.eo)
  __c30_signature
-                  0x000fde          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(powers.dXXeo)
+                  0x001041          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(memcpy.eo)
  __c30_signature
-                  0x000fe4          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(flsbuf.eo)
+                  0x001047          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(stdclean.eo)
  __c30_signature
-                  0x000fea          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(_exit.eo)
+                  0x00104d          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(sprintf_cdfFnopsuxX.XXeo)
  __c30_signature
-                  0x000ff0          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(write.eo)
+                  0x001053          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
  __c30_signature
-                  0x000ff6          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(c30_uart.eo)
+                  0x001059          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(fputc.eo)
  __c30_signature
-                  0x000ffc          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(adddf3.eo)
+                  0x00105f          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(_iob.eo)
  __c30_signature
-                  0x001002          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(deqltle.eo)
+                  0x001065          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(powers.dXXeo)
  __c30_signature
-                  0x001008          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dgtge.eo)
+                  0x00106b          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(flsbuf.eo)
  __c30_signature
-                  0x00100e          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divdf3.eo)
+                  0x001071          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(_exit.eo)
  __c30_signature
-                  0x001014          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dne.eo)
+                  0x001077          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(write.eo)
  __c30_signature
-                  0x00101a          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dpack.eo)
+                  0x00107d          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(c30_uart.eo)
  __c30_signature
-                  0x001020          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dunpack2.eo)
+                  0x001083          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(adddf3.eo)
  __c30_signature
-                  0x001026          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(extendsfdf.eo)
+                  0x001089          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(deqltle.eo)
  __c30_signature
-                  0x00102c          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fixunsdfdi.eo)
+                  0x00108f          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dgtge.eo)
  __c30_signature
-                  0x001032          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsidf.eo)
+                  0x001095          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(divdf3.eo)
  __c30_signature
-                  0x001038          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(frexp.eo)
+                  0x00109b          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dne.eo)
  __c30_signature
-                  0x00103e          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(muldf3.eo)
+                  0x0010a1          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dpack.eo)
  __c30_signature
-                  0x001044          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(subdf3.eo)
+                  0x0010a7          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dunpack2.eo)
  __c30_signature
-                  0x00104a          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(udivsi3.eo)
+                  0x0010ad          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(extendsfdf.eo)
  __c30_signature
-                  0x001050          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(umodsi3.eo)
+                  0x0010b3          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(fixunsdfdi.eo)
  __c30_signature
-                  0x001056          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(mulsi3.eo)
+                  0x0010b9          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatunsidf.eo)
  __c30_signature
-                  0x00105c          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dcompare.eo)
+                  0x0010bf          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(frexp.eo)
  __c30_signature
-                  0x001062          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dpropagateNaN.eo)
+                  0x0010c5          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(muldf3.eo)
  __c30_signature
-                  0x001068          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dtype.eo)
+                  0x0010cb          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(subdf3.eo)
  __c30_signature
-                  0x00106e          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dunpack.eo)
+                  0x0010d1          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(udivsi3.eo)
  __c30_signature
-                  0x001074          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatundidf.eo)
+                  0x0010d7          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(umodsi3.eo)
+ __c30_signature
+                  0x0010dd          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(mulsi3.eo)
+ __c30_signature
+                  0x0010e3          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dcompare.eo)
+ __c30_signature
+                  0x0010e9          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dpropagateNaN.eo)
+ __c30_signature
+                  0x0010ef          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dtype.eo)
+ __c30_signature
+                  0x0010f5          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(dunpack.eo)
+ __c30_signature
+                  0x0010fb          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(floatundidf.eo)
 
-_0000000004329F005ff5ff23
+_00000000044401E05ffc4d28
                     0x4700        0x100
- _0000000004329F005ff5ff23
+ _00000000044401E05ffc4d28
                     0x4700        0x100 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                    0x4700                  _BufferA
 
-_0000000002F7C0005ff5ff23
+_00000000044402805ffc4d28
                     0x4600        0x100
- _0000000002F7C0005ff5ff23
+ _00000000044402805ffc4d28
                     0x4600        0x100 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                    0x4600                  _BufferB
 
 .nbss               0x0800         0x44
  .nbss              0x0800         0x20 build/default/production/Source/tasks.o
@@ -2299,60 +2410,78 @@ _0000000002F7C0005ff5ff23
                     0x084c                  _detect_delta_N
                     0x0850                  _detect_delta_S
 
-.nbss               0x0854         0x22
+.nbss               0x0854         0x24
  .nbss              0x0854          0xc build/default/production/Source/portable/MemMang/heap_4.o
- .nbss              0x0860          0x8 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+ .nbss              0x0860          0xa build/default/production/Demo/dsPIC33F_MPLAB/adc.o
                     0x0860                  _DmaBuffer
                     0x0862                  _dataSamples
- .nbss              0x0868          0x8 build/default/production/Demo/dsPIC33F_MPLAB/main.o
-                    0x086c                  _anemometroModoActivo
-                    0x086e                  _medProgFlag
-                    0x086f                  _medAborted
- .nbss              0x0870          0x6 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
-                    0x0870                  _xSemaphoreComparadorPulsos
-                    0x0872                  _xQueueComparadorNumPulsos
-                    0x0874                  _pulseCount
+                    0x0864                  _rPtr
+ .nbss              0x086a          0x8 build/default/production/Demo/dsPIC33F_MPLAB/main.o
+                    0x086e                  _anemometroModoActivo
+                    0x0870                  _medProgFlag
+                    0x0871                  _medAborted
+ .nbss              0x0872          0x6 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+                    0x0872                  _xSemaphoreComparadorPulsos
+                    0x0874                  _xQueueComparadorNumPulsos
+                    0x0876                  _pulseCount
 
-.ndata              0x0876          0x2
- .ndata             0x0876          0x2 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
-                    0x0876                  _uxCriticalNesting
+.ndata              0x0878          0x2
+ .ndata             0x0878          0x2 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
+                    0x0878                  _uxCriticalNesting
 
-.nbss               0x0878          0x2
- .nbss              0x0878          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(errno.eo)
-                    0x0878                  _errno
+.nbss               0x087a          0x2
+ .nbss              0x087a          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libm-elf.a(errno.eo)
+                    0x087a                  _errno
 
-.bss                0x087a       0x1c00
- .bss               0x087a       0x1400 build/default/production/Source/portable/MemMang/heap_4.o
- .bss               0x1c7a        0x800 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+_00000000044400005ffc4d28
+                    0x0880        0x640
+ _00000000044400005ffc4d28
+                    0x0880        0x640 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                    0x0880                  _xTransSignal
 
-.data               0x247a        0x160
- .data              0x247a        0x160 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(powers.dXXeo)
-                    0x247a                  __powers_
-                    0x252a                  __npowers_
+_0000000004376F005ffc4d28
+                    0x0f00        0x4bc
+ _0000000004376F005ffc4d28
+                    0x0f00        0x4bc build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                    0x0f00                  _uPwmSignal
 
-.bss                0x25da         0x60
- .bss               0x25da         0x60 build/default/production/Source/tasks.o
+_00000000044400A05ffc4d28
+                    0x3a80        0xafa
+ _00000000044400A05ffc4d28
+                    0x3a80        0xafa build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                    0x3a80                  _rCorrSignal
 
-.data               0x263a         0x52
- .data              0x263a         0x52 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
+.bss                0x13bc       0x1400
+ .bss               0x13bc       0x1400 build/default/production/Source/portable/MemMang/heap_4.o
 
-.bss                0x268c         0x3c
- .bss               0x268c         0x3c build/default/production/Source/croutine.o
+.data               0x27bc        0x160
+ .data              0x27bc        0x160 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(powers.dXXeo)
+                    0x27bc                  __powers_
+                    0x286c                  __npowers_
 
-.data               0x26c8         0x26
- .data              0x26c8         0x26 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(_iob.eo)
-                    0x26c8                  __iob
-                    0x26ec                  __Files
+.bss                0x457a         0x60
+ .bss               0x457a         0x60 build/default/production/Source/tasks.o
 
-.bss                0x26ee          0x6
- .bss               0x26ee          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(_iob.eo)
-                    0x26ee                  __outdone
-                    0x26ef                  __sibuf
-                    0x26f1                  __sobuf
+.data               0x291c         0x52
+ .data              0x291c         0x52 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(doprnt_cdfFnopsuxX.XXeo)
 
-.data               0x26f4          0x2
- .data              0x26f4          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(c30_uart.eo)
-                    0x26f4                  ___C30_UART
+.bss                0x0ec0         0x3c
+ .bss               0x0ec0         0x3c build/default/production/Source/croutine.o
+
+.data               0x45da         0x26
+ .data              0x45da         0x26 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(_iob.eo)
+                    0x45da                  __iob
+                    0x45fe                  __Files
+
+.bss                0x296e          0x6
+ .bss               0x296e          0x6 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libc-elf.a(_iob.eo)
+                    0x296e                  __outdone
+                    0x296f                  __sibuf
+                    0x2971                  __sobuf
+
+.data               0x087c          0x2
+ .data              0x087c          0x2 c:/program files/microchip/xc16/v1.50/bin/bin/../../lib\libpic30-elf.a(c30_uart.eo)
+                    0x087c                  ___C30_UART
 
 .ivt._T1Interrupt
                   0x00001a          0x2
@@ -2397,156 +2526,158 @@ _0000000002F7C0005ff5ff23
  .ivt._OC1Interrupt
                   0x000018          0x2 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
 
-.const              0x9ce0        0x57e load address 0x001ce0  
- .const             0x9ce0        0x202 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
- .const             0x9ee2        0x1fa build/default/production/Demo/dsPIC33F_MPLAB/main.o
- .const             0xa0dc        0x134 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
- .const             0xa210         0x36 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
- .const             0xa246         0x10 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
- .const             0xa256          0x6 build/default/production/Source/tasks.o
- .const             0xa25c          0x2 build/default/production/Source/portable/MemMang/heap_4.o
+.const              0x9fe0        0xeec load address 0x001fe0  
+ .const             0x9fe0        0xaa2 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                    0xa10a                  _uSignal
+ .const             0xaa82        0x202 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
+ .const             0xac84        0x1fa build/default/production/Demo/dsPIC33F_MPLAB/main.o
+ .const             0xae7e         0x36 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
+ .const             0xaeb4         0x10 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+ .const             0xaec4          0x6 build/default/production/Source/tasks.o
+ .const             0xaeca          0x2 build/default/production/Source/portable/MemMang/heap_4.o
 
-.text             0x00225e       0x3a08
- .text            0x00225e       0x102e build/default/production/Demo/dsPIC33F_MPLAB/main.o
-                  0x00225e                  _main
-                  0x002296                  build/default/production/Demo/dsPIC33F_MPLAB/main.o:_anemometro_main_task
-                  0x002522                  _anemometroGetTmode
-                  0x0025ac                  _anemometroGetVcoord
-                  0x002748                  _anemometroVmode
-                  0x0028d6                  _anemometroVprom
-                  0x0029de                  _anemometroGetCoordTime
-                  0x002a76                  _anemometroGetMed
-                  0x002dfc                  _anemometroTdetectedFromISR
-                  0x002e16                  _anemometroEmiterSelect
-                  0x002e22                  _anemometroSendFloat
-                  0x002e36                  _anemometroRecvFloat
-                  0x002e4a                  _anemometroReceptorDelay
-                  0x002e82                  _anemometroMuxOutputSelect
-                  0x002ed6                  _anemometroCalcMode
-                  0x003014                  _anemometroCalibCero
-                  0x0030d2                  _anemometroAbortMed
-                  0x0030e8                  _anemometroDelayTest
-                  0x003286                  _vApplicationIdleHook
- .text            0x00328c        0xfe4 build/default/production/Source/tasks.o
-                  0x00328c                  _xTaskCreate
-                  0x003438                  _vTaskDelayUntil
-                  0x0034e0                  _vTaskDelay
-                  0x003512                  _eTaskGetState
-                  0x00356e                  _vTaskPrioritySet
-                  0x003644                  _vTaskSuspend
-                  0x0036da                  _vTaskResume
-                  0x003738                  _xTaskResumeFromISR
-                  0x0037a2                  _vTaskStartScheduler
-                  0x0037de                  _vTaskEndScheduler
-                  0x0037f6                  _vTaskSuspendAll
-                  0x00384a                  _xTaskResumeAll
-                  0x0038f4                  _xTaskGetTickCount
-                  0x003906                  _xTaskGetTickCountFromISR
-                  0x00391c                  _uxTaskGetNumberOfTasks
-                  0x003924                  _pcTaskGetName
-                  0x00393e                  _vTaskStepTick
-                  0x003954                  _xTaskAbortDelay
-                  0x0039c0                  _xTaskIncrementTick
-                  0x003ac4                  _vTaskSwitchContext
-                  0x003b28                  _vTaskPlaceOnEventList
-                  0x003b46                  _vTaskPlaceOnUnorderedEventList
-                  0x003b74                  _xTaskRemoveFromEventList
-                  0x003be4                  _xTaskRemoveFromUnorderedEventList
-                  0x003c4a                  _vTaskSetTimeOutState
-                  0x003c62                  _xTaskCheckForTimeOut
-                  0x003d02                  _vTaskMissedYield
-                  0x003d0c                  build/default/production/Source/tasks.o:_prvIdleTask
-                  0x003d3c                  _eTaskConfirmSleepModeStatus
-                  0x003ddc                  _uxTaskResetEventItemValue
-                  0x003e00                  _ulTaskNotifyTake
-                  0x003e74                  _xTaskNotifyWait
-                  0x003f38                  _xTaskGenericNotify
-                  0x004022                  _xTaskGenericNotifyFromISR
-                  0x00412a                  _vTaskNotifyGiveFromISR
-                  0x0041b4                  _xTaskNotifyStateClear
- .text            0x004270        0x906 build/default/production/Source/queue.o
-                  0x004270                  _xQueueGenericReset
-                  0x0042f8                  _xQueueGenericCreate
-                  0x004372                  _xQueueGenericSend
-                  0x00445c                  _xQueueGenericSendFromISR
-                  0x0044ce                  _xQueueGiveFromISR
-                  0x00453a                  _xQueueGenericReceive
-                  0x00464c                  _xQueueReceiveFromISR
-                  0x0046bc                  _xQueuePeekFromISR
-                  0x0046f4                  _uxQueueMessagesWaiting
-                  0x004708                  _uxQueueSpacesAvailable
-                  0x004726                  _uxQueueMessagesWaitingFromISR
-                  0x004736                  _vQueueDelete
-                  0x0048c0                  _xQueueIsQueueEmptyFromISR
-                  0x004900                  _xQueueIsQueueFullFromISR
-                  0x004920                  _xQueueCRSend
-                  0x0049d2                  _xQueueCRReceive
-                  0x004ab4                  _xQueueCRSendFromISR
-                  0x004af6                  _xQueueCRReceiveFromISR
- .text            0x004b76        0x63a build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
-                  0x004b76                  _uartInit_RTOS
-                  0x004bc8                  _uartSendMenu
-                  0x004c2c                  _uartInit
-                  0x004cba                  _uartRecv
-                  0x004d32                  _uartSend
-                  0x004da2                  build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o:_uart_task
-                  0x00513c                  _uartGetMode
-                  0x00515c                  _uartGetModeConfig
-                  0x00517c                  _uartSendMed
-                  0x00519a                  _uartEndMode
- .text            0x0051b0        0x570 build/default/production/Demo/dsPIC33F_MPLAB/adc.o
-                  0x0051b0                  _adc_init
-                  0x005220                  _adc_start
-                  0x00522c                  _initDma0
-                  0x00525c                  _adc_stop
-                  0x00526a                  _dma_ceroAligned
-                  0x0052fa                  _dma_ceroCalib
-                  0x00539c                  _dma_capturePulse
-                  0x005482                  _dma_detectPulse
- .text            0x005720        0x2f6 build/default/production/Source/croutine.o
-                  0x005720                  _xCoRoutineCreate
-                  0x0057c0                  _vCoRoutineAddToDelayedList
-                  0x00593e                  _vCoRoutineSchedule
-                  0x0059de                  _xCoRoutineRemoveFromEventList
- .text            0x005a16        0x250 build/default/production/Source/portable/MemMang/heap_4.o
-                  0x005a16                  _pvPortMalloc
-                  0x005afa                  _vPortFree
-                  0x005b4a                  _xPortGetFreeHeapSize
-                  0x005b52                  _xPortGetMinimumEverFreeHeapSize
-                  0x005b5a                  _vPortInitialiseBlocks
+.text             0x002ecc       0x3860
+ .text            0x002ecc       0x102e build/default/production/Demo/dsPIC33F_MPLAB/main.o
+                  0x002ecc                  _main
+                  0x002f04                  build/default/production/Demo/dsPIC33F_MPLAB/main.o:_anemometro_main_task
+                  0x003190                  _anemometroGetTmode
+                  0x00321a                  _anemometroGetVcoord
+                  0x0033b6                  _anemometroVmode
+                  0x003544                  _anemometroVprom
+                  0x00364c                  _anemometroGetCoordTime
+                  0x0036e4                  _anemometroGetMed
+                  0x003a6a                  _anemometroTdetectedFromISR
+                  0x003a84                  _anemometroEmiterSelect
+                  0x003a90                  _anemometroSendFloat
+                  0x003aa4                  _anemometroRecvFloat
+                  0x003ab8                  _anemometroReceptorDelay
+                  0x003af0                  _anemometroMuxOutputSelect
+                  0x003b44                  _anemometroCalcMode
+                  0x003c82                  _anemometroCalibCero
+                  0x003d40                  _anemometroAbortMed
+                  0x003d56                  _anemometroDelayTest
+                  0x003ef4                  _vApplicationIdleHook
+ .text            0x003efa        0xfe4 build/default/production/Source/tasks.o
+                  0x003efa                  _xTaskCreate
+                  0x0040a6                  _vTaskDelayUntil
+                  0x00414e                  _vTaskDelay
+                  0x004180                  _eTaskGetState
+                  0x0041dc                  _vTaskPrioritySet
+                  0x0042b2                  _vTaskSuspend
+                  0x004348                  _vTaskResume
+                  0x0043a6                  _xTaskResumeFromISR
+                  0x004410                  _vTaskStartScheduler
+                  0x00444c                  _vTaskEndScheduler
+                  0x004464                  _vTaskSuspendAll
+                  0x0044b8                  _xTaskResumeAll
+                  0x004562                  _xTaskGetTickCount
+                  0x004574                  _xTaskGetTickCountFromISR
+                  0x00458a                  _uxTaskGetNumberOfTasks
+                  0x004592                  _pcTaskGetName
+                  0x0045ac                  _vTaskStepTick
+                  0x0045c2                  _xTaskAbortDelay
+                  0x00462e                  _xTaskIncrementTick
+                  0x004732                  _vTaskSwitchContext
+                  0x004796                  _vTaskPlaceOnEventList
+                  0x0047b4                  _vTaskPlaceOnUnorderedEventList
+                  0x0047e2                  _xTaskRemoveFromEventList
+                  0x004852                  _xTaskRemoveFromUnorderedEventList
+                  0x0048b8                  _vTaskSetTimeOutState
+                  0x0048d0                  _xTaskCheckForTimeOut
+                  0x004970                  _vTaskMissedYield
+                  0x00497a                  build/default/production/Source/tasks.o:_prvIdleTask
+                  0x0049aa                  _eTaskConfirmSleepModeStatus
+                  0x004a4a                  _uxTaskResetEventItemValue
+                  0x004a6e                  _ulTaskNotifyTake
+                  0x004ae2                  _xTaskNotifyWait
+                  0x004ba6                  _xTaskGenericNotify
+                  0x004c90                  _xTaskGenericNotifyFromISR
+                  0x004d98                  _vTaskNotifyGiveFromISR
+                  0x004e22                  _xTaskNotifyStateClear
+ .text            0x004ede        0x906 build/default/production/Source/queue.o
+                  0x004ede                  _xQueueGenericReset
+                  0x004f66                  _xQueueGenericCreate
+                  0x004fe0                  _xQueueGenericSend
+                  0x0050ca                  _xQueueGenericSendFromISR
+                  0x00513c                  _xQueueGiveFromISR
+                  0x0051a8                  _xQueueGenericReceive
+                  0x0052ba                  _xQueueReceiveFromISR
+                  0x00532a                  _xQueuePeekFromISR
+                  0x005362                  _uxQueueMessagesWaiting
+                  0x005376                  _uxQueueSpacesAvailable
+                  0x005394                  _uxQueueMessagesWaitingFromISR
+                  0x0053a4                  _vQueueDelete
+                  0x00552e                  _xQueueIsQueueEmptyFromISR
+                  0x00556e                  _xQueueIsQueueFullFromISR
+                  0x00558e                  _xQueueCRSend
+                  0x005640                  _xQueueCRReceive
+                  0x005722                  _xQueueCRSendFromISR
+                  0x005764                  _xQueueCRReceiveFromISR
+ .text            0x0057e4        0x656 build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o
+                  0x0057e4                  _uartInit_RTOS
+                  0x005836                  _uartSendMenu
+                  0x00589a                  _uartInit
+                  0x005928                  _uartRecv
+                  0x0059bc                  _uartSend
+                  0x005a2c                  build/default/production/Demo/dsPIC33F_MPLAB/UART_RTOS.o:_uart_task
+                  0x005dc6                  _uartGetMode
+                  0x005de6                  _uartGetModeConfig
+                  0x005e06                  _uartSendMed
+                  0x005e24                  _uartEndMode
+ .text            0x005e3a        0x3ac build/default/production/Demo/dsPIC33F_MPLAB/adc.o
+                  0x005e3a                  _adc_init
+                  0x005eac                  _ads_signalInit
+                  0x005ede                  _adc_start
+                  0x005eea                  _initDma0
+                  0x005f1a                  _adc_stop
+                  0x005f28                  _dma_ceroAligned
+                  0x005fb8                  _dma_ceroCalib
+                  0x00605a                  _dma_capturePulse
+                  0x006180                  _dma_detectPulse
+ .text            0x0061e6        0x2f6 build/default/production/Source/croutine.o
+                  0x0061e6                  _xCoRoutineCreate
+                  0x006286                  _vCoRoutineAddToDelayedList
+                  0x006404                  _vCoRoutineSchedule
+                  0x0064a4                  _xCoRoutineRemoveFromEventList
+ .text            0x0064dc        0x250 build/default/production/Source/portable/MemMang/heap_4.o
+                  0x0064dc                  _pvPortMalloc
+                  0x0065c0                  _vPortFree
+                  0x006610                  _xPortGetFreeHeapSize
+                  0x006618                  _xPortGetMinimumEverFreeHeapSize
+                  0x006620                  _vPortInitialiseBlocks
 
-.dinit            0x005c66        0x1ce
- .dinit           0x005c66        0x1ce data_init
+.dinit            0x00672c        0x1da
+ .dinit           0x00672c        0x1da data_init
 
-.text             0x005e34        0x4c6
- .text            0x005e34        0x168 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
-                  0x005e34                  _comparadorInit
-                  0x005e8e                  _comparador_rtos_init
-                  0x005ebc                  _comparadorStart
-                  0x005ed0                  _comparadorStop
-                  0x005ee0                  _comparadorPulseTrain_bloq
-                  0x005f00                  _comparadorPulseTrain_NObloq
-                  0x005f30                  _comparadorPulseTrainRTOS
-                  0x005f4c                  build/default/production/Demo/dsPIC33F_MPLAB/pwm.o:_comparador_task
-                  0x005f8a                  _filtroEnable
-                  0x005f92                  _filtroDisable
- .text            0x005f9c        0x13a build/default/production/Source/list.o
-                  0x005f9c                  _vListInitialise
-                  0x005fd2                  _vListInitialiseItem
-                  0x005fe0                  _vListInsertEnd
-                  0x00601c                  _vListInsert
-                  0x00608e                  _uxListRemove
- .text            0x0060d6        0x138 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
-                  0x0060d6                  _pxPortInitialiseStack
-                  0x006166                  _xPortStartScheduler
-                  0x0061aa                  _vPortEndScheduler
-                  0x0061b0                  _vApplicationSetupTickTimerInterrupt
-                  0x0061d8                  _vPortEnterCritical
-                  0x0061f2                  _vPortExitCritical
- .text            0x00620e         0x7c build/default/production/Source/portable/MPLAB/PIC24_dsPIC/portasm_dsPIC.o
-                  0x00620e                  _vPortYield
- .text            0x00628a         0x70 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
-                  0x00628a                  _timerInit
-                  0x0062ac                  _timerStart
-                  0x0062b8                  _timerStop
-                  0x0062c0                  _timerCount
+.text             0x006906        0x4c6
+ .text            0x006906        0x168 build/default/production/Demo/dsPIC33F_MPLAB/pwm.o
+                  0x006906                  _comparadorInit
+                  0x006960                  _comparador_rtos_init
+                  0x00698e                  _comparadorStart
+                  0x0069a2                  _comparadorStop
+                  0x0069b2                  _comparadorPulseTrain_bloq
+                  0x0069d2                  _comparadorPulseTrain_NObloq
+                  0x006a02                  _comparadorPulseTrainRTOS
+                  0x006a1e                  build/default/production/Demo/dsPIC33F_MPLAB/pwm.o:_comparador_task
+                  0x006a5c                  _filtroEnable
+                  0x006a64                  _filtroDisable
+ .text            0x006a6e        0x13a build/default/production/Source/list.o
+                  0x006a6e                  _vListInitialise
+                  0x006aa4                  _vListInitialiseItem
+                  0x006ab2                  _vListInsertEnd
+                  0x006aee                  _vListInsert
+                  0x006b60                  _uxListRemove
+ .text            0x006ba8        0x138 build/default/production/Source/portable/MPLAB/PIC24_dsPIC/port.o
+                  0x006ba8                  _pxPortInitialiseStack
+                  0x006c38                  _xPortStartScheduler
+                  0x006c7c                  _vPortEndScheduler
+                  0x006c82                  _vApplicationSetupTickTimerInterrupt
+                  0x006caa                  _vPortEnterCritical
+                  0x006cc4                  _vPortExitCritical
+ .text            0x006ce0         0x7c build/default/production/Source/portable/MPLAB/PIC24_dsPIC/portasm_dsPIC.o
+                  0x006ce0                  _vPortYield
+ .text            0x006d5c         0x70 build/default/production/Demo/dsPIC33F_MPLAB/timer.o
+                  0x006d5c                  _timerInit
+                  0x006d7e                  _timerStart
+                  0x006d8a                  _timerStop
+                  0x006d92                  _timerCount

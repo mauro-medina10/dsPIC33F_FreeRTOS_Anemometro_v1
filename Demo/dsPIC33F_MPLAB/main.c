@@ -11,7 +11,7 @@
 /*Standars includes*/
 #include <stdint.h>
 #include <stdio.h> 
-
+#include <dsp.h>
 
 /*Config includes*/
 #include "xc.h"
@@ -132,10 +132,10 @@ static void anemometro_main_task(void *pvParameters) {
 
                 break;
             case Medicion_Simple:
-
                 //                simpleMed = anemometroGetMed();
                 //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
                 simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
+                
                 uartSendMed(simpleMed);
                 //                emisorSelect++;
                 //                                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
@@ -179,7 +179,7 @@ static void anemometro_main_task(void *pvParameters) {
                 }
 
                 uartSendMed(simpleMed);
-                
+
                 auxV++;
                 if (auxV >= 20) {
                     auxV = 0;
@@ -830,7 +830,7 @@ static void prvSetupHardware(void) {
     //    RB_8_SET_MODE(1);
     //    DELAY_100uS;
     RB_9_SET_MODE(0);
-    DELAY_100uS;
+    DELAY_100uS
 }
 
 void vApplicationIdleHook(void) {

@@ -28,53 +28,15 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef ADC_HEADER_TEMPLATE_H
-#define	ADC_HEADER_TEMPLATE_H
+#ifndef SENALES_HEADER_TEMPLATE_H
+#define	SENALES_HEADER_TEMPLATE_H
 
-#include <xc.h>
-#include <p33FJ128GP802.h> // include processor files - each processor file is guarded.  
-#include <dsp.h>
+#include <xc.h> // include processor files - each processor file is guarded.  
 
-#include <anemometroDef.h>
-#include <UART_RTOS.h>
+extern const float uSignal[];
 
-/*FreeRTOS includes*/
-#include "FreeRTOS.h"
-#include "FreeRTOSConfig.h"
-#include "list.h"
-#include "queue.h"
-#include "task.h"
-#include "timers.h"
-#include "semphr.h"
-
-/*C includes*/
-#include <stdint.h>
-
-
-#define N_DMA_SAMP 128//255
-#define DMA_FREQ 1100000
-#define DMA_TOTAL_SAMP 800
-#define PWM_SIGNAL_SAMP 606
-
-void adc_init(void);
-
-void adc_start(void);
-
-void adc_stop(void);
-
-void adc_transdSelect(mux_transSelect_enum transd);
-
-void initDma0(void);
-
-void ads_signalInit(void);
-
-BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture);
-
-BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time);
-
-BaseType_t dma_ceroAligned(mux_transSelect_enum coordAligned);
-
-BaseType_t dma_ceroCalib(mux_transSelect_enum coordCalib);
+// TODO Insert declarations or function prototypes (right here) to leverage 
+// live documentation
 
 #ifdef	__cplusplus
 extern "C" {

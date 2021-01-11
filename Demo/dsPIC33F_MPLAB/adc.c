@@ -6,17 +6,630 @@
  */
 
 #include "adc.h"
-
+#include <signal.h>
 /*Global variables*/
 uint16_t DmaBuffer = 0;
-static unsigned int dataN[1024];
+//fractional dataN[1024];
 uint16_t dataSamples = 0;
+
+const float uSignal[] = {0,
+    0.004529935348515,
+    0.008824422024864,
+    0.012660249076177,
+    0.015838044918446,
+    0.018192639907090,
+    0.019601651221848,
+    0.019991843856564,
+    0.019342937094039,
+    0.017688658619956,
+    0.015114991487085,
+    0.011755705045849,
+    0.007785402126348,
+    0.003410443852652,
+    -0.001141776217255,
+    -0.005634651136829,
+    -0.009834658492912,
+    -0.013523498005480,
+    -0.016509437939255,
+    -0.018637280584229,
+    -0.019796428837619,
+    -0.019926634617254,
+    -0.019021130325903,
+    -0.017126980605032,
+    -0.014342636095179,
+    -0.010812816349112,
+    -0.006720987864309,
+    -0.002279828197811,
+    0.002279828197811,
+    0.006720987864309,
+    0.010812816349112,
+    0.014342636095179,
+    0.017126980605032,
+    0.019021130325903,
+    0.019926634617254,
+    0.019796428837619,
+    0.018637280584229,
+    0.016509437939255,
+    0.013523498005480,
+    0.009834658492912,
+    0.005634651136829,
+    0.001141776217255,
+    -0.003410443852652,
+    -0.007785402126348,
+    -0.011755705045849,
+    -0.015114991487085,
+    -0.017688658619956,
+    -0.019342937094039,
+    -0.019991843856564,
+    -0.019601651221848,
+    -0.018192639907090,
+    -0.015838044918446,
+    -0.012660249076177,
+    -0.008824422024864,
+    -0.004529935348515,
+    -0.000000000000000,
+    0.004529935348515,
+    0.008824422024864,
+    0.012660249076177,
+    0.015838044918445,
+    0.018192639907090,
+    0.019601651221848,
+    0.019991843856564,
+    0.019342937094039,
+    0.017688658619956,
+    0.015114991487085,
+    0.011755705045850,
+    0.007785402126348,
+    0.003410443852652,
+    -0.001141776217255,
+    -0.005634651136829,
+    -0.009834658492912,
+    -0.013523498005480,
+    -0.016509437939255,
+    -0.018637280584229,
+    -0.019796428837619,
+    -0.019926634617254,
+    -0.019021130325903,
+    -0.017126980605032,
+    -0.014342636095179,
+    -0.010812816349112,
+    -0.006720987864309,
+    -0.002279828197811,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0.004529935348515,
+    0.008824422024864,
+    0.012660249076177,
+    0.015838044918446,
+    0.018192639907090,
+    0.019601651221848,
+    0.019991843856564,
+    0.019342937094039,
+    0.017688658619956,
+    0.015114991487085,
+    0.011755705045849,
+    0.007785402126348,
+    0.003410443852652,
+    -0.001141776217255,
+    -0.005634651136829,
+    -0.009834658492912,
+    -0.013523498005480,
+    -0.016509437939255,
+    -0.018637280584229,
+    -0.019796428837619,
+    -0.019926634617254,
+    -0.019021130325903,
+    -0.017126980605032,
+    -0.014342636095179,
+    -0.010812816349112,
+    -0.006720987864309,
+    -0.002279828197811,
+    0.002279828197811,
+    0.006720987864309,
+    0.010812816349112,
+    0.014342636095179,
+    0.017126980605032,
+    0.019021130325903,
+    0.019926634617254,
+    0.019796428837619,
+    0.018637280584229,
+    0.016509437939255,
+    0.013523498005480,
+    0.009834658492912,
+    0.005634651136829,
+    0.001141776217255,
+    -0.003410443852652,
+    -0.007785402126348,
+    -0.011755705045849,
+    -0.015114991487085,
+    -0.017688658619956,
+    -0.019342937094039,
+    -0.019991843856564,
+    -0.019601651221848,
+    -0.018192639907090,
+    -0.015838044918446,
+    -0.012660249076177,
+    -0.008824422024864,
+    -0.004529935348515,
+    -0.000000000000000,
+    0.004529935348515,
+    0.008824422024864,
+    0.012660249076177,
+    0.015838044918445,
+    0.018192639907090,
+    0.019601651221848,
+    0.019991843856564,
+    0.019342937094039,
+    0.017688658619956,
+    0.015114991487085,
+    0.011755705045850,
+    0.007785402126348,
+    0.003410443852652,
+    -0.001141776217255,
+    -0.005634651136829,
+    -0.009834658492912,
+    -0.013523498005480,
+    -0.016509437939255,
+    -0.018637280584229,
+    -0.019796428837619,
+    -0.019926634617254,
+    -0.019021130325903,
+    -0.017126980605032,
+    -0.014342636095179,
+    -0.010812816349112,
+    -0.006720987864309,
+    -0.002279828197811,
+    0.002279828197811,
+    0.006720987864309,
+    0.010812816349112,
+    0.014342636095179,
+    0.017126980605032,
+    0.019021130325903,
+    0.019926634617254,
+    0.019796428837619,
+    0.018637280584229,
+    0.016509437939256,
+    0.013523498005480,
+    0.009834658492912,
+    0.005634651136829,
+    0.001141776217255,
+    -0.003410443852652,
+    -0.007785402126348,
+    -0.011755705045849,
+    -0.015114991487085,
+    -0.017688658619956,
+    -0.019342937094039,
+    -0.019991843856564,
+    -0.019601651221848,
+    -0.018192639907090,
+    -0.015838044918446,
+    -0.012660249076177,
+    -0.008824422024864,
+    -0.004529935348515,
+    0.000000000000000,
+    0.004529935348515,
+    0.008824422024864,
+    0.012660249076177,
+    0.015838044918446,
+    0.018192639907090,
+    0.019601651221848,
+    0.019991843856564,
+    0.019342937094039,
+    0.017688658619956,
+    0.015114991487085,
+    0.011755705045849,
+    0.007785402126348,
+    0.003410443852652,
+    -0.001141776217255,
+    -0.005634651136829,
+    -0.009834658492912,
+    -0.013523498005480,
+    -0.016509437939256,
+    -0.018637280584229,
+    -0.019796428837619,
+    -0.019926634617254,
+    -0.019021130325903,
+    -0.017126980605032,
+    -0.014342636095179,
+    -0.010812816349112,
+    -0.006720987864309,
+    -0.002279828197811,
+    0.002279828197811,
+    0.006720987864309,
+    0.010812816349112,
+    0.014342636095179,
+    0.017126980605032,
+    0.019021130325903,
+    0.019926634617254,
+    0.019796428837619,
+    0.018637280584229,
+    0.016509437939255,
+    0.013523498005480,
+    0.009834658492912,
+    0.005634651136828,
+    0.001141776217255,
+    -0.003410443852653,
+    -0.007785402126348,
+    -0.011755705045850,
+    -0.015114991487085,
+    -0.017688658619956,
+    -0.019342937094039,
+    -0.019991843856564,
+    -0.019601651221848,
+    -0.018192639907090,
+    -0.015838044918445,
+    -0.012660249076177,
+    -0.008824422024864,
+    -0.004529935348515,
+    0.000000000000000,
+    0.004529935348515,
+    0.008824422024864,
+    0.012660249076177,
+    0.015838044918446,
+    0.018192639907090,
+    0.019601651221848,
+    0.019991843856564,
+    0.019342937094039,
+    0.017688658619956,
+    0.015114991487085,
+    0.011755705045849,
+    0.007785402126348,
+    0.003410443852652,
+    -0.001141776217255,
+    -0.005634651136829,
+    -0.009834658492912,
+    -0.013523498005480,
+    -0.016509437939255,
+    -0.018637280584229,
+    -0.019796428837619,
+    -0.019926634617254,
+    -0.019021130325903,
+    -0.017126980605032,
+    -0.014342636095179,
+    -0.010812816349112,
+    -0.006720987864309,
+    -0.002279828197811,
+    0.002279828197811,
+    0.006720987864309,
+    0.010812816349112,
+    0.014342636095179,
+    0.017126980605032,
+    0.019021130325903,
+    0.019926634617254,
+    0.019796428837619,
+    0.018637280584229,
+    0.016509437939255,
+    0.013523498005480,
+    0.009834658492912,
+    0.005634651136829,
+    0.001141776217255,
+    -0.003410443852653,
+    -0.007785402126348,
+    -0.011755705045850,
+    -0.015114991487085,
+    -0.017688658619956,
+    -0.019342937094039,
+    -0.019991843856564,
+    -0.019601651221848,
+    -0.018192639907090,
+    -0.015838044918446,
+    -0.012660249076177,
+    -0.008824422024864,
+    -0.004529935348515,
+    0.000000000000000,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0};
 
 //uint8_t thE = 1;
 //uint8_t thO = 0;
 
-static unsigned int BufferA[N_DMA_SAMP] __attribute__((space(dma)));
-static unsigned int BufferB[N_DMA_SAMP] __attribute__((space(dma)));
+fractional uPwmSignal[PWM_SIGNAL_SAMP] __attribute__((space(xmemory), aligned(128)));
+fractional xTransSignal[DMA_TOTAL_SAMP] __attribute__((space(xmemory), aligned(128)));
+fractional rCorrSignal[PWM_SIGNAL_SAMP + DMA_TOTAL_SAMP - 1] __attribute__((space(ymemory), aligned(128)));
+
+fractional* rPtr;
+
+fractional BufferA[N_DMA_SAMP] __attribute__((space(dma)));
+fractional BufferB[N_DMA_SAMP] __attribute__((space(dma)));
 static uint8_t detect_sample_O = 0;
 static uint8_t detect_sample_E = 0;
 static uint8_t detect_sample_N = 0;
@@ -64,7 +677,17 @@ void adc_init(void) {
 
     INTCON1bits.NSTDIS = 0; // Enable interrupt nesting
 
+    ads_signalInit();
+
     initDma0();
+}
+
+void ads_signalInit(void) {
+    uint16_t i = 0;
+
+    for (i = 0; i < PWM_SIGNAL_SAMP; i++) {
+        uPwmSignal[i] = Float2Fract(uSignal[i]);
+    }
 }
 
 void adc_start(void) {
@@ -169,7 +792,8 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
     BaseType_t notifyStatus = pdFAIL;
     char msgN[6];
     uint16_t j = 0;
-
+    float dataSum = 0;
+    float dataSamp = 0;
     dataSamples = 0;
 
     while (dataSamples < DMA_TOTAL_SAMP) {
@@ -178,12 +802,12 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
         if ((ulNotificationValue & 0x01) != 0 && notifyStatus == pdPASS) {
             if (DmaBuffer & 0x01) {
                 for (i = 0; i < N_DMA_SAMP; i++) {
-                    dataN[dataSamples] = BufferA[i];
+                    xTransSignal[dataSamples] = BufferA[i];
                     dataSamples++;
                 }
             } else {
                 for (i = 0; i < N_DMA_SAMP; i++) {
-                    dataN[dataSamples] = BufferB[i];
+                    xTransSignal[dataSamples] = BufferB[i];
                     dataSamples++;
                 }
             }
@@ -193,100 +817,130 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
     }
 
     adc_stop();
-    //datos por UART
-    for (j = 0; j < dataSamples; j++) {
-        sprintf(msgN, "%3.0d\r\n%c", dataN[j], '\0');
-        uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
+
+    //Quito valor medio
+    for(j = 0; j < DMA_TOTAL_SAMP; j++){
+//        dataSamp = Fract2Float(xTransSignal[j]);
+        dataSum += Fract2Float(xTransSignal[j]);
     }
+    
+    dataSum = dataSum / (float) DMA_TOTAL_SAMP;
+
+    for (j = 0; j < DMA_TOTAL_SAMP; j++) {
+        xTransSignal[j] = xTransSignal[j] - Float2Fract(dataSum);
+    }
+    //datos por UART
+    //    for (j = 0; j < dataSamples; j++) {
+    //        sprintf(msgN, "%3.0d\r\n%c", dataN[j], '\0');
+    //        uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
+    //    }
     return pdPASS;
 }
 
 BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
-    anemometro_deteccion_enum maxDetectionState = PRIMERA_MUESTRA;
-    uint16_t i = 0;
-    uint16_t maxIndex = 0;
-    uint16_t minIndex = 0;
-    unsigned int lastMax = dataN[dataSamples];
-    unsigned int lastMin = dataN[dataSamples - 3];
-    //    unsigned int lastVal = dataN[0];
-    char msgN[9];
+    fractional maxValCorr = 0;
+    uint16_t* maxIndex;
 
-    //Analizo de atras para adelante porque el ruido es demasiado 
-    //N-S: aparentemente miden bien asi
-    //O: probar detectando el minimo
-    i = dataSamples;
+    //Calculo la correlacion
+    rPtr = VectorCorrelate(DMA_TOTAL_SAMP, PWM_SIGNAL_SAMP, &rCorrSignal[0], &xTransSignal[0], &uPwmSignal[0]);
+    //Busco el maximo de la correlacion
+    maxValCorr = VectorMax(DMA_TOTAL_SAMP + PWM_SIGNAL_SAMP - 1, &rCorrSignal[0], maxIndex);
 
-    //Detecto el MAXIMO
-    while (1) {
-        switch (maxDetectionState) {
-            case PRIMERA_MUESTRA:
-                //Veo si estoy bajando o subiendo
-                if (dataN[i] > dataN[i - 1]) {
-                    maxDetectionState = MINIMO_LOCAL;
-                } else if (dataN[i] < dataN[i - 1]) {
-                    maxDetectionState = MAXIMO_LOCAL;
-                } else {
-                    i--;
-                    if (i == 0) return pdFAIL;
-                }
-                break;
-            case MAXIMO_LOCAL:
-                //Busco el maximo local
-                while (dataN[i - 1] >= dataN[i]) {
-                    i--;
-                    if (i == 0) return pdFAIL;
-                }
-                //Busco el maximo global (comparo con el mayor 'maximo local' encontrado)
-
-                if ((coordDetect == TRANS_EMISOR_OESTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_O)))
-                        || (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_E)))
-                        || (coordDetect == TRANS_EMISOR_NORTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_N)))
-                        || (coordDetect == TRANS_EMISOR_SUR && (dataN[i] >= (lastMax + MAX_THRESHOLD_S)))
-                        ) {
-                    lastMax = dataN[i];
-                    maxIndex = i;
-                    i--;
-                    if (i == 0) maxDetectionState = MAXIMO_GLOBAL;
-                    maxDetectionState = MINIMO_LOCAL;
-                } else if (((coordDetect == TRANS_EMISOR_OESTE && dataN[i] < (lastMax * (DETECTION_THRESHOLD_O)))
-                        || (coordDetect == TRANS_EMISOR_ESTE && dataN[i] < (lastMax * (DETECTION_THRESHOLD_E)))
-                        || (coordDetect == TRANS_EMISOR_NORTE && dataN[i] < (lastMax * (DETECTION_THRESHOLD_N)))
-                        || (coordDetect == TRANS_EMISOR_SUR && dataN[i] < (lastMax * (DETECTION_THRESHOLD_S))))
-                        && lastMax > LIMIT_SAFETY) { //Si los maximos empiezan a decaer dejo de buscar
-                    //                    maxIndex = i;
-                    maxDetectionState = MAXIMO_GLOBAL;
-                } else {
-                    i--;
-                    maxDetectionState = MINIMO_LOCAL;
-                    if (i == 0) return pdFAIL;
-                }
-                break;
-            case MINIMO_LOCAL:
-                //Avanzo hasta que cambie la derivada a positiva
-                while (dataN[i - 1] <= dataN[i]) {
-                    i--;
-                    if (i == 0) return pdFAIL;
-                }
-                maxDetectionState = MAXIMO_LOCAL;
-                break;
-            case MAXIMO_GLOBAL:
-                //muestro indice (debug)
-                //                    sprintf(msgN, "\r\nI: %3.0d%c", maxIndex + 1, '\0');
-                //                    uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
-                //termino la busqueda 
-                if (lastMax > LIMIT_SAFETY) {
-                    *time = (float) (maxIndex + 1) / DMA_FREQ;
-
-                    return pdPASS;
-                }
-                return pdFAIL;
-
-                break;
-            default: maxDetectionState = PRIMERA_MUESTRA;
-        }
+    if (*maxIndex == 0 || maxValCorr > 0.3) {
+        return pdFAIL;
     }
-    return pdFAIL;
+
+    *time = (float) (*maxIndex + 1) / DMA_FREQ;
+
+    return pdPASS;
 }
+
+//BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
+//    anemometro_deteccion_enum maxDetectionState = PRIMERA_MUESTRA;
+//    uint16_t i = 0;
+//    uint16_t maxIndex = 0;
+//    uint16_t minIndex = 0;
+//    fractional lastMax = xTransSignal[dataSamples];
+//    fractional lastMin = xTransSignal[dataSamples - 3];
+//    //    unsigned int lastVal = dataN[0];
+//    char msgN[9];
+//
+//    //Analizo de atras para adelante porque el ruido es demasiado 
+//    //N-S: aparentemente miden bien asi
+//    //O: probar detectando el minimo
+//    i = dataSamples;
+//
+//    //Detecto el MAXIMO
+//    while (1) {
+//        switch (maxDetectionState) {
+//            case PRIMERA_MUESTRA:
+//                //Veo si estoy bajando o subiendo
+//                if (dataN[i] > dataN[i - 1]) {
+//                    maxDetectionState = MINIMO_LOCAL;
+//                } else if (dataN[i] < dataN[i - 1]) {
+//                    maxDetectionState = MAXIMO_LOCAL;
+//                } else {
+//                    i--;
+//                    if (i == 0) return pdFAIL;
+//                }
+//                break;
+//            case MAXIMO_LOCAL:
+//                //Busco el maximo local
+//                while (dataN[i - 1] >= dataN[i]) {
+//                    i--;
+//                    if (i == 0) return pdFAIL;
+//                }
+//                //Busco el maximo global (comparo con el mayor 'maximo local' encontrado)
+//
+//                if ((coordDetect == TRANS_EMISOR_OESTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_O)))
+//                        || (coordDetect == TRANS_EMISOR_ESTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_E)))
+//                        || (coordDetect == TRANS_EMISOR_NORTE && (dataN[i] >= (lastMax + MAX_THRESHOLD_N)))
+//                        || (coordDetect == TRANS_EMISOR_SUR && (dataN[i] >= (lastMax + MAX_THRESHOLD_S)))
+//                        ) {
+//                    lastMax = dataN[i];
+//                    maxIndex = i;
+//                    i--;
+//                    if (i == 0) maxDetectionState = MAXIMO_GLOBAL;
+//                    maxDetectionState = MINIMO_LOCAL;
+//                } else if (((coordDetect == TRANS_EMISOR_OESTE && dataN[i] < (lastMax * (DETECTION_THRESHOLD_O)))
+//                        || (coordDetect == TRANS_EMISOR_ESTE && dataN[i] < (lastMax * (DETECTION_THRESHOLD_E)))
+//                        || (coordDetect == TRANS_EMISOR_NORTE && dataN[i] < (lastMax * (DETECTION_THRESHOLD_N)))
+//                        || (coordDetect == TRANS_EMISOR_SUR && dataN[i] < (lastMax * (DETECTION_THRESHOLD_S))))
+//                        && lastMax > LIMIT_SAFETY) { //Si los maximos empiezan a decaer dejo de buscar
+//                    //                    maxIndex = i;
+//                    maxDetectionState = MAXIMO_GLOBAL;
+//                } else {
+//                    i--;
+//                    maxDetectionState = MINIMO_LOCAL;
+//                    if (i == 0) return pdFAIL;
+//                }
+//                break;
+//            case MINIMO_LOCAL:
+//                //Avanzo hasta que cambie la derivada a positiva
+//                while (dataN[i - 1] <= dataN[i]) {
+//                    i--;
+//                    if (i == 0) return pdFAIL;
+//                }
+//                maxDetectionState = MAXIMO_LOCAL;
+//                break;
+//            case MAXIMO_GLOBAL:
+//                //muestro indice (debug)
+//                //                    sprintf(msgN, "\r\nI: %3.0d%c", maxIndex + 1, '\0');
+//                //                    uartSend((uint8_t *) msgN, sizeof (msgN), portMAX_DELAY);
+//                //termino la busqueda 
+//                if (lastMax > LIMIT_SAFETY) {
+//                    *time = (float) (maxIndex + 1) / DMA_FREQ;
+//
+//                    return pdPASS;
+//                }
+//                return pdFAIL;
+//
+//                break;
+//            default: maxDetectionState = PRIMERA_MUESTRA;
+//        }
+//    }
+//    return pdFAIL;
+//}
 
 void __attribute__((interrupt, no_auto_psv))_DMA0Interrupt(void) {
     BaseType_t xTaskWoken = pdFALSE;

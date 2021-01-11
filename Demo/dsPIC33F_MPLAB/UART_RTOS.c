@@ -122,7 +122,7 @@ uint32_t uartRecv(uint8_t *pBuf, int32_t size, uint32_t blockTime) {
 
     while ((ret < size) && (xQueueReceive(qRecv, &pBuf[ret], waitTick) == pdTRUE) && pBuf[ret] != '\n' && pBuf[ret] != '\r') {
         //eco
-        //        if ((char) pBuf[ret] != '¬') uartSend(&pBuf[ret], 1, 0);
+        if ((char) pBuf[ret] != '¬') uartSend(&pBuf[ret], 1, 0);
         ret++;
         //        waitTick = 0;
     }
