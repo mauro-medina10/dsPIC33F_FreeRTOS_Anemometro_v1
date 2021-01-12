@@ -191,7 +191,7 @@ BaseType_t dma_capturePulse(mux_transSelect_enum coordCapture) {
     char msgN[6];
     uint16_t j = 0;
     float dataSum = 0;
-    float dataSamp = 0;
+    uint16_t dataSamp = 0;
     dataSamples = 0;
 
     while (dataSamples < DMA_TOTAL_SAMP) {
@@ -240,24 +240,25 @@ BaseType_t dma_detectPulse(mux_transSelect_enum coordDetect, float* time) {
     uint16_t* maxIndex;
 
     adc_signalInit();
-    
+
     //Calculo la correlacion
     rPtr = VectorCorrelate(DMA_TOTAL_SAMP, PWM_SIGNAL_SAMP, &rCorrSignal[0], &xTransSignal[0], &uPwmSignal[0]);
     //Busco el maximo de la correlacion
     maxValCorr = VectorMax(DMA_TOTAL_SAMP + PWM_SIGNAL_SAMP - 1, &rCorrSignal[0], maxIndex);
 
-    if (*maxIndex == 0 || (Fract2Float(maxValCorr) > 0.3)) {
+    if ((Fract2Float(maxValCorr) > 0.3) || (Fract2Float(maxValCorr) < 0.04)) {
         return pdFAIL;
     }
 
     if (*maxIndex > CORR_ZERO) {
         *maxIndex -= CORR_ZERO;
-        *time = (float) (*maxIndex + 1) / DMA_FREQ;
-    } else {
-        return pdFAIL;
-    }
 
-    return pdPASS;
+        *time = (float) (*maxIndex + 1) / DMA_FREQ;
+
+        return pdPASS;
+    }
+    
+    return pdFAIL;
 }
 
 void __attribute__((interrupt, no_auto_psv))_DMA0Interrupt(void) {

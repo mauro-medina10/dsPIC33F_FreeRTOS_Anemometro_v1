@@ -110,6 +110,7 @@ static void anemometro_main_task(void *pvParameters) {
     unsigned int firstPeriodFlag = 1;
     float soundSpeed = 345.7;
     uint32_t medPeriod = 5;
+    BaseType_t medState = pdFAIL;
 
     MUX_INPUT_INH(0);
 
@@ -134,8 +135,22 @@ static void anemometro_main_task(void *pvParameters) {
             case Medicion_Simple:
                 //                simpleMed = anemometroGetMed();
                 //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                //                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
-                anemometroGetTmedian(&simpleMed.mag, &simpleMed.deg, emisorSelect);
+                medState = anemometroGetCoordTime(&simpleMed.mag, emisorSelect);
+
+                emisorSelect++;
+                
+                if (medState == pdPASS) {
+                    sprintf(simpleMed.coord, "OK ");
+                    medState = pdFAIL;
+                } else {
+                    sprintf(simpleMed.coord, " F ");
+                }
+                //                anemometroGetTmedian(&simpleMed.mag, &simpleMed.deg, emisorSelect);
+                //                if (anemometroVmedian(&simpleMed.mag, &simpleMed.deg) == pdPASS) {
+                //                    sprintf(simpleMed.coord, "OK ");
+                //                } else {
+                //                    sprintf(simpleMed.coord, " F ");
+                //                }
 
                 uartSendMed(&simpleMed);
 
@@ -154,25 +169,25 @@ static void anemometro_main_task(void *pvParameters) {
 
                 //                anemometroGetCoordTime(&simpleMed.mag, emisorSelect) * 1000000;
                 if (anemometroVmedian(&simpleMed.mag, &simpleMed.deg) == pdPASS) {
-                    emisorSelect = TRANS_EMISOR_NORTE;
+                    sprintf(simpleMed.coord, "OK ");
                 } else {
-                    emisorSelect = TRANS_EMISOR_SUR;
+                    sprintf(simpleMed.coord, " F ");
                 }
 
-                switch (emisorSelect) {
-                    case TRANS_EMISOR_OESTE:
-                        sprintf(simpleMed.coord, " O ");
-                        break;
-                    case TRANS_EMISOR_ESTE:
-                        sprintf(simpleMed.coord, " E ");
-                        break;
-                    case TRANS_EMISOR_NORTE:
-                        sprintf(simpleMed.coord, " N ");
-                        break;
-                    case TRANS_EMISOR_SUR:
-                        sprintf(simpleMed.coord, " S ");
-                        break;
-                }
+                //                switch (emisorSelect) {
+                //                    case TRANS_EMISOR_OESTE:
+                //                        sprintf(simpleMed.coord, " O ");
+                //                        break;
+                //                    case TRANS_EMISOR_ESTE:
+                //                        sprintf(simpleMed.coord, " E ");
+                //                        break;
+                //                    case TRANS_EMISOR_NORTE:
+                //                        sprintf(simpleMed.coord, " N ");
+                //                        break;
+                //                    case TRANS_EMISOR_SUR:
+                //                        sprintf(simpleMed.coord, " S ");
+                //                        break;
+                //                }
 
                 uartSendMed(&simpleMed);
 
