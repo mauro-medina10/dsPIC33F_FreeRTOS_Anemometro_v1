@@ -138,8 +138,8 @@ static void anemometro_main_task(void *pvParameters) {
                 anemometroGetTmedian(&simpleMed.mag, &simpleMed.deg, emisorSelect);
 
                 uartSendMed(&simpleMed);
-                //                emisorSelect++;
-                //                                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
+
+                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
 
                 anemometroModoActivo = Menu;
                 break;
@@ -152,20 +152,12 @@ static void anemometro_main_task(void *pvParameters) {
 
                 medProgFlag = 1;
 
-                //                                simpleMed = anemometroGetMed();
-                //                                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                //                anemometroGetTmode(&simpleMed.mag, &simpleMed.deg, emisorSelect);
-                simpleMed.mag = anemometroGetCoordTime(emisorSelect) * 1000000;
-
-
-                //                anemometroGetTmedian(&simpleMed.mag, &simpleMed.deg, emisorSelect);
-
-
-                //                if (anemometroVmode(&simpleMed.mag, &simpleMed.deg, N_MED_MODE) == pdPASS) {
-                //                    emisorSelect = TRANS_EMISOR_NORTE;
-                //                } else {
-                //                    emisorSelect = TRANS_EMISOR_SUR;
-                //                }
+                //                anemometroGetCoordTime(&simpleMed.mag, emisorSelect) * 1000000;
+                if (anemometroVmedian(&simpleMed.mag, &simpleMed.deg) == pdPASS) {
+                    emisorSelect = TRANS_EMISOR_NORTE;
+                } else {
+                    emisorSelect = TRANS_EMISOR_SUR;
+                }
 
                 switch (emisorSelect) {
                     case TRANS_EMISOR_OESTE:
@@ -185,15 +177,15 @@ static void anemometro_main_task(void *pvParameters) {
                 uartSendMed(&simpleMed);
 
                 auxV++;
-                if (auxV >= 50) {
+                if (auxV >= 10) {
                     auxV = 0;
-                    emisorSelect++;
+                    //                    emisorSelect++;
                     //                    emisorSelect += 2;
                     if (emisorSelect > TRANS_EMISOR_SUR) {
                         emisorSelect = TRANS_EMISOR_OESTE;
-                        uartEndMode();
+                        //                        uartEndMode();
                     }
-                    //                    uartEndMode();
+                    uartEndMode();
                 }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
 
@@ -265,6 +257,41 @@ static void anemometro_main_task(void *pvParameters) {
     }
 }
 
+BaseType_t anemometroVmedian(float* medOE, float* medNS) {
+    BaseType_t medState = pdFAIL;
+    float timeMedian[4];
+    float timeCorr[2];
+
+    medState = anemometroGetTmedian(&timeMedian[0], &timeMedian[1], TRANS_EMISOR_OESTE);
+
+    medState *= anemometroGetTmedian(&timeMedian[2], &timeMedian[3], TRANS_EMISOR_NORTE);
+
+    if (medState == pdFAIL) return pdFAIL;
+
+    //Calculo V para OE
+    timeCorr[0] = timeMedian[0] - detect_delta_O; //taOE
+    timeCorr[1] = timeMedian[1] - detect_delta_E; //trOE
+
+    if (timeCorr[0] == timeCorr[1]) {
+        *medOE = 0;
+    } else {
+        *medOE = (((float) DISTANCE_EO / 2) * (1 / timeCorr[0] - 1 / timeCorr[1])) - OFFSET_ERROR_EO;
+        *medOE = (*medOE - DETECT_OFFSET_OE) / DETECT_SCALING_OE;
+    }
+    //Calculo V para NS
+    timeCorr[0] = timeMedian[2] - detect_delta_N; //taNS
+    timeCorr[1] = timeMedian[3] - detect_delta_S; //trNS
+
+    if (timeCorr[0] == timeCorr[1]) {
+        *medNS = 0;
+    } else {
+        *medNS = (((float) DISTANCE_NS / 2) * (1 / timeCorr[0] - 1 / timeCorr[1])) - OFFSET_ERROR_NS;
+        *medNS = (*medNS - DETECT_OFFSET_NS) / DETECT_SCALING_NS;
+    }
+
+    return medState;
+}
+
 BaseType_t anemometroGetTmedian(float* medianA, float* medianB, mux_transSelect_enum coordV) {
     float timeMed[] = {0, 0};
     uint8_t i = 0;
@@ -275,7 +302,7 @@ BaseType_t anemometroGetTmedian(float* medianA, float* medianB, mux_transSelect_
     for (i = 0; i < 2; i++) {
         for (n = 0; n < N_TIMER_MEDIAN; n++) {
 
-            timeNmediciones[n] = anemometroGetCoordTime(coordV + i);
+            anemometroGetCoordTime(&timeNmediciones[n], coordV + i); //no importa si unas pocas mediciones falla
 
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
@@ -284,10 +311,10 @@ BaseType_t anemometroGetTmedian(float* medianA, float* medianB, mux_transSelect_
 
     if (medState == pdPASS) {
         //DEBUG: ajuste ventanas
-        *medianA = timeMed[0] * 1000000;
-        *medianB = timeMed[1] * 1000000;
-        //        *medianA = timeMed[0];
-        //        *medianB = timeMed[1];
+        //        *medianA = timeMed[0] * 1000000;
+        //        *medianB = timeMed[1] * 1000000;
+        *medianA = timeMed[0];
+        *medianB = timeMed[1];
     }
 
     return medState;
@@ -303,7 +330,7 @@ BaseType_t anemometroGetTmode(float* modeA, float* modeB, mux_transSelect_enum c
     for (i = 0; i < 2; i++) {
         for (n = 0; n < N_TIMER_MODE; n++) {
 
-            timeNmediciones[n] = anemometroGetCoordTime(coordV + i);
+            anemometroGetCoordTime(&timeNmediciones[n], coordV + i);
 
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
@@ -330,7 +357,7 @@ float anemometroGetVcoord(mux_transSelect_enum coordV) {
     for (i = 0; i < 2; i++) {
         for (n = 0; n < N_TIMER_MODE; n++) {
 
-            timeNmediciones[n] = anemometroGetCoordTime(coordV + i);
+            anemometroGetCoordTime(&timeNmediciones[n], coordV + i);
 
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
@@ -436,10 +463,6 @@ BaseType_t anemometroVmode(float* medOE, float* medNS, uint8_t Nmode) {
     return modeState;
 }
 
-BaseType_t anemometroVmedian(float* medOE, float* medNS, uint8_t Nmedian){
-    
-}
-
 BaseType_t anemometroVprom(float* medOE, float* medNS, uint8_t Nprom) {
     float medAcumOE = 0;
     float medAcumNS = 0;
@@ -482,15 +505,15 @@ BaseType_t anemometroVprom(float* medOE, float* medNS, uint8_t Nprom) {
     return pdFAIL;
 }
 
-float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
-    float timeMed = 999.99;
+BaseType_t anemometroGetCoordTime(float* timeMed, mux_transSelect_enum coordTime) {
+    float timeCalc = 999.99;
     uint32_t ulNotificationValue;
     BaseType_t notifyStatus = pdFAIL;
     BaseType_t pulseDetected = pdFALSE;
     BaseType_t pulseCaptured = pdFALSE;
 
     if (anemometroMuxOutputSelect(coordTime) != pdTRUE) {
-        return timeMed;
+        return pdFAIL;
     }
     //Desactivo MUX 2
     MUX_INPUT_INH(1);
@@ -522,23 +545,24 @@ float anemometroGetCoordTime(mux_transSelect_enum coordTime) {
     //    adc_stop();
 
     if (pulseCaptured == pdPASS) {
-        pulseDetected = dma_detectPulse(coordTime, &timeMed);
+        pulseDetected = dma_detectPulse(coordTime, &timeCalc);
 
-        timeMed += (((float) timerCount() / configCPU_CLOCK_HZ));
+        if (pulseDetected == pdPASS) {
+            timeCalc += (((float) timerCount() / configCPU_CLOCK_HZ));
 
-        if (pulseDetected == pdFAIL) timeMed = 888.77;
+            *timeMed = timeCalc;
 
-    } else {
-        timeMed = 888.88;
+            return pdPASS;
+        }
     }
 
-    return timeMed;
+    return pdFAIL;
 }
 
-wind_medicion_type anemometroGetMed(void) {
+wind_medicion_type anemometroGetMed(float VcoordOE, float VcoordNS) {
     wind_medicion_type valMed = {0, 0};
-    float VcoordOE = 0;
-    float VcoordNS = 0;
+    //    float VcoordOE = 0;
+    //    float VcoordNS = 0;
     BaseType_t medResult = pdFAIL;
 
     //    //Mido en la coordenada O-E
@@ -546,7 +570,7 @@ wind_medicion_type anemometroGetMed(void) {
     //    //Mido en la coordenada N-S
     //    VcoordNS = anemometroGetMedProm(TRANS_EMISOR_NORTE, N_MED_PROM);
     //Tomo 10 promedios de cada coordenada 
-    medResult = anemometroVprom(&VcoordOE, &VcoordNS, N_MED_PROM);
+    //    medResult = anemometroVprom(&VcoordOE, &VcoordNS, N_MED_PROM);
 
     //Calculo 
     //    valMed.mag = sqrtf(powf(VcoordOE, 2) + powf(VcoordNS, 2
@@ -785,7 +809,7 @@ void anemometroCalibCero(float Sspeed) {
     for (j = 0; j < 4; j++) {
         for (i = 0; i < N_TIMER_MODE; i++) {
 
-            ceroMed[i] = anemometroGetCoordTime((mux_transSelect_enum) j);
+            anemometroGetCoordTime(&ceroMed[i], (mux_transSelect_enum) j);
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
         //Mido el tiempo de pulso sin viento para cada coordenada
@@ -807,8 +831,9 @@ void anemometroAbortMed(void) {
 
 void anemometroDelayTest(void) {
     char msg[30];
+    float medAux = 0;
 
-    anemometroGetCoordTime(TRANS_EMISOR_OESTE);
+    anemometroGetCoordTime(&medAux, TRANS_EMISOR_OESTE);
     if (dma_ceroAligned(TRANS_EMISOR_OESTE) == pdPASS) {
         sprintf(msg, "\r\n Delay emisor OESTE: OK%c", '\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
@@ -818,7 +843,7 @@ void anemometroDelayTest(void) {
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
-    anemometroGetCoordTime(TRANS_EMISOR_ESTE);
+    anemometroGetCoordTime(&medAux, TRANS_EMISOR_ESTE);
     if (dma_ceroAligned(TRANS_EMISOR_ESTE) == pdPASS) {
         sprintf(msg, "  ESTE: OK%c", '\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
@@ -828,7 +853,7 @@ void anemometroDelayTest(void) {
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
-    anemometroGetCoordTime(TRANS_EMISOR_NORTE);
+    anemometroGetCoordTime(&medAux, TRANS_EMISOR_NORTE);
     if (dma_ceroAligned(TRANS_EMISOR_NORTE) == pdPASS) {
         sprintf(msg, "  NORTE: OK%c", '\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
@@ -838,7 +863,7 @@ void anemometroDelayTest(void) {
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
-    anemometroGetCoordTime(TRANS_EMISOR_SUR);
+    anemometroGetCoordTime(&medAux, TRANS_EMISOR_SUR);
     if (dma_ceroAligned(TRANS_EMISOR_SUR) == pdPASS) {
         sprintf(msg, "  SUR: OK\r\n%c", '\0');
         uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);

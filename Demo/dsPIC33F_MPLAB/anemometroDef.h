@@ -89,11 +89,11 @@
 #define DETECTION_THRESHOLD_S 0.9474
 
 
-#define DETECT_SCALING_OE 1//0.7841		
-#define DETECT_SCALING_NS 1//0.739			   						  
+#define DETECT_SCALING_OE 0.9311
+#define DETECT_SCALING_NS 0.9027			   						  
 
-#define DETECT_OFFSET_OE 0//-0.1361		
-#define DETECT_OFFSET_NS 0//-0.0264
+#define DETECT_OFFSET_OE 0.0638	
+#define DETECT_OFFSET_NS 0.1055
 
 #define ANGLE_SCALING 1//1.031
 #define ANGLE_OFFSET 0//9.5
@@ -108,7 +108,7 @@
 #define N_MED_PROM 20
 #define N_MED_MODE 5
 #define N_TIMER_MODE 16
-#define N_TIMER_MEDIAN 10
+#define N_TIMER_MEDIAN 11
 
 
 //definiciones tiempos
@@ -197,7 +197,7 @@ typedef struct {
 /*Funciones*/
 BaseType_t anemometroMuxOutputSelect(mux_transSelect_enum ch);
 
-wind_medicion_type anemometroGetMed(void);
+wind_medicion_type anemometroGetMed(float VcoordOE, float VcoordNS);
 
 void anemometroTdetectedFromISR(BaseType_t *pxHigherPriorityTaskWoken, uint32_t val);
 
@@ -211,7 +211,7 @@ BaseType_t anemometroVprom(float* medOE, float* medNS, uint8_t Nprom);
 
 BaseType_t anemometroVmode(float* medOE, float* medNS, uint8_t Nmode);
 
-float anemometroGetCoordTime(mux_transSelect_enum coordTime);
+BaseType_t anemometroGetCoordTime(float* timeMed, mux_transSelect_enum coordTime);
 
 void anemometroReceptorDelay(mux_transSelect_enum emisor);
 
@@ -220,6 +220,8 @@ BaseType_t anemometroCalcMode(float* pData, float* pMode, uint16_t nData);
 BaseType_t anemometroFindMedian(float* pData, float* pMedian, uint16_t nData);
 
 BaseType_t anemometroGetTmedian(float* medianA, float* medianB, mux_transSelect_enum coordV); 
+
+BaseType_t anemometroVmedian(float* medOE, float* medNS);
 
 void anemometroCalibCero(float Sspeed);
 
