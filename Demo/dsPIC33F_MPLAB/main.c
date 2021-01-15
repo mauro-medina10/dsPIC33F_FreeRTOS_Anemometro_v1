@@ -109,6 +109,7 @@ static void anemometro_main_task(void *pvParameters) {
     TickType_t xLastWakeTime;
     unsigned int firstPeriodFlag = 1;
     float soundSpeed = 345.7;
+    float coordVmed[2];
     uint32_t medPeriod = 5;
     BaseType_t medState = pdFAIL;
 
@@ -135,12 +136,15 @@ static void anemometro_main_task(void *pvParameters) {
             case Medicion_Simple:
                 //                simpleMed = anemometroGetMed();
                 //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                medState = anemometroGetCoordTime(&simpleMed.mag, emisorSelect);
+                //                medState = anemometroGetCoordTime(&simpleMed.mag, emisorSelect);
+                //                simpleMed.mag *= 1000000;
+                medState = anemometroVmedian(&coordVmed[0], &coordVmed[1]);
 
                 emisorSelect++;
-                
+
                 if (medState == pdPASS) {
-                    sprintf(simpleMed.coord, "OK ");
+                    simpleMed = anemometroGetMed(coordVmed[0], coordVmed[1]);
+
                     medState = pdFAIL;
                 } else {
                     sprintf(simpleMed.coord, " F ");
@@ -168,31 +172,26 @@ static void anemometro_main_task(void *pvParameters) {
                 medProgFlag = 1;
 
                 //                anemometroGetCoordTime(&simpleMed.mag, emisorSelect) * 1000000;
-                if (anemometroVmedian(&simpleMed.mag, &simpleMed.deg) == pdPASS) {
-                    sprintf(simpleMed.coord, "OK ");
+                //                if (anemometroVmedian(&simpleMed.mag, &simpleMed.deg) == pdPASS) {
+                //                    sprintf(simpleMed.coord, "OK ");
+                //                } else {
+                //                    sprintf(simpleMed.coord, " F ");
+                //                }
+
+                if (anemometroVmedian(&coordVmed[0], &coordVmed[1]) == pdPASS) {
+
+                    simpleMed = anemometroGetMed(coordVmed[0], coordVmed[1]);
+                    //                    simpleMed.mag = coordVmed[0];
+                    //                    simpleMed.deg = coordVmed[1];
+                    //                    sprintf(simpleMed.coord, "OK ");
                 } else {
                     sprintf(simpleMed.coord, " F ");
                 }
 
-                //                switch (emisorSelect) {
-                //                    case TRANS_EMISOR_OESTE:
-                //                        sprintf(simpleMed.coord, " O ");
-                //                        break;
-                //                    case TRANS_EMISOR_ESTE:
-                //                        sprintf(simpleMed.coord, " E ");
-                //                        break;
-                //                    case TRANS_EMISOR_NORTE:
-                //                        sprintf(simpleMed.coord, " N ");
-                //                        break;
-                //                    case TRANS_EMISOR_SUR:
-                //                        sprintf(simpleMed.coord, " S ");
-                //                        break;
-                //                }
-
                 uartSendMed(&simpleMed);
 
                 auxV++;
-                if (auxV >= 10) {
+                if (auxV >= 5) {
                     auxV = 0;
                     //                    emisorSelect++;
                     //                    emisorSelect += 2;
@@ -311,17 +310,23 @@ BaseType_t anemometroGetTmedian(float* medianA, float* medianB, mux_transSelect_
     float timeMed[] = {0, 0};
     uint8_t i = 0;
     uint8_t n = 0;
+    uint8_t correctMeds = 0;
     float timeNmediciones[N_TIMER_MEDIAN];
-    BaseType_t medState = pdFAIL;
+    BaseType_t medState = pdPASS;
 
     for (i = 0; i < 2; i++) {
         for (n = 0; n < N_TIMER_MEDIAN; n++) {
 
-            anemometroGetCoordTime(&timeNmediciones[n], coordV + i); //no importa si unas pocas mediciones falla
+            correctMeds += (uint8_t) anemometroGetCoordTime(&timeNmediciones[n], coordV + i);
 
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
-        medState = anemometroFindMedian(timeNmediciones, &timeMed[i], N_TIMER_MEDIAN);
+        if (correctMeds > (N_TIMER_MEDIAN / 2)) {
+            medState = anemometroFindMedian(timeNmediciones, &timeMed[i], N_TIMER_MEDIAN);
+            correctMeds = 0;
+        } else {
+            return pdFAIL;
+        }
     }
 
     if (medState == pdPASS) {
@@ -576,91 +581,71 @@ BaseType_t anemometroGetCoordTime(float* timeMed, mux_transSelect_enum coordTime
 
 wind_medicion_type anemometroGetMed(float VcoordOE, float VcoordNS) {
     wind_medicion_type valMed = {0, 0};
-    //    float VcoordOE = 0;
-    //    float VcoordNS = 0;
-    BaseType_t medResult = pdFAIL;
 
-    //    //Mido en la coordenada O-E
-    //    VcoordOE = anemometroGetMedProm(TRANS_EMISOR_OESTE, N_MED_PROM);
-    //    //Mido en la coordenada N-S
-    //    VcoordNS = anemometroGetMedProm(TRANS_EMISOR_NORTE, N_MED_PROM);
-    //Tomo 10 promedios de cada coordenada 
-    //    medResult = anemometroVprom(&VcoordOE, &VcoordNS, N_MED_PROM);
+    valMed.mag = sqrtf(VcoordOE * VcoordOE + VcoordNS * VcoordNS);
 
-    //Calculo 
-    //    valMed.mag = sqrtf(powf(VcoordOE, 2) + powf(VcoordNS, 2
-    //    if (VcoordOE < 555 && VcoordNS < 555) {
-    if (medResult == pdPASS) {
+    if (valMed.mag == 0) {
+        valMed.deg = 0;
+        sprintf(valMed.coord, "   ");
 
-        valMed.mag = sqrtf(VcoordOE * VcoordOE + VcoordNS * VcoordNS);
-
-        if (valMed.mag == 0) {
-            valMed.deg = 0;
-            sprintf(valMed.coord, "   ");
-            return valMed;
-        }
-
-        //Correccion lineal de la medicion
-        valMed.mag = (valMed.mag - MED_OFFSET) / MED_SCALING;
-
-        if (VcoordNS != 0) {
-            //Viento desde NorOeste: 0 < deg < 90
-            if (VcoordOE > 0 && VcoordNS > 0) {
-                valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS);
-                if (valMed.deg < 20) {
-                    sprintf(valMed.coord, " N ");
-                } else if (valMed.deg > 70) {
-                    sprintf(valMed.coord, " O ");
-                } else {
-                    sprintf(valMed.coord, "N-O");
-                }
-            }
-            //Viento desde Sur: 90 < deg < 270
-            if (VcoordNS < 0) {
-                valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 180;
-                if (valMed.deg < 110) {
-                    sprintf(valMed.coord, " O ");
-                } else if (valMed.deg > 160 && valMed.deg < 200) {
-                    sprintf(valMed.coord, " S ");
-                } else if (valMed.deg > 250) {
-                    sprintf(valMed.coord, " E ");
-                } else {
-                    if (valMed.deg < 180) {
-                        sprintf(valMed.coord, "S-O");
-                    } else {
-                        sprintf(valMed.coord, "S-E");
-                    }
-                }
-            }
-            //Viento desde NorEste: 270 < deg < 360
-            if (VcoordOE < 0 && VcoordNS > 0) {
-                valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 360;
-                if (valMed.deg > 340) {
-                    sprintf(valMed.coord, " N ");
-                } else if (valMed.deg < 290) {
-                    sprintf(valMed.coord, " E ");
-                } else {
-                    sprintf(valMed.coord, "N-E");
-                }
-            }
-        } else if (VcoordOE > 0) {
-            //Viento desde Oeste
-            valMed.deg = 90;
-            sprintf(valMed.coord, " O ");
-        } else {
-            //Viento desde Este
-            valMed.deg = 270;
-            sprintf(valMed.coord, " E ");
-        }
-        //Correccion lineal del angulo
-        if (valMed.deg >= ANGLE_OFFSET) {
-            valMed.deg = (valMed.deg - ANGLE_OFFSET) / ANGLE_SCALING;
-        }
-    } else {
-        //Error lectura
-        valMed.mag = 999.99;
-        valMed.deg = 999.99;
         return valMed;
+    }
+
+    //Correccion lineal de la medicion
+    valMed.mag = (valMed.mag - MED_OFFSET) / MED_SCALING;
+
+    if (VcoordNS != 0) {
+        //Viento desde NorOeste: 0 < deg < 90
+        if (VcoordOE > 0 && VcoordNS > 0) {
+            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS);
+            if (valMed.deg < 20) {
+                sprintf(valMed.coord, " N ");
+            } else if (valMed.deg > 70) {
+                sprintf(valMed.coord, " O ");
+            } else {
+                sprintf(valMed.coord, "N-O");
+            }
+        }
+        //Viento desde Sur: 90 < deg < 270
+        if (VcoordNS < 0) {
+            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 180;
+            if (valMed.deg < 110) {
+                sprintf(valMed.coord, " O ");
+            } else if (valMed.deg > 160 && valMed.deg < 200) {
+                sprintf(valMed.coord, " S ");
+            } else if (valMed.deg > 250) {
+                sprintf(valMed.coord, " E ");
+            } else {
+                if (valMed.deg < 180) {
+                    sprintf(valMed.coord, "S-O");
+                } else {
+                    sprintf(valMed.coord, "S-E");
+                }
+            }
+        }
+        //Viento desde NorEste: 270 < deg < 360
+        if (VcoordOE < 0 && VcoordNS > 0) {
+            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 360;
+            if (valMed.deg > 340) {
+                sprintf(valMed.coord, " N ");
+            } else if (valMed.deg < 290) {
+                sprintf(valMed.coord, " E ");
+            } else {
+                sprintf(valMed.coord, "N-E");
+            }
+        }
+    } else if (VcoordOE > 0) {
+        //Viento desde Oeste
+        valMed.deg = 90;
+        sprintf(valMed.coord, " O ");
+    } else {
+        //Viento desde Este
+        valMed.deg = 270;
+        sprintf(valMed.coord, " E ");
+    }
+    //Correccion lineal del angulo
+    if (valMed.deg >= ANGLE_OFFSET) {
+        valMed.deg = (valMed.deg - ANGLE_OFFSET) / ANGLE_SCALING;
     }
 
     if (valMed.deg == 180) {

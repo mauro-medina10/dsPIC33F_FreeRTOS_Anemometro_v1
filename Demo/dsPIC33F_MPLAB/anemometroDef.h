@@ -88,22 +88,22 @@
 #define DETECTION_THRESHOLD_N 0.952
 #define DETECTION_THRESHOLD_S 0.9474
 
+//Correccion coord individual
+#define DETECT_SCALING_OE 0.71//0.6349	//0.9311
+#define DETECT_SCALING_NS 0.7//0.6442    //0.9027			   						  
 
-#define DETECT_SCALING_OE 0.9311
-#define DETECT_SCALING_NS 0.9027			   						  
+#define DETECT_OFFSET_OE 0.0813 //0.0638	
+#define DETECT_OFFSET_NS 0.1409 //0.1055
 
-#define DETECT_OFFSET_OE 0.0638	
-#define DETECT_OFFSET_NS 0.1055
-
+//Correccion total
 #define ANGLE_SCALING 1//1.031
 #define ANGLE_OFFSET 0//9.5
 
 #define OFFSET_ERROR_EO 0
 #define OFFSET_ERROR_NS 0
 
-#define MED_SCALING 1//0.976558333
-#define MED_OFFSET 0//-0.356591667
-
+#define MED_SCALING 1//0.67
+#define MED_OFFSET 0//0.1
 //Numero de mediciones que se promedian
 #define N_MED_PROM 20
 #define N_MED_MODE 5

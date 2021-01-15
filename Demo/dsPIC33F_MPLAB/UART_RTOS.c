@@ -159,7 +159,7 @@ static void uart_task(void *pvParameters) {
     float datFaux = 0;
     uint8_t notifyFlag = 1;
     float tempAmbiente = 25;
-
+    
     while (1) {
         switch (modoActivo) {
             case Menu:
