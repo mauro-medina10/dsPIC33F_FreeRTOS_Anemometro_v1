@@ -191,7 +191,7 @@ static void anemometro_main_task(void *pvParameters) {
                 uartSendMed(&simpleMed);
 
                 auxV++;
-                if (auxV >= 5) {
+                if (auxV >= 7) {
                     auxV = 0;
                     //                    emisorSelect++;
                     //                    emisorSelect += 2;
@@ -595,26 +595,39 @@ wind_medicion_type anemometroGetMed(float VcoordOE, float VcoordNS) {
     valMed.mag = (valMed.mag - MED_OFFSET) / MED_SCALING;
 
     if (VcoordNS != 0) {
+        //Calculo Angulo
+        valMed.deg = (180 / 3.14159265) * atanf(VcoordOE / VcoordNS);
+
+        //Correccion lineal del angulo
+        if (fabsf(valMed.deg) >= ANGLE_OFFSET) {
+            valMed.deg = (valMed.deg - ANGLE_OFFSET) / ANGLE_SCALING;
+        }
+
         //Viento desde NorOeste: 0 < deg < 90
         if (VcoordOE > 0 && VcoordNS > 0) {
-            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS);
             if (valMed.deg < 20) {
                 sprintf(valMed.coord, " N ");
+                valMed.mag = valMed.mag / PARALLEL_SCALING;
             } else if (valMed.deg > 70) {
                 sprintf(valMed.coord, " O ");
+                valMed.mag = valMed.mag / PARALLEL_SCALING;
             } else {
                 sprintf(valMed.coord, "N-O");
             }
         }
         //Viento desde Sur: 90 < deg < 270
         if (VcoordNS < 0) {
-            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 180;
+            valMed.deg += 180;
+
             if (valMed.deg < 110) {
                 sprintf(valMed.coord, " O ");
+                valMed.mag = valMed.mag / PARALLEL_SCALING;
             } else if (valMed.deg > 160 && valMed.deg < 200) {
                 sprintf(valMed.coord, " S ");
+                valMed.mag = valMed.mag / PARALLEL_SCALING;
             } else if (valMed.deg > 250) {
                 sprintf(valMed.coord, " E ");
+                valMed.mag = valMed.mag / PARALLEL_SCALING;
             } else {
                 if (valMed.deg < 180) {
                     sprintf(valMed.coord, "S-O");
@@ -625,11 +638,14 @@ wind_medicion_type anemometroGetMed(float VcoordOE, float VcoordNS) {
         }
         //Viento desde NorEste: 270 < deg < 360
         if (VcoordOE < 0 && VcoordNS > 0) {
-            valMed.deg = (180 / 3.14159) * atanf(VcoordOE / VcoordNS) + 360;
+            valMed.deg += 360;
+
             if (valMed.deg > 340) {
                 sprintf(valMed.coord, " N ");
+                valMed.mag = valMed.mag / PARALLEL_SCALING;
             } else if (valMed.deg < 290) {
                 sprintf(valMed.coord, " E ");
+                valMed.mag = valMed.mag / PARALLEL_SCALING;
             } else {
                 sprintf(valMed.coord, "N-E");
             }
@@ -638,23 +654,32 @@ wind_medicion_type anemometroGetMed(float VcoordOE, float VcoordNS) {
         //Viento desde Oeste
         valMed.deg = 90;
         sprintf(valMed.coord, " O ");
+        valMed.mag = valMed.mag / PARALLEL_SCALING;
     } else {
         //Viento desde Este
         valMed.deg = 270;
         sprintf(valMed.coord, " E ");
-    }
-    //Correccion lineal del angulo
-    if (valMed.deg >= ANGLE_OFFSET) {
-        valMed.deg = (valMed.deg - ANGLE_OFFSET) / ANGLE_SCALING;
+        valMed.mag = valMed.mag / PARALLEL_SCALING;
     }
 
     if (valMed.deg == 180) {
         sprintf(valMed.coord, " S ");
+        valMed.mag = valMed.mag / PARALLEL_SCALING;
     } else if (valMed.deg == 0) {
         sprintf(valMed.coord, " N ");
+        valMed.mag = valMed.mag / PARALLEL_SCALING;
     }
 
     return valMed;
+}
+
+void anemometroVmeqCorrec(wind_medicion_type* medCorrect) {
+    float cosMed = 0;
+
+    cosMed = fabsf(cos(medCorrect->mag));
+    if (cosMed < 0.120 || cosMed > 0.992) {
+        medCorrect->mag = medCorrect->mag / PARALLEL_SCALING;
+    }
 }
 
 void anemometroTdetectedFromISR(BaseType_t * pxHigherPriorityTaskWoken, uint32_t val) {

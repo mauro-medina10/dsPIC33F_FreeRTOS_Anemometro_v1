@@ -35,8 +35,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h> 
-#include <Math.h>
-#include<dsp.h>
+#include <math.h>
+#include <dsp.h>
 
 /*FreeRTOS includes*/
 #include "FreeRTOS.h"
@@ -96,11 +96,13 @@
 #define DETECT_OFFSET_NS 0.1409 //0.1055
 
 //Correccion total
-#define ANGLE_SCALING 1//1.031
-#define ANGLE_OFFSET 0//9.5
+#define ANGLE_SCALING 1//1.02
+#define ANGLE_OFFSET 8
 
 #define OFFSET_ERROR_EO 0
 #define OFFSET_ERROR_NS 0
+
+#define PARALLEL_SCALING 1//0.75
 
 #define MED_SCALING 1//0.67
 #define MED_OFFSET 0//0.1
@@ -232,6 +234,8 @@ void anemometroDelayTest(void);
 void anemometroSendFloat(float* dat);
 
 void anemometroRecvFloat(float* dat);
+
+void anemometroVmeqCorrec(wind_medicion_type* medCorrect);
 /*FreeRTOS declarations*/
 
 /*Global variables*/
