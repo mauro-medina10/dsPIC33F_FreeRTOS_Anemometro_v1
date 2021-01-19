@@ -235,7 +235,6 @@ void anemometroSendFloat(float* dat);
 
 void anemometroRecvFloat(float* dat);
 
-void anemometroVmeqCorrec(wind_medicion_type* medCorrect);
 /*FreeRTOS declarations*/
 
 /*Global variables*/

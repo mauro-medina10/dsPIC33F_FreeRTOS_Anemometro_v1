@@ -673,15 +673,6 @@ wind_medicion_type anemometroGetMed(float VcoordOE, float VcoordNS) {
     return valMed;
 }
 
-void anemometroVmeqCorrec(wind_medicion_type* medCorrect) {
-    float cosMed = 0;
-
-    cosMed = fabsf(cos(medCorrect->mag));
-    if (cosMed < 0.120 || cosMed > 0.992) {
-        medCorrect->mag = medCorrect->mag / PARALLEL_SCALING;
-    }
-}
-
 void anemometroTdetectedFromISR(BaseType_t * pxHigherPriorityTaskWoken, uint32_t val) {
     xTaskNotifyFromISR(xMainTaskHandle, val, eSetBits, pxHigherPriorityTaskWoken);
 }
