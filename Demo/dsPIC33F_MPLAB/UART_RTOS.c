@@ -159,14 +159,14 @@ static void uart_task(void *pvParameters) {
     float datFaux = 0;
     uint8_t notifyFlag = 1;
     float tempAmbiente = 25;
-    
+
     while (1) {
         switch (modoActivo) {
             case Menu:
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 while (modoActivo == Menu || modoActivo == Exit) {
-                    //                    uartSendMenu(menuTemplate);
+                    uartSendMenu(menuTemplate);
 
                     uartRecv((uint8_t *) & comando, 1, portMAX_DELAY);
                     if (comando < 53 && comando > 48) {
@@ -183,29 +183,24 @@ static void uart_task(void *pvParameters) {
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
                     if (strcmp(medSimple.coord, " F ") != 0) {
-                        sprintf(msg, "\r\nMedición: %5.2f m/s ; %3f deg  %s\r\n%c",
-                                (double) medSimple.mag, (double) medSimple.deg, medSimple.coord, '\0');
+                        sprintf(msg, "\r\nMedición: %3.2f m/s ; %3.2f%c  %s\r\n%c",
+                                (double) medSimple.mag, (double) medSimple.deg, 0xa7, medSimple.coord, '\0');
                     } else {
                         sprintf(msg, "\r\n NULL     NULL%c", '\0');
                     }
                     uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
                     modoActivo = Menu;
                 }
-                //                if (xQueueReceive(qSendMedicion, &medSimple, 50 / portTICK_PERIOD_MS) == pdTRUE) {
-                //                    sprintf(msg, "Medición: %4.4f m/s - %5.2f deg\r\n\0", medSimple.mag, medSimple.deg);
-                //                    uartSend((uint8_t *) msg, sizeof (msg), portMAX_DELAY);
-                //                } else {
-                //                    modoActivo = Menu;
-                //                }
                 break;
             case Medicion_Continua:
                 xQueueSend(qAnemometroModo, &modoActivo, portMAX_DELAY);
 
                 if (xQueueReceive(qSendMedicion, &medSimple, portMAX_DELAY) == pdTRUE) {
                     if (strcmp(medSimple.coord, " F ") != 0) {
-                        //                    sprintf(msg, "\r\nMedición: %4.2f m/s - %4.2f deg\r\n", medSimple.mag, medSimple.deg);
-                        sprintf(msg, "\r\n %3.2f     %3.2f  %s%c",
-                                (double) medSimple.mag, (double) medSimple.deg, medSimple.coord, '\0');
+                        sprintf(msg, "\r\nMedición: %3.2f m/s ; %3.2f%c   %s\r\n%c",
+                                (double) medSimple.mag, (double) medSimple.deg,0xa7, medSimple.coord, '\0');
+                        //                        sprintf(msg, "\r\n %3.2f     %3.2f  %s%c",
+                        //                                (double) medSimple.mag, (double) medSimple.deg, medSimple.coord, '\0');
                     } else {
                         sprintf(msg, "\r\n NULL     NULL%c", '\0');
                     }
@@ -214,7 +209,7 @@ static void uart_task(void *pvParameters) {
                 /*Si recibo cualquier caracter termino el modo continuo*/
                 if (uartRecv((uint8_t *) & exit, 1, 0) == 1) {
                     modoActivo = Menu;
-                    //                    anemometroAbortMed();
+                    anemometroAbortMed();
                 }
                 break;
             case Configuracion:

@@ -89,14 +89,14 @@
 #define DETECTION_THRESHOLD_S 0.9474
 
 //Correccion coord individual
-#define DETECT_SCALING_OE 0.71//0.6349	//0.9311
-#define DETECT_SCALING_NS 0.7//0.6442    //0.9027			   						  
+#define DETECT_SCALING_OE 1//0.71
+#define DETECT_SCALING_NS 1//0.7		   						  
 
-#define DETECT_OFFSET_OE 0.0813 //0.0638	
-#define DETECT_OFFSET_NS 0.1409 //0.1055
+#define DETECT_OFFSET_OE 0//0.0813 
+#define DETECT_OFFSET_NS 0//0.1409 
 
 //Correccion total
-#define ANGLE_SCALING 1//1.02
+#define ANGLE_SCALING 1.02
 #define ANGLE_OFFSET 8
 
 #define OFFSET_ERROR_EO 0

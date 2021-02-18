@@ -110,7 +110,7 @@ static void anemometro_main_task(void *pvParameters) {
     unsigned int firstPeriodFlag = 1;
     float soundSpeed = 345.7;
     float coordVmed[2];
-    uint32_t medPeriod = 5;
+    uint32_t medPeriod = 10;
     BaseType_t medState = pdFAIL;
 
     MUX_INPUT_INH(0);
@@ -134,13 +134,8 @@ static void anemometro_main_task(void *pvParameters) {
 
                 break;
             case Medicion_Simple:
-                //                simpleMed = anemometroGetMed();
-                //                simpleMed.mag = anemometroGetVcoord(emisorSelect);
-                //                medState = anemometroGetCoordTime(&simpleMed.mag, emisorSelect);
-                //                simpleMed.mag *= 1000000;
-                medState = anemometroVmedian(&coordVmed[0], &coordVmed[1]);
 
-                emisorSelect++;
+                medState = anemometroVmedian(&coordVmed[0], &coordVmed[1]);
 
                 if (medState == pdPASS) {
                     simpleMed = anemometroGetMed(coordVmed[0], coordVmed[1]);
@@ -149,16 +144,8 @@ static void anemometro_main_task(void *pvParameters) {
                 } else {
                     sprintf(simpleMed.coord, " F ");
                 }
-                //                anemometroGetTmedian(&simpleMed.mag, &simpleMed.deg, emisorSelect);
-                //                if (anemometroVmedian(&simpleMed.mag, &simpleMed.deg) == pdPASS) {
-                //                    sprintf(simpleMed.coord, "OK ");
-                //                } else {
-                //                    sprintf(simpleMed.coord, " F ");
-                //                }
 
                 uartSendMed(&simpleMed);
-
-                if (emisorSelect > TRANS_EMISOR_SUR) emisorSelect = TRANS_EMISOR_OESTE;
 
                 anemometroModoActivo = Menu;
                 break;
@@ -171,44 +158,35 @@ static void anemometro_main_task(void *pvParameters) {
 
                 medProgFlag = 1;
 
-                //                anemometroGetCoordTime(&simpleMed.mag, emisorSelect) * 1000000;
-                //                if (anemometroVmedian(&simpleMed.mag, &simpleMed.deg) == pdPASS) {
-                //                    sprintf(simpleMed.coord, "OK ");
-                //                } else {
-                //                    sprintf(simpleMed.coord, " F ");
-                //                }
-
                 if (anemometroVmedian(&coordVmed[0], &coordVmed[1]) == pdPASS) {
 
                     simpleMed = anemometroGetMed(coordVmed[0], coordVmed[1]);
-                    //                    simpleMed.mag = coordVmed[0];
-                    //                    simpleMed.deg = coordVmed[1];
-                    //                    sprintf(simpleMed.coord, "OK ");
+
                 } else {
                     sprintf(simpleMed.coord, " F ");
                 }
 
                 uartSendMed(&simpleMed);
 
-                auxV++;
-                if (auxV >= 7) {
-                    auxV = 0;
-                    //                    emisorSelect++;
-                    //                    emisorSelect += 2;
-                    if (emisorSelect > TRANS_EMISOR_SUR) {
-                        emisorSelect = TRANS_EMISOR_OESTE;
-                        //                        uartEndMode();
-                    }
-                    uartEndMode();
-                }
-                vTaskDelay(10 / portTICK_PERIOD_MS);
+                //                auxV++;
+                //                if (auxV >= 7) {
+                //                    auxV = 0;
+                //                    //                    emisorSelect++;
+                //                    //                    emisorSelect += 2;
+                //                    if (emisorSelect > TRANS_EMISOR_SUR) {
+                //                        emisorSelect = TRANS_EMISOR_OESTE;
+                //                        //                        uartEndMode();
+                //                    }
+                //                    uartEndMode();
+                //                }
+                //                vTaskDelay(10 / portTICK_PERIOD_MS);
 
                 anemometroModoActivo = uartGetMode();
 
                 medProgFlag = 0;
 
                 if (anemometroModoActivo == Medicion_Continua) {
-                    //                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
+                    vTaskDelayUntil(&xLastWakeTime, (medPeriod * 1000) / portTICK_PERIOD_MS);
                 }
 
                 break;
